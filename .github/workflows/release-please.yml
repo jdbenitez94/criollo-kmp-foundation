@@ -1,0 +1,42 @@
+# release-please on main: opens/updates a release PR from conventional commits.
+# When that PR merges, it creates tag vX.Y.Z + GitHub Release, then publishes to Maven Central
+# in this same workflow (GITHUB_TOKEN tag pushes do not trigger release.yml).
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+env:
+  # Prefer Node.js 24 LTS for JS actions; release-please-action@v5 already declares node24.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-24.04
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Release Please
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0 (node24)
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    name: Publish Maven Central
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/publish-maven-central.yml
+    secrets: inherit
+    with:
+      ref: ${{ needs.release-please.outputs.tag_name }}

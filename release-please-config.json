@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "version-file": "version.txt",
+      "package-name": "criollo-kmp-foundation",
+      "changelog-path": "CHANGELOG.md",
+      "initial-version": "0.1.0",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
+      "pull-request-title-pattern": "chore${scope}: release${component} ${version}",
+      "extra-files": [
+        {
+          "type": "generic",
+          "path": "build-logic/convention/src/main/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/buildlogic/ProjectConfig.kt"
+        }
+      ]
+    }
+  }
+}
