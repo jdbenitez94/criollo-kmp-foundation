@@ -1,0 +1,67 @@
+name: 'Setup Gradle for CI'
+description: 'Configures Gradle environment for CI/CD with optimized settings injected directly into gradle.properties'
+
+inputs:
+  jdk-version:
+    description: 'JDK version to use'
+    required: true
+  jdk-distribution:
+    description: 'JDK distribution (e.g., temurin)'
+    required: true
+  gradle-memory:
+    description: 'Memory allocation for Gradle (e.g., 3072M)'
+    required: true
+  cache-read-only:
+    description: >
+      Whether Gradle User Home cache is read-only. Prefer write only on long-lived
+      branches (main/dev); PRs and feature branches should be read-only.
+    required: false
+    default: 'false'
+  cache-encryption-key:
+    description: 'Encryption key for Gradle configuration-cache entries in the Actions cache (GRADLE_ENCRYPTION_KEY)'
+    required: false
+  dependency-graph:
+    description: 'Enable dependency graph generation (generate-and-submit, generate, or disabled)'
+    required: false
+    default: 'disabled'
+
+outputs:
+  gradle-opts:
+    description: 'GRADLE_OPTS environment variable value'
+    value: ${{ steps.config.outputs.gradle-opts }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up JDK
+      uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+      with:
+        java-version: ${{ inputs.jdk-version }}
+        distribution: ${{ inputs.jdk-distribution }}
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+      with:
+        cache-read-only: ${{ inputs.cache-read-only }}
+        cache-encryption-key: ${{ inputs.cache-encryption-key }}
+        cache-cleanup: 'on-success'
+        add-job-summary: 'on-failure'
+        dependency-graph: ${{ inputs.dependency-graph }}
+
+    - name: Configure Gradle for CI
+      id: config
+      shell: bash
+      run: |
+        echo "Injecting CI configuration into gradle.properties..."
+
+        sed -i "s/org.gradle.jvmargs=-Xmx[0-9]*[a-zA-Z]*/org.gradle.jvmargs=-Xmx${{ inputs.gradle-memory }}/" gradle.properties
+        sed -i "s/kotlin.daemon.jvmargs=-Xmx[0-9]*[a-zA-Z]*/kotlin.daemon.jvmargs=-Xmx${{ inputs.gradle-memory }}/" gradle.properties
+
+        sed -i "s/org.gradle.daemon=true/org.gradle.daemon=false/" gradle.properties
+        sed -i "s/org.gradle.vfs.watch=true/org.gradle.vfs.watch=false/" gradle.properties
+
+        sed -i "s/org.gradle.workers.max=[0-9]*/org.gradle.workers.max=2/" gradle.properties
+
+        GRADLE_OPTS="-Dorg.gradle.console=plain -Dfile.encoding=UTF-8"
+        echo "GRADLE_OPTS=${GRADLE_OPTS}" >> $GITHUB_ENV
+        echo "gradle-opts=${GRADLE_OPTS}" >> $GITHUB_OUTPUT

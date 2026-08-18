@@ -1,0 +1,12 @@
+---
+# YAML lint for GitHub Actions workflows and repo YAML files.
+# https://yamllint.readthedocs.io/en/stable/configuration.html
+
+extends: default
+
+rules:
+  truthy: disable
+  line-length:
+    max: 120
+    level: warning
+  document-start: disable

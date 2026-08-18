@@ -1,0 +1,38 @@
+# Manual / external tag push (e.g. git tag vX.Y.Z && git push origin vX.Y.Z).
+# release-please creates tags with GITHUB_TOKEN and publishes via release-please.yml instead.
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish Maven Central
+    uses: ./.github/workflows/publish-maven-central.yml
+    secrets: inherit
+
+  github-release:
+    name: GitHub Release notes
+    needs: publish
+    runs-on: ubuntu-24.04
+    # Skip if release-please (or a human) already created this release.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Create GitHub Release if missing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "GitHub Release $GITHUB_REF_NAME already exists; skipping."
+            exit 0
+          fi
+          gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
