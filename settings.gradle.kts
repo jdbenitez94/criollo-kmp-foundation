@@ -64,6 +64,7 @@ plugins {
 // pluginManagement.includeBuild alone only covers plugin markers, not buildscript deps.
 includeBuild("build-logic")
 
+include(":bom")
 include(":coroutines")
 include(":coroutines:compose")
 include(":coroutines:viewmodel")
