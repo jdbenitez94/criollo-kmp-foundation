@@ -1,0 +1,45 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+max_line_length = 180
+
+[*.ts]
+indent_size = 4
+
+[*.{kt,kts}]
+indent_size = 4
+ktlint_code_style = intellij_idea
+ktlint_standard = enabled
+ktlint_experimental = disabled
+ktlint_standard_comment-wrapping = disabled
+ktlint_standard_kdoc-wrapping = disabled
+ktlint_standard_backing-property-naming = disabled
+ktlint_standard_property-naming = disabled
+ktlint_standard_filename = disabled
+ktlint_standard_function-naming = disabled
+ktlint_standard_no-empty-file = disabled
+ktlint_standard_no-wildcard-imports = enabled
+ktlint_function_naming_ignore_when_annotated_with = Composable
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
+ij_continuation_indent_size = 4
+ij_kotlin_name_count_to_use_star_import = 2147483647
+ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+ij_kotlin_imports_layout = *,java.**,javax.**,kotlin.**,^
+
+[**/src/test/**/*.kt]
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_function-naming = disabled
+
+[**/generated/**/*.kt]
+ktlint_ignore = true
+
+[*.md]
+trim_trailing_whitespace = false

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+echo "=========================================="
+echo "criollo-kmp-foundation pre-push verification"
+echo "=========================================="
+echo ""
+
+REPO_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$REPO_DIR" || exit 1
+
+LOG_DIR="$REPO_DIR/build/hooks/logs"
+mkdir -p "$LOG_DIR"
+
+# Do not override org.gradle.jvmargs — MaxMetaspaceSize=512m OOMs KMP verification.
+CMD="./gradlew qualityCheck jvmLibraryTests --configuration-cache --configuration-cache-problems=warn --no-daemon"
+echo "Running: $CMD"
+
+if ! $CMD >"$LOG_DIR/pre-push-gradle.log" 2>&1; then
+  echo "ERROR: pre-push Gradle verification failed"
+  echo "See: $LOG_DIR/pre-push-gradle.log"
+  echo "Fix: ./gradlew qualityCheck jvmLibraryTests --configuration-cache --configuration-cache-problems=warn"
+  exit 1
+fi
+
+echo "Pre-push checks passed."
