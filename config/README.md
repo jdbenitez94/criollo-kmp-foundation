@@ -12,6 +12,13 @@ Shared static-analysis policy lives under [`detekt/`](detekt/):
 
 Consumer repos can sync these files with the [`project-conventions`](../docs/project-conventions.md) Gradle plugin.
 
+## OWASP Dependency Check
+
+[`owasp/suppressions.xml`](owasp/suppressions.xml) documents accepted CPE false positives
+(Dokka/stdlib mapped to the Kotlin compiler CVE) and the NVD range quirk for Kotlin
+`2.4.20-RC` until `2.4.20` final. Jackson on Dokka classpaths is forced to a patched
+line in `DokkaConventionPlugin` rather than suppressed.
+
 ## YAML lint
 
 [`.yamllint`](.yamllint) configures YAML lint for GitHub Actions workflows and other repo YAML when you run `yamllint` locally.

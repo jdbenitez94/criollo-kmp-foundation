@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!--
+      CVE-2026-53914 is unsafe deserialization of Kotlin *compiler* build-cache
+      metadata (fixed in 2.4.20-Beta1). OWASP maps many JetBrains artifacts to
+      the kotlin CPE, including Dokka and the stdlib.
+    -->
+    <suppress>
+        <notes><![CDATA[
+            Dokka 2.2.0 is identified as JetBrains Kotlin 2.2.0 via CPE. The
+            artifact is the documentation engine, not the Kotlin compiler.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.dokka/.*$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+            kotlin-stdlib / reflect / jdk7 / jdk8 / script-runtime are not the
+            compiler build-cache path described by CVE-2026-53914. Dokka still
+            pulls older stdlib (2.0.21) onto its generator classpath.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(stdlib.*|reflect|script-runtime)$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+            IntelliJ-forked kotlinx-coroutines bundled inside the Kotlin compiler
+            distribution. CPE matches "Kotlin 1.10.2", not the compiler CVE.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.intellij\.deps\.kotlinx/.*$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+    <!--
+      NVD range is "before 2.4.20". Maven treats 2.4.20-RC as earlier than 2.4.20,
+      so the compiler artifacts can still match until the stable release. Drop
+      this block when kotlin is pinned to 2.4.20 (no qualifier).
+    -->
+    <suppress until="2026-10-01Z">
+        <notes><![CDATA[
+            This repo uses Kotlin 2.4.20-RC, which includes the GHSA-r937-wjx7-w2jp
+            fix (landed in 2.4.20-Beta1). Temporary until 2.4.20 final is available.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(compiler.*|gradle-plugin.*|build-tools-api)$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+</suppressions>

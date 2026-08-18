@@ -1,18 +1,23 @@
 [versions]
 agp = "9.3.1"
-kotlin = "2.4.10"
+# 2.4.20-RC is the first line that includes CVE-2026-53914 (GHSA-r937-wjx7-w2jp).
+# Stable 2.4.20 was not on Maven Central yet when this pin was set.
+kotlin = "2.4.20-RC"
 compose-multiplatform = "1.11.1"
 androidx-lifecycle-kmp = "2.11.0"
 coroutines = "1.11.0"
 detekt = "1.23.8"
 # alpha.4+ detekt-test requests unpublished detekt-api test-fixtures (detekt/detekt#9543)
-detekt2 = "2.0.0-alpha.5"
+detekt2 = "2.0.0-alpha.6"
 ktlint-engine = "1.8.0"
 ktlint-engine-legacy = "1.5.0"
 klint = "14.2.0"
 dokka = "2.2.0"
+# Dokka 2.2.0 still ships jackson-databind 2.15.3 (CVE-2026-54512/54513).
+# Dokka 2.1+ is safe for user Jackson upgrades; force this on Dokka classpaths.
+jackson = "2.22.2"
 kover = "0.9.9"
-dependencycheck = "12.2.2"
+dependencycheck = "13.0.0"
 strikt = "0.35.1"
 
 [plugins]

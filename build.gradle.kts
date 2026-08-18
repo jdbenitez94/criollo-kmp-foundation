@@ -16,6 +16,7 @@ plugins {
 
 dependencyCheck {
     failBuildOnCVSS = 7.0f
+    suppressionFile = "config/owasp/suppressions.xml"
 
     // Without an NVD API key, CVE DB updates are rate-limited and can take tens of minutes.
     // Request a key: https://nvd.nist.gov/developers/request-an-api-key
