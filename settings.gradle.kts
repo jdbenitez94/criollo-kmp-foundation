@@ -65,6 +65,7 @@ plugins {
 includeBuild("build-logic")
 
 include(":coroutines")
+include(":coroutines:compose")
 
 check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
     """
