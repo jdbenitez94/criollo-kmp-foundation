@@ -64,6 +64,8 @@ plugins {
 // pluginManagement.includeBuild alone only covers plugin markers, not buildscript deps.
 includeBuild("build-logic")
 
+include(":coroutines")
+
 check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
     """
       Criollo KMP Foundation requires JDK 21+ but it is currently using JDK ${JavaVersion.current()}.
