@@ -7,13 +7,13 @@ is missing or the Codecov upload errors. Codacy coverage stays best-effort.
 Store tokens in gitignored `local.properties` and sync to GitHub Actions secrets
 (never commit tokens).
 
-| `local.properties` key | GitHub Actions secret |
-|------------------------|------------------------|
-| `codecovRepositoryToken` (or `codecovToken`) | `CODECOV_TOKEN` |
-| `codacyApiToken` (or `codacyToken`) | `CODACY_API_TOKEN` (preferred) |
-| `codacyProjectToken` | `CODACY_PROJECT_TOKEN` (fallback) |
-| `gradleEncryptionKey` | `GRADLE_ENCRYPTION_KEY` |
-| `nvdApiKey` | `NVD_API_KEY` |
+| `local.properties` key                          | GitHub Actions secret |
+|-------------------------------------------------|------------------------|
+| `codecovRepositoryToken` (or `codecovApiToken`) | `CODECOV_TOKEN` |
+| `codacyApiToken` (or `codacyToken`)             | `CODACY_API_TOKEN` (preferred) |
+| `codacyProjectToken`                            | `CODACY_PROJECT_TOKEN` (fallback) |
+| `gradleEncryptionKey`                           | `GRADLE_ENCRYPTION_KEY` |
+| `nvdApiKey`                                     | `NVD_API_KEY` |
 
 Sync example (values never printed):
 
@@ -32,9 +32,10 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
 2. Add **`jdbenitez94/criollo-kmp-foundation`** and open **Setup Repo**.
 3. Copy the **Repository Upload Token**.
 4. Put it in `local.properties` as `codecovRepositoryToken=…` and sync `CODECOV_TOKEN`.
-5. CI uploads `**/build/reports/kover/report.xml` after `koverXmlReport`.
-   Missing token or upload errors fail Quality. The action is SHA-pinned
-   (`codecov-action` v7); floating `@v5` is not allowed with `sha_pinning_required`.
+5. CI uploads Kover XML as coverage and Gradle `TEST-*.xml` as Test Analytics
+   (`report_type: test_results` on the same SHA-pinned `codecov-action` v7).
+   Do not use floating `codecov-action@v5` or deprecated `test-results-action@v1`.
+   Missing token or upload errors fail Quality.
 
 ---
 
