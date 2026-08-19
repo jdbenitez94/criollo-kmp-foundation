@@ -1,7 +1,8 @@
 # Status and coverage badge setup
 
 Manual steps for third-party badge integrations used in `README.md`.
-CI **requires** Codecov and Codacy secrets; builds fail if they are missing.
+CI **requires** Codecov and Codacy secrets to attempt uploads; coverage
+providers must not fail the Quality job if the SaaS repo is not onboarded yet.
 
 Store tokens in gitignored `local.properties` and sync to GitHub Actions secrets
 (never commit tokens).
@@ -32,6 +33,7 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
 3. Copy the **Repository Upload Token**.
 4. Put it in `local.properties` as `codecovToken=…` and sync `CODECOV_TOKEN` (table above).
 5. CI uploads `**/build/reports/kover/report.xml` after `koverXmlReport`.
+   Upload errors (`Repository not found`) do not fail Quality.
 
 ---
 

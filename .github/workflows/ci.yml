@@ -78,15 +78,17 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: env.HAS_REPO_SECRETS == 'true'
+        continue-on-error: true
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: jdbenitez94/criollo-kmp-foundation
           files: build/reports/kover/report.xml
-          fail_ci_if_error: true
+          fail_ci_if_error: false
 
       - name: Upload coverage to Codacy
         if: env.HAS_REPO_SECRETS == 'true'
+        continue-on-error: true
         uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
         with:
           # Prefer account API token; project-token wins inside the action if both are set.
