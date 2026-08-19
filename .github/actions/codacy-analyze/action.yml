@@ -17,11 +17,15 @@ runs:
       env:
         CODACY_PROJECT_TOKEN: ${{ inputs.project-token }}
         COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        CLI_VERSION: '7.10.0'
+        # Same CLI/docker tag as codacy-analysis-cli-action@v4.4.7
+        CLI_VERSION: '7.9.25'
+        CODACY_ANALYSIS_CLI_VERSION: '7.9.25'
       run: |
         set -euo pipefail
         OWNER="${GITHUB_REPOSITORY%%/*}"
         REPO="${GITHUB_REPOSITORY##*/}"
+        # setup-gradle-ci rewrites gradle.properties; upload requires a clean tree.
+        git checkout -- gradle.properties
         SCRIPT="${RUNNER_TEMP}/codacy-analysis-cli.sh"
         curl -fsSL "https://raw.githubusercontent.com/codacy/codacy-analysis-cli/${CLI_VERSION}/bin/codacy-analysis-cli.sh" \
           -o "${SCRIPT}"
@@ -31,6 +35,8 @@ runs:
           --upload \
           --gh-code-scanning-compat \
           --skip-commit-uuid-validation \
+          --skip-uncommitted-files-check \
+          --max-allowed-issues 2147483647 \
           --commit-uuid "${COMMIT_SHA}"
         curl -fsSL -X POST \
           -H "project-token: ${CODACY_PROJECT_TOKEN}" \

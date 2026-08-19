@@ -97,7 +97,11 @@ layout, so AGP `compileSdk = 37` resolves. See [`action.yml`](../actions/setup-a
 
 Runs the Codacy Analysis CLI script (pinned CLI tag) and uploads results.
 Does not use `codacy-analysis-cli-action`, whose nested `actions/setup-go@v3`
-fails `sha_pinning_required`. See [`action.yml`](../actions/codacy-analyze/action.yml).
+fails `sha_pinning_required`. Restores `gradle.properties` after
+`setup-gradle-ci` rewrites it so `--upload` is not exit 11. See
+[`action.yml`](../actions/codacy-analyze/action.yml).
+
+## Local parity
 
 ```bash
 ./gradlew installGitHooks
