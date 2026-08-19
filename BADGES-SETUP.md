@@ -63,8 +63,9 @@ awk -F= '/^nvdApiKey=/{print substr($0,index($0,"=")+1)}' local.properties \
   | gh secret set NVD_API_KEY -R jdbenitez94/criollo-kmp-foundation
 ```
 
-CI fails the security job if `NVD_API_KEY` is missing. The Gradle User Home cache (via
-`setup-gradle` + `GRADLE_ENCRYPTION_KEY`) retains NVD data between runs on `main`/`dev`.
+CI fails the security job if `NVD_API_KEY` is missing on maintainer PRs and pushes.
+Dependabot and fork PRs skip that job (GitHub withholds Actions secrets). NVD data is
+cached in Actions under `OWASP_NVD_DIR` (not Gradle User Home), including on PRs.
 
 ---
 

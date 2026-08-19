@@ -27,6 +27,13 @@ dependencyCheck {
         validForHours = 24
     }
 
+    // CI caches this directory separately from Gradle User Home (PR caches are read-only).
+    providers.environmentVariable("OWASP_NVD_DIR").orNull?.let { nvdDir ->
+        data {
+            directory = nvdDir
+        }
+    }
+
     // KMP/JVM/Android libraries — skip ecosystem analyzers we never ship.
     analyzers {
         assemblyEnabled = false

@@ -6,8 +6,8 @@ CI for the Criollo KMP Foundation monorepo.
 
 | Job | Purpose |
 |-----|---------|
-| `security` | OWASP `dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`) |
-| `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; Codacy analysis + coverage; Codecov upload |
+| `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; Codacy analysis + coverage; Codecov upload. Runs **in parallel** with security so an NVD timeout cannot skip tests. |
+| `security` | OWASP `dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`). Dedicated Actions cache for the NVD DB (`OWASP_NVD_DIR`); skipped on Dependabot and fork PRs (no secrets). |
 
 Required secrets: `CODECOV_TOKEN`, `CODACY_PROJECT_TOKEN`, `GRADLE_ENCRYPTION_KEY`,
 `NVD_API_KEY` (see [`BADGES-SETUP.md`](../../BADGES-SETUP.md)).
@@ -22,7 +22,11 @@ changes are skipped via `paths-ignore`), matching Saveable.
 | Push to `main` / `dev` | Read + **write** (seeds shared cache) |
 | PRs into `main` / `dev`, `feature/*`, other branches, tags | **Read-only** |
 
-GitHub Actions only restores caches from the **same branch**, the **PR base branch**, or the
+NVD data is **not** stored in Gradle User Home. The security job uses a separate
+`actions/cache` keyed by UTC day (`owasp-nvd-<os>-<date>`) and **saves on PRs**, so the
+first daily download is slow and later runs reuse it.
+
+GitHub Actions only restores Gradle caches from the **same branch**, the **PR base branch**, or the
 **default branch**. Prefer opening feature work as PRs into `dev` so jobs reuse the `dev`
 cache; after release squash, `main` also writes a cache line.
 
