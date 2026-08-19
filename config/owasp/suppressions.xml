@@ -4,22 +4,24 @@
       CVE-2026-53914 is unsafe deserialization of Kotlin *compiler* build-cache
       metadata (fixed in 2.4.20-Beta1). OWASP maps many JetBrains artifacts to
       the kotlin CPE, including Dokka and the stdlib.
+
+      packageUrl regex must include @version (OWASP purl form pkg:maven/g/a@v).
     -->
     <suppress>
         <notes><![CDATA[
-            Dokka 2.2.0 is identified as JetBrains Kotlin 2.2.0 via CPE. The
-            artifact is the documentation engine, not the Kotlin compiler.
+            Dokka is identified as JetBrains Kotlin via CPE. The artifact is the
+            documentation engine, not the Kotlin compiler.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.dokka/.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.dokka/[^@]+@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
             kotlin-stdlib / reflect / jdk7 / jdk8 / script-runtime are not the
             compiler build-cache path described by CVE-2026-53914. Dokka still
-            pulls older stdlib (2.0.21) onto its generator classpath.
+            pulls older stdlib onto its generator classpath.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(stdlib.*|reflect|script-runtime)$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(stdlib[^@]*|reflect|script-runtime)@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
     <suppress>
@@ -27,7 +29,7 @@
             IntelliJ-forked kotlinx-coroutines bundled inside the Kotlin compiler
             distribution. CPE matches "Kotlin 1.10.2", not the compiler CVE.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.intellij\.deps\.kotlinx/.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.intellij\.deps\.kotlinx/[^@]+@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
     <!--
@@ -40,7 +42,7 @@
             Accepted on Kotlin 2.4.10 until 2.4.20 stable. Exploit needs local
             high-privilege write to the compiler build cache (JetBrains CVSS 6.7).
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(compiler.*|gradle-plugin.*|build-tools-api)$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(compiler[^@]*|gradle-plugin[^@]*|build-tools-api)@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
 </suppressions>
