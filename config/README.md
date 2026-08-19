@@ -15,9 +15,10 @@ Consumer repos can sync these files with the [`project-conventions`](../docs/pro
 ## OWASP Dependency Check
 
 [`owasp/suppressions.xml`](owasp/suppressions.xml) documents accepted CPE false positives
-(Dokka/stdlib mapped to the Kotlin compiler CVE) and the NVD range quirk for Kotlin
-`2.4.20-RC` until `2.4.20` final. Jackson on Dokka classpaths is forced to a patched
-line in `DokkaConventionPlugin` rather than suppressed.
+(Dokka/stdlib mapped to the Kotlin compiler CVE) and a dated suppression for
+CVE-2026-53914 on Kotlin 2.4.10 compiler/KGP until 2.4.20 stable. Jackson on Dokka
+classpaths is forced to a patched line in `DokkaConventionPlugin` rather than
+suppressed.
 
 ## YAML lint
 

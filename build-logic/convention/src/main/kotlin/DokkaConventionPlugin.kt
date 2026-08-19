@@ -16,10 +16,11 @@ class DokkaConventionPlugin : Plugin<Project> {
         val jackson = libsVersion("jackson")
         configurations.configureEach {
             resolutionStrategy.eachDependency {
-                if (requested.group.startsWith("com.fasterxml.jackson")) {
-                    useVersion(jackson)
-                    because("Dokka 2.2.0 ships Jackson 2.15.3 (CVE-2026-54512/54513)")
-                }
+                if (!requested.group.startsWith("com.fasterxml.jackson")) return@eachDependency
+                // jackson-annotations is versioned as 2.22 (no patch); databind is 2.22.2.
+                if (requested.name == "jackson-annotations") return@eachDependency
+                useVersion(jackson)
+                because("Dokka 2.2.0 ships Jackson 2.15.3 (CVE-2026-54512/54513)")
             }
         }
     }

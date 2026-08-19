@@ -31,14 +31,14 @@
         <cve>CVE-2026-53914</cve>
     </suppress>
     <!--
-      NVD range is "before 2.4.20". Maven treats 2.4.20-RC as earlier than 2.4.20,
-      so the compiler artifacts can still match until the stable release. Drop
-      this block when kotlin is pinned to 2.4.20 (no qualifier).
+      Stay on Kotlin 2.4.10 stable. CVE-2026-53914 is the compiler build-cache
+      issue (GHSA-r937-wjx7-w2jp); JetBrains scores 6.7, NVD 9.8 trips
+      failBuildOnCVSS=7.0. Drop when kotlin is pinned to 2.4.20 stable.
     -->
     <suppress until="2026-10-01Z">
         <notes><![CDATA[
-            This repo uses Kotlin 2.4.20-RC, which includes the GHSA-r937-wjx7-w2jp
-            fix (landed in 2.4.20-Beta1). Temporary until 2.4.20 final is available.
+            Accepted on Kotlin 2.4.10 until 2.4.20 stable. Exploit needs local
+            high-privilege write to the compiler build cache (JetBrains CVSS 6.7).
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(compiler.*|gradle-plugin.*|build-tools-api)$</packageUrl>
         <cve>CVE-2026-53914</cve>
