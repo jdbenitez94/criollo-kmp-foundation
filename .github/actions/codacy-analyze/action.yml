@@ -1,0 +1,38 @@
+name: 'Codacy analysis CLI'
+description: >
+  Runs Codacy Analysis CLI (dockerized tools) and uploads results. Avoids
+  codacy-analysis-cli-action, which nests unpinned actions/setup-go@v3 and
+  fails sha_pinning_required even when Staticcheck is off.
+
+inputs:
+  project-token:
+    description: Codacy project API token
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Run Codacy Analysis CLI
+      shell: bash
+      env:
+        CODACY_PROJECT_TOKEN: ${{ inputs.project-token }}
+        COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        CLI_VERSION: '7.10.0'
+      run: |
+        set -euo pipefail
+        OWNER="${GITHUB_REPOSITORY%%/*}"
+        REPO="${GITHUB_REPOSITORY##*/}"
+        SCRIPT="${RUNNER_TEMP}/codacy-analysis-cli.sh"
+        curl -fsSL "https://raw.githubusercontent.com/codacy/codacy-analysis-cli/${CLI_VERSION}/bin/codacy-analysis-cli.sh" \
+          -o "${SCRIPT}"
+        chmod +x "${SCRIPT}"
+        "${SCRIPT}" analyze \
+          --project-token "${CODACY_PROJECT_TOKEN}" \
+          --upload \
+          --gh-code-scanning-compat \
+          --skip-commit-uuid-validation \
+          --commit-uuid "${COMMIT_SHA}"
+        curl -fsSL -X POST \
+          -H "project-token: ${CODACY_PROJECT_TOKEN}" \
+          -H "Content-type: application/json" \
+          "https://api.codacy.com/2.0/gh/${OWNER}/${REPO}/commit/${COMMIT_SHA}/resultsFinal"

@@ -42,7 +42,7 @@ awk -F= '/^codacyToken=/{print substr($0,index($0,"=")+1)}' local.properties \
    (also available under repository API tokens).
 4. Put it in `local.properties` as `codacyProjectToken=…` and sync `CODACY_PROJECT_TOKEN`.
 5. CI runs:
-   - `codacy/codacy-analysis-cli-action` (upload, `max-allowed-issues: 0`)
+   - `.github/actions/codacy-analyze` (pinned Analysis CLI + upload)
    - `codacy/codacy-coverage-reporter-action` with the Kover XML report
 
 Grade badge: Shields.io `codacy/grade/github/jdbenitez94/criollo-kmp-foundation`

@@ -77,12 +77,9 @@ jobs:
 
       - name: Codacy static analysis
         if: env.HAS_REPO_SECRETS == 'true'
-        uses: codacy/codacy-analysis-cli-action@562ee3e92b8e92df8b67e0a5ff8aa8e261919c08 # v4.4.7
+        uses: ./.github/actions/codacy-analyze
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          upload: true
-          gh-code-scanning-compat: true
-          # Detekt/KtLint remain the local quality gates; Codacy upload is mandatory.
 
       - name: Upload coverage to Codecov
         if: env.HAS_REPO_SECRETS == 'true'

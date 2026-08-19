@@ -93,7 +93,11 @@ Uses the Ubuntu runner `ANDROID_HOME` (no third-party actions). Symlinks
 `platforms/android-37` → `android-37.0` when the image only ships the dotted
 layout, so AGP `compileSdk = 37` resolves. See [`action.yml`](../actions/setup-android-sdk/action.yml).
 
-## Local parity
+## Composite action: `codacy-analyze`
+
+Runs the Codacy Analysis CLI script (pinned CLI tag) and uploads results.
+Does not use `codacy-analysis-cli-action`, whose nested `actions/setup-go@v3`
+fails `sha_pinning_required`. See [`action.yml`](../actions/codacy-analyze/action.yml).
 
 ```bash
 ./gradlew installGitHooks
