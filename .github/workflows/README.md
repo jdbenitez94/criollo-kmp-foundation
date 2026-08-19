@@ -87,6 +87,12 @@ https://central.sonatype.com/publishing.
 
 Injects CI-friendly settings into [`gradle.properties`](../../gradle.properties) (daemon off, reduced workers, memory cap). See [`action.yml`](../actions/setup-gradle-ci/action.yml).
 
+## Composite action: `setup-android-sdk`
+
+Uses the Ubuntu runner `ANDROID_HOME` (no third-party actions). Symlinks
+`platforms/android-37` → `android-37.0` when the image only ships the dotted
+layout, so AGP `compileSdk = 37` resolves. See [`action.yml`](../actions/setup-android-sdk/action.yml).
+
 ## Local parity
 
 ```bash

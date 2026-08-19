@@ -1,0 +1,48 @@
+name: 'Ensure Android SDK platform'
+description: >
+  Uses the GitHub-hosted Ubuntu Android SDK (ANDROID_HOME). No third-party
+  actions. API 37 is installed on the image as platforms/android-37.0; Gradle
+  still looks for platforms/android-37, so this step symlinks or installs.
+
+runs:
+  using: composite
+  steps:
+    - name: Ensure platforms/android-37
+      shell: bash
+      run: |
+        set -euo pipefail
+        : "${ANDROID_HOME:?ANDROID_HOME must be set (ubuntu-24.04 runner image)}"
+        platforms="${ANDROID_HOME}/platforms"
+        wanted="${platforms}/android-37"
+        dotted="${platforms}/android-37.0"
+
+        if [[ -d "${wanted}" ]]; then
+          echo "Using ${wanted}"
+          exit 0
+        fi
+
+        if [[ -d "${dotted}" ]]; then
+          ln -s "${dotted}" "${wanted}"
+          echo "Symlinked android-37 -> android-37.0 (runner image layout)"
+          exit 0
+        fi
+
+        sdkmanager="$(find "${ANDROID_HOME}/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+        if [[ -z "${sdkmanager}" || ! -x "${sdkmanager}" ]]; then
+          echo "::error::sdkmanager not found under ${ANDROID_HOME}/cmdline-tools"
+          exit 1
+        fi
+
+        yes | "${sdkmanager}" --licenses >/dev/null || true
+        "${sdkmanager}" --install "platforms;android-37.0" || "${sdkmanager}" --install "platforms;android-37"
+
+        if [[ ! -d "${wanted}" && -d "${dotted}" ]]; then
+          ln -s "${dotted}" "${wanted}"
+        fi
+
+        if [[ ! -d "${wanted}" && ! -d "${dotted}" ]]; then
+          echo "::error::Failed to provision Android API 37 under ${platforms}"
+          ls -la "${platforms}" || true
+          exit 1
+        fi
+        echo "Provisioned Android API 37"

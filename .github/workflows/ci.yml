@@ -66,8 +66,8 @@ jobs:
           cache-read-only: ${{ env.GRADLE_CACHE_READ_ONLY }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
+      - name: Ensure Android SDK platform 37
+        uses: ./.github/actions/setup-android-sdk
 
       - name: Quality checks and JVM tests
         run: |
