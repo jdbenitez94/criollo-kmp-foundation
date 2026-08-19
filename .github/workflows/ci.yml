@@ -47,14 +47,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Require Codacy credentials
+      - name: Require coverage credentials
         if: env.HAS_REPO_SECRETS == 'true'
         env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           CODACY_API_TOKEN: ${{ secrets.CODACY_API_TOKEN }}
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: |
+          if [ -z "${CODECOV_TOKEN}" ]; then
+            echo "::error::CODECOV_TOKEN secret is required (see BADGES-SETUP.md)."
+            exit 1
+          fi
           if [ -z "${CODACY_API_TOKEN}" ] && [ -z "${CODACY_PROJECT_TOKEN}" ]; then
-            echo "::error::Set GitHub secret CODACY_API_TOKEN (account token) or CODACY_PROJECT_TOKEN (see BADGES-SETUP.md)."
+            echo "::error::Set GitHub secret CODACY_API_TOKEN or CODACY_PROJECT_TOKEN (see BADGES-SETUP.md)."
             exit 1
           fi
 
@@ -78,13 +83,12 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: env.HAS_REPO_SECRETS == 'true'
-        continue-on-error: true
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: jdbenitez94/criollo-kmp-foundation
           files: build/reports/kover/report.xml
-          fail_ci_if_error: false
+          fail_ci_if_error: true
 
       - name: Upload coverage to Codacy
         if: env.HAS_REPO_SECRETS == 'true'

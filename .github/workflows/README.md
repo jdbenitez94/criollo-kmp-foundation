@@ -6,7 +6,7 @@ CI for the Criollo KMP Foundation monorepo.
 
 | Job | Purpose |
 |-----|---------|
-| `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; best-effort Codecov + Codacy coverage. Runs **in parallel** with security so an NVD timeout cannot skip tests. Static analysis on Codacy is the GitHub App check, not a CLI upload. |
+| `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; required Codecov upload; best-effort Codacy coverage. Runs **in parallel** with security so an NVD timeout cannot skip tests. Static analysis on Codacy is the GitHub App check, not a CLI upload. |
 | `security` | OWASP `dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`). Dedicated Actions cache for the NVD DB (`OWASP_NVD_DIR`); skipped on Dependabot and fork PRs (no secrets). |
 
 Required secrets: `CODECOV_TOKEN`, `CODACY_API_TOKEN` (or `CODACY_PROJECT_TOKEN`),

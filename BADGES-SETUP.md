@@ -1,15 +1,15 @@
 # Status and coverage badge setup
 
 Manual steps for third-party badge integrations used in `README.md`.
-CI **requires** Codecov and Codacy secrets to attempt uploads; coverage
-providers must not fail the Quality job if the SaaS repo is not onboarded yet.
+CI **requires** Codecov and Codacy secrets. Quality fails if `CODECOV_TOKEN`
+is missing or the Codecov upload errors. Codacy coverage stays best-effort.
 
 Store tokens in gitignored `local.properties` and sync to GitHub Actions secrets
 (never commit tokens).
 
 | `local.properties` key | GitHub Actions secret |
 |------------------------|------------------------|
-| `codecovToken` | `CODECOV_TOKEN` |
+| `codecovRepositoryToken` (or `codecovToken`) | `CODECOV_TOKEN` |
 | `codacyApiToken` (or `codacyToken`) | `CODACY_API_TOKEN` (preferred) |
 | `codacyProjectToken` | `CODACY_PROJECT_TOKEN` (fallback) |
 | `gradleEncryptionKey` | `GRADLE_ENCRYPTION_KEY` |
@@ -18,7 +18,7 @@ Store tokens in gitignored `local.properties` and sync to GitHub Actions secrets
 Sync example (values never printed):
 
 ```bash
-awk -F= '/^codecovToken=/{print substr($0,index($0,"=")+1)}' local.properties \
+awk -F= '/^codecovRepositoryToken=/{print substr($0,index($0,"=")+1)}' local.properties \
   | gh secret set CODECOV_TOKEN -R jdbenitez94/criollo-kmp-foundation
 awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties \
   | gh secret set CODACY_API_TOKEN -R jdbenitez94/criollo-kmp-foundation
@@ -31,9 +31,10 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
 1. Sign in to [Codecov](https://codecov.io/) with GitHub.
 2. Add **`jdbenitez94/criollo-kmp-foundation`** and open **Setup Repo**.
 3. Copy the **Repository Upload Token**.
-4. Put it in `local.properties` as `codecovToken=…` and sync `CODECOV_TOKEN` (table above).
+4. Put it in `local.properties` as `codecovRepositoryToken=…` and sync `CODECOV_TOKEN`.
 5. CI uploads `**/build/reports/kover/report.xml` after `koverXmlReport`.
-   Upload errors (`Repository not found`) do not fail Quality.
+   Missing token or upload errors fail Quality. The action is SHA-pinned
+   (`codecov-action` v7); floating `@v5` is not allowed with `sha_pinning_required`.
 
 ---
 
