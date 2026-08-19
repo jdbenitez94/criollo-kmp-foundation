@@ -41,14 +41,13 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
 2. **Add organization** for the GitHub user `jdbenitez94`, then **Add Repository**
    **`criollo-kmp-foundation`**. Skip Segments if GitHub Custom Properties fail
    (personal GitHub accounts do not have them).
-3. Create an **account API token** (Codacy account → Access management / API tokens).
-   Put it in `local.properties` as `codacyApiToken=…` and sync `CODACY_API_TOKEN`.
-   CI sends `provider=gh`, `username=jdbenitez94`, `project=criollo-kmp-foundation`.
-4. Optional fallback: project API token as `CODACY_PROJECT_TOKEN` if you do not use
-   an account token.
-5. CI runs:
-   - `.github/actions/codacy-analyze` (pinned Analysis CLI + upload)
-   - `codacy/codacy-coverage-reporter-action` with the Kover XML report
+3. Project API token: Codacy repo → Settings → Integrations → Project API Token.
+   Put it in `local.properties` as `codacyProjectToken=…` and sync `CODACY_PROJECT_TOKEN`.
+   Optional: account API token as `CODACY_API_TOKEN` (CI prefers it when set).
+4. Leave **Run analysis on your build server** **off**. The GitHub App already
+   posts *Codacy Static Code Analysis* on PRs. Enabling that flag makes Codacy
+   wait for a CLI upload we do not send.
+5. CI uploads Kover XML via `codacy/codacy-coverage-reporter-action`.
 
 Grade badge: Shields.io `codacy/grade/github/jdbenitez94/criollo-kmp-foundation`
 (dashboard: https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard).

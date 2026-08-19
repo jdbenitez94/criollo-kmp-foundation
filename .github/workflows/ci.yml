@@ -76,13 +76,6 @@ jobs:
             --configuration-cache \
             --configuration-cache-problems=fail
 
-      - name: Codacy static analysis
-        if: env.HAS_REPO_SECRETS == 'true'
-        uses: ./.github/actions/codacy-analyze
-        with:
-          api-token: ${{ secrets.CODACY_API_TOKEN }}
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-
       - name: Upload coverage to Codecov
         if: env.HAS_REPO_SECRETS == 'true'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0

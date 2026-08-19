@@ -6,7 +6,7 @@ CI for the Criollo KMP Foundation monorepo.
 
 | Job | Purpose |
 |-----|---------|
-| `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; Codacy analysis + coverage; Codecov upload. Runs **in parallel** with security so an NVD timeout cannot skip tests. |
+| `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; Codecov + Codacy coverage. Runs **in parallel** with security so an NVD timeout cannot skip tests. Static analysis on Codacy is the GitHub App check, not a CLI upload. |
 | `security` | OWASP `dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`). Dedicated Actions cache for the NVD DB (`OWASP_NVD_DIR`); skipped on Dependabot and fork PRs (no secrets). |
 
 Required secrets: `CODECOV_TOKEN`, `CODACY_API_TOKEN` (or `CODACY_PROJECT_TOKEN`),
@@ -93,14 +93,6 @@ Injects CI-friendly settings into [`gradle.properties`](../../gradle.properties)
 Uses the Ubuntu runner `ANDROID_HOME` (no third-party actions). Symlinks
 `platforms/android-37` → `android-37.0` when the image only ships the dotted
 layout, so AGP `compileSdk = 37` resolves. See [`action.yml`](../actions/setup-android-sdk/action.yml).
-
-## Composite action: `codacy-analyze`
-
-Runs the Codacy Analysis CLI script (pinned CLI tag) and uploads results.
-Does not use `codacy-analysis-cli-action`, whose nested `actions/setup-go@v3`
-fails `sha_pinning_required`. Restores `gradle.properties` after
-`setup-gradle-ci` rewrites it so `--upload` is not exit 11. See
-[`action.yml`](../actions/codacy-analyze/action.yml).
 
 ## Local parity
 
