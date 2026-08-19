@@ -9,8 +9,8 @@ CI for the Criollo KMP Foundation monorepo.
 | `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; Codacy analysis + coverage; Codecov upload. Runs **in parallel** with security so an NVD timeout cannot skip tests. |
 | `security` | OWASP `dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`). Dedicated Actions cache for the NVD DB (`OWASP_NVD_DIR`); skipped on Dependabot and fork PRs (no secrets). |
 
-Required secrets: `CODECOV_TOKEN`, `CODACY_PROJECT_TOKEN`, `GRADLE_ENCRYPTION_KEY`,
-`NVD_API_KEY` (see [`BADGES-SETUP.md`](../../BADGES-SETUP.md)).
+Required secrets: `CODECOV_TOKEN`, `CODACY_API_TOKEN` (or `CODACY_PROJECT_TOKEN`),
+`GRADLE_ENCRYPTION_KEY`, `NVD_API_KEY` (see [`BADGES-SETUP.md`](../../BADGES-SETUP.md)).
 
 Triggers: push and pull_request to **`main`** and **`dev`** (docs-only / markdown-only
 changes are skipped via `paths-ignore`), matching Saveable.
@@ -68,7 +68,8 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 | `OSSRH_USERNAME` / `OSSRH_PASSWORD` | Central Publisher Portal **user token** (not legacy OSSRH) |
 | `SIGNING_KEY_ID` / `SIGNING_KEY` / `SIGNING_PASSWORD` | In-memory PGP signing for publications |
 | `CODECOV_TOKEN` | Codecov upload (required by `ci.yml`) |
-| `CODACY_PROJECT_TOKEN` | Codacy analysis + coverage upload (required by `ci.yml`) |
+| `CODACY_API_TOKEN` | Codacy account API token (preferred; analysis + coverage) |
+| `CODACY_PROJECT_TOKEN` | Codacy project token (fallback if `CODACY_API_TOKEN` is unset) |
 | `GRADLE_ENCRYPTION_KEY` | Encrypts Gradle configuration-cache entries in Actions cache (required for warm CC) |
 | `NVD_API_KEY` | NIST NVD API key for OWASP Dependency Check (required; avoids multi-minute rate limits) |
 

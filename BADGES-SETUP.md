@@ -9,7 +9,8 @@ Store tokens in gitignored `local.properties` and sync to GitHub Actions secrets
 | `local.properties` key | GitHub Actions secret |
 |------------------------|------------------------|
 | `codecovToken` | `CODECOV_TOKEN` |
-| `codacyToken` (or `codacyProjectToken`) | `CODACY_PROJECT_TOKEN` |
+| `codacyApiToken` (or `codacyToken`) | `CODACY_API_TOKEN` (preferred) |
+| `codacyProjectToken` | `CODACY_PROJECT_TOKEN` (fallback) |
 | `gradleEncryptionKey` | `GRADLE_ENCRYPTION_KEY` |
 | `nvdApiKey` | `NVD_API_KEY` |
 
@@ -18,8 +19,8 @@ Sync example (values never printed):
 ```bash
 awk -F= '/^codecovToken=/{print substr($0,index($0,"=")+1)}' local.properties \
   | gh secret set CODECOV_TOKEN -R jdbenitez94/criollo-kmp-foundation
-awk -F= '/^codacyToken=/{print substr($0,index($0,"=")+1)}' local.properties \
-  | gh secret set CODACY_PROJECT_TOKEN -R jdbenitez94/criollo-kmp-foundation
+awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties \
+  | gh secret set CODACY_API_TOKEN -R jdbenitez94/criollo-kmp-foundation
 ```
 
 ---
@@ -37,10 +38,14 @@ awk -F= '/^codacyToken=/{print substr($0,index($0,"=")+1)}' local.properties \
 ## 2. Code quality (Codacy) — required
 
 1. Sign in to [Codacy](https://www.codacy.com/) with GitHub.
-2. **Add Repository** → import **`criollo-kmp-foundation`**.
-3. In the project: **Settings → Integrations / Coverage → Project API Token**
-   (also available under repository API tokens).
-4. Put it in `local.properties` as `codacyProjectToken=…` and sync `CODACY_PROJECT_TOKEN`.
+2. **Add organization** for the GitHub user `jdbenitez94`, then **Add Repository**
+   **`criollo-kmp-foundation`**. Skip Segments if GitHub Custom Properties fail
+   (personal GitHub accounts do not have them).
+3. Create an **account API token** (Codacy account → Access management / API tokens).
+   Put it in `local.properties` as `codacyApiToken=…` and sync `CODACY_API_TOKEN`.
+   CI sends `provider=gh`, `username=jdbenitez94`, `project=criollo-kmp-foundation`.
+4. Optional fallback: project API token as `CODACY_PROJECT_TOKEN` if you do not use
+   an account token.
 5. CI runs:
    - `.github/actions/codacy-analyze` (pinned Analysis CLI + upload)
    - `codacy/codacy-coverage-reporter-action` with the Kover XML report

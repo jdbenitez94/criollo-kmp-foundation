@@ -47,13 +47,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Require Codacy project token
+      - name: Require Codacy credentials
         if: env.HAS_REPO_SECRETS == 'true'
         env:
+          CODACY_API_TOKEN: ${{ secrets.CODACY_API_TOKEN }}
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: |
-          if [ -z "${CODACY_PROJECT_TOKEN}" ]; then
-            echo "::error::CODACY_PROJECT_TOKEN secret is required. Add the Codacy project API token (see BADGES-SETUP.md)."
+          if [ -z "${CODACY_API_TOKEN}" ] && [ -z "${CODACY_PROJECT_TOKEN}" ]; then
+            echo "::error::Set GitHub secret CODACY_API_TOKEN (account token) or CODACY_PROJECT_TOKEN (see BADGES-SETUP.md)."
             exit 1
           fi
 
@@ -79,6 +80,7 @@ jobs:
         if: env.HAS_REPO_SECRETS == 'true'
         uses: ./.github/actions/codacy-analyze
         with:
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
       - name: Upload coverage to Codecov
@@ -94,7 +96,9 @@ jobs:
         if: env.HAS_REPO_SECRETS == 'true'
         uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
         with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          # Prefer account API token; project-token wins inside the action if both are set.
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
+          project-token: ${{ secrets.CODACY_API_TOKEN == '' && secrets.CODACY_PROJECT_TOKEN || '' }}
           coverage-reports: build/reports/kover/report.xml
 
   security:
