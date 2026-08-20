@@ -2,6 +2,12 @@
   "overrides": [
     {
       "files": ["**/webpack.config.d/**/*.js"],
+      "env": {
+        "node": true
+      },
+      "parserOptions": {
+        "ecmaVersion": 2020
+      },
       "globals": {
         "config": "writable"
       }

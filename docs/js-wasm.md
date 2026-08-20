@@ -7,7 +7,6 @@ Modules that target **JS browser** and/or **WasmJS browser** may ship a `webpack
 [`coroutines/webpack.config.d/resolve-fallback.js`](../coroutines/webpack.config.d/resolve-fallback.js) (also under `coroutines/compose` and `coroutines/viewmodel`) disables Node polyfills for `path` and `os`:
 
 ```js
-/* eslint-disable no-undef -- config is injected by Kotlin/JS webpack.config.d */
 config.resolve.fallback = {
     ...config.resolve.fallback,
     path: false,
