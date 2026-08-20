@@ -75,6 +75,7 @@ jobs:
             --configuration-cache-problems=fail
 
       # Gradle maven-publish is "Maven-API-like": finalize so the deployment appears in the Portal.
+      # user_managed stops after validation; release the deployment manually in the Portal UI.
       # https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
       - name: Finalize Central Portal deployment
         env:
@@ -82,8 +83,22 @@ jobs:
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_CENTRAL_NAMESPACE: ${{ vars.MAVEN_CENTRAL_NAMESPACE }}
         run: |
+          set -o pipefail
           AUTH="$(printf '%s:%s' "$OSSRH_USERNAME" "$OSSRH_PASSWORD" | base64 | tr -d '\n')"
-          curl --fail-with-body -X POST \
+          URL="https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${MAVEN_CENTRAL_NAMESPACE}?publishing_type=user_managed"
+          RESPONSE="$(curl --silent --show-error --connect-timeout 30 --max-time 300 \
+            --write-out $'\n%{http_code}' \
+            -X POST \
             -H "Authorization: Bearer ${AUTH}" \
             -H "Content-Type: application/json" \
-            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${MAVEN_CENTRAL_NAMESPACE}?publishing_type=user_managed"
+            "$URL")"
+          HTTP_CODE="${RESPONSE##*$'\n'}"
+          BODY="${RESPONSE%$'\n'*}"
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "::notice title=Maven Central::Upload finalized (user_managed). Publish manually at https://central.sonatype.com/publishing"
+            exit 0
+          fi
+
+          echo "::error title=Central Portal finalize failed (HTTP ${HTTP_CODE})::${BODY}"
+          exit 1

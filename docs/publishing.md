@@ -23,8 +23,9 @@ with in-memory PGP signing in CI.
 3. Merge that release PR → release-please creates tag `vX.Y.Z` + GitHub Release.
 4. The same workflow run publishes to Maven Central (see
    [`publish-maven-central.yml`](../.github/workflows/publish-maven-central.yml)).
-5. In <https://central.sonatype.com/publishing>, publish (or drop) the deployment if
-   `publishing_type=user_managed`.
+5. CI **Finalize Central Portal deployment** validates the upload and exposes it in the Portal
+   (`publishing_type=user_managed`). When that step is green, publish (or drop) the deployment at
+   <https://central.sonatype.com/publishing>.
 
 Bootstrap: `initial-version` is `0.1.0` so the first release PR is `0.1.0`. After that, SemVer follows commit types.
 
