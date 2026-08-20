@@ -14,8 +14,10 @@ enum class TaskJobState {
     Running,
 }
 
-fun TaskScope.taskState(key: TaskKey): StateFlow<TaskJobState> = (this as? StatefulTaskScope)?.taskState(key)
-    ?: error("taskState requires TaskScope created via TaskScope(coroutineScope)")
+fun TaskScope.taskState(key: TaskKey): StateFlow<TaskJobState> {
+    if (this is StatefulTaskScope) return taskState(key)
+    error("taskState requires TaskScope created via TaskScope(coroutineScope)")
+}
 
 internal interface StatefulTaskScope : TaskScope {
     fun taskState(key: TaskKey): StateFlow<TaskJobState>
@@ -43,7 +45,7 @@ internal class DefaultTaskScope(private val parentScope: CoroutineScope) : State
     override fun launch(key: TaskKey, policy: TaskPolicy, block: suspend CoroutineScope.() -> Unit): TaskLaunchResult {
         val started = lock.withLock {
             val activeJob = jobs[key]
-            if (activeJob?.isActive == true) {
+            if (activeJob != null && activeJob.isActive) {
                 when (policy) {
                     TaskPolicy.SkipIfActive -> return@withLock null
                     TaskPolicy.ReplaceActive -> activeJob.cancel()
@@ -96,6 +98,7 @@ internal class DefaultTaskScope(private val parentScope: CoroutineScope) : State
     }
 
     override fun isActive(key: TaskKey): Boolean = lock.withLock {
-        jobs[key]?.isActive == true
+        val job = jobs[key]
+        job != null && job.isActive
     }
 }

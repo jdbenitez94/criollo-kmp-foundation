@@ -52,8 +52,8 @@ jobs:
           EXPECTED="$(grep 'const val version' build-logic/convention/src/main/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/buildlogic/ProjectConfig.kt | sed -E 's/.*"([^"]+)".*/\1/')"
           test "$TAG" = "$EXPECTED"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
+      - name: Ensure Android SDK platform 37
+        uses: ./.github/actions/setup-android-sdk
 
       - name: Quality checks and tests
         run: |

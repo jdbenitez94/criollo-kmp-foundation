@@ -6,11 +6,11 @@ CI for the Criollo KMP Foundation monorepo.
 
 | Job | Purpose |
 |-----|---------|
-| `security` | OWASP `dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`) |
-| `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; Codacy analysis + coverage; Codecov upload |
+| `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; required Codecov coverage + Test Analytics; best-effort Codacy coverage. Runs **in parallel** with security so an NVD timeout cannot skip tests. Static analysis on Codacy is the GitHub App check, not a CLI upload. |
+| `security` | OWASP `dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`). Dedicated Actions cache for the NVD DB (`OWASP_NVD_DIR`); skipped on Dependabot and fork PRs (no secrets). |
 
-Required secrets: `CODECOV_TOKEN`, `CODACY_PROJECT_TOKEN`, `GRADLE_ENCRYPTION_KEY`,
-`NVD_API_KEY` (see [`BADGES-SETUP.md`](../../BADGES-SETUP.md)).
+Required secrets: `CODECOV_TOKEN`, `CODACY_API_TOKEN` (or `CODACY_PROJECT_TOKEN`),
+`GRADLE_ENCRYPTION_KEY`, `NVD_API_KEY` (see [`BADGES-SETUP.md`](../../BADGES-SETUP.md)).
 
 Triggers: push and pull_request to **`main`** and **`dev`** (docs-only / markdown-only
 changes are skipped via `paths-ignore`), matching Saveable.
@@ -22,7 +22,11 @@ changes are skipped via `paths-ignore`), matching Saveable.
 | Push to `main` / `dev` | Read + **write** (seeds shared cache) |
 | PRs into `main` / `dev`, `feature/*`, other branches, tags | **Read-only** |
 
-GitHub Actions only restores caches from the **same branch**, the **PR base branch**, or the
+NVD data is **not** stored in Gradle User Home. The security job uses a separate
+`actions/cache` keyed by UTC day (`owasp-nvd-<os>-<date>`) and **saves on PRs**, so the
+first daily download is slow and later runs reuse it.
+
+GitHub Actions only restores Gradle caches from the **same branch**, the **PR base branch**, or the
 **default branch**. Prefer opening feature work as PRs into `dev` so jobs reuse the `dev`
 cache; after release squash, `main` also writes a cache line.
 
@@ -64,7 +68,8 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 | `OSSRH_USERNAME` / `OSSRH_PASSWORD` | Central Publisher Portal **user token** (not legacy OSSRH) |
 | `SIGNING_KEY_ID` / `SIGNING_KEY` / `SIGNING_PASSWORD` | In-memory PGP signing for publications |
 | `CODECOV_TOKEN` | Codecov upload (required by `ci.yml`) |
-| `CODACY_PROJECT_TOKEN` | Codacy analysis + coverage upload (required by `ci.yml`) |
+| `CODACY_API_TOKEN` | Codacy account API token (preferred; analysis + coverage) |
+| `CODACY_PROJECT_TOKEN` | Codacy project token (fallback if `CODACY_API_TOKEN` is unset) |
 | `GRADLE_ENCRYPTION_KEY` | Encrypts Gradle configuration-cache entries in Actions cache (required for warm CC) |
 | `NVD_API_KEY` | NIST NVD API key for OWASP Dependency Check (required; avoids multi-minute rate limits) |
 
@@ -77,11 +82,17 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 Publish URL is the Portal OSSRH staging API
 (`ossrh-staging-api.central.sonatype.com`). After Gradle upload, publish calls
 `POST /manual/upload/defaultRepository/{namespace}` so the deployment is visible at
-https://central.sonatype.com/publishing.
+<https://central.sonatype.com/publishing>.
 
 ## Composite action: `setup-gradle-ci`
 
 Injects CI-friendly settings into [`gradle.properties`](../../gradle.properties) (daemon off, reduced workers, memory cap). See [`action.yml`](../actions/setup-gradle-ci/action.yml).
+
+## Composite action: `setup-android-sdk`
+
+Uses the Ubuntu runner `ANDROID_HOME` (no third-party actions). Symlinks
+`platforms/android-37` → `android-37.0` when the image only ships the dotted
+layout, so AGP `compileSdk = 37` resolves. See [`action.yml`](../actions/setup-android-sdk/action.yml).
 
 ## Local parity
 

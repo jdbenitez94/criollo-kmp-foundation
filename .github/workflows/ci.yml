@@ -33,10 +33,103 @@ env:
   # PRs and feature/* (etc.) are read-only and restore from the PR base branch and/or
   # the repo default branch (GitHub Actions cache scoping).
   GRADLE_CACHE_READ_ONLY: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
+  OWASP_NVD_DIR: ${{ github.workspace }}/.owasp-nvd
+  # Secrets are available on same-repo maintainer PRs and pushes, not Dependabot/forks.
+  HAS_REPO_SECRETS: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
 
 jobs:
+  # Independent of OWASP: a 60-minute NVD timeout must not skip tests.
+  build:
+    name: Quality, tests, and coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Require coverage credentials
+        if: env.HAS_REPO_SECRETS == 'true'
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          CODACY_API_TOKEN: ${{ secrets.CODACY_API_TOKEN }}
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: |
+          if [ -z "${CODECOV_TOKEN}" ]; then
+            echo "::error::CODECOV_TOKEN secret is required (see BADGES-SETUP.md)."
+            exit 1
+          fi
+          if [ -z "${CODACY_API_TOKEN}" ] && [ -z "${CODACY_PROJECT_TOKEN}" ]; then
+            echo "::error::Set GitHub secret CODACY_API_TOKEN or CODACY_PROJECT_TOKEN (see BADGES-SETUP.md)."
+            exit 1
+          fi
+
+      - name: Setup Gradle for CI
+        uses: ./.github/actions/setup-gradle-ci
+        with:
+          jdk-version: ${{ env.JDK_VERSION }}
+          jdk-distribution: ${{ env.JDK_DISTRIBUTION }}
+          gradle-memory: ${{ env.GRADLE_MEMORY }}
+          cache-read-only: ${{ env.GRADLE_CACHE_READ_ONLY }}
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Ensure Android SDK platform 37
+        uses: ./.github/actions/setup-android-sdk
+
+      - name: Quality checks and JVM tests
+        run: |
+          ./gradlew qualityCheck jvmLibraryTests koverXmlReport \
+            --configuration-cache \
+            --configuration-cache-problems=fail
+
+      - name: Collect JUnit reports
+        if: ${{ !cancelled() && env.HAS_REPO_SECRETS == 'true' }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/reports/junit
+          found=0
+          while IFS= read -r -d '' f; do
+            found=1
+            rel="${f#./}"
+            cp "$f" "build/reports/junit/$(echo "$rel" | tr '/ ' '__').junit.xml"
+          done < <(find . -path '*/build/test-results/*' -name 'TEST-*.xml' -print0)
+          if [ "$found" -eq 0 ]; then
+            echo "::error::No Gradle JUnit XML under **/build/test-results/**/TEST-*.xml"
+            exit 1
+          fi
+
+      - name: Upload coverage to Codecov
+        if: ${{ !cancelled() && env.HAS_REPO_SECRETS == 'true' }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: jdbenitez94/criollo-kmp-foundation
+          files: build/reports/kover/report.xml
+          disable_search: true
+          fail_ci_if_error: true
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() && env.HAS_REPO_SECRETS == 'true' }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: jdbenitez94/criollo-kmp-foundation
+          report_type: test_results
+          directory: build/reports/junit
+          fail_ci_if_error: true
+
+      - name: Upload coverage to Codacy
+        if: ${{ !cancelled() && env.HAS_REPO_SECRETS == 'true' }}
+        continue-on-error: true
+        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
+        with:
+          # Prefer account API token; project-token wins inside the action if both are set.
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
+          project-token: ${{ secrets.CODACY_API_TOKEN == '' && secrets.CODACY_PROJECT_TOKEN || '' }}
+          coverage-reports: build/reports/kover/report.xml
+
   security:
     name: Security scan
+    if: github.event_name == 'push' || (github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -52,6 +145,19 @@ jobs:
             exit 1
           fi
 
+      - name: NVD cache date
+        id: nvd-date
+        run: echo "day=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore NVD database cache
+        id: nvd-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.OWASP_NVD_DIR }}
+          key: owasp-nvd-${{ runner.os }}-${{ steps.nvd-date.outputs.day }}
+          restore-keys: |
+            owasp-nvd-${{ runner.os }}-
+
       - name: Setup Gradle for CI
         uses: ./.github/actions/setup-gradle-ci
         with:
@@ -65,64 +171,14 @@ jobs:
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
+          mkdir -p "${OWASP_NVD_DIR}"
           ./gradlew dependencyCheckAnalyze \
             --no-configuration-cache \
             -PdependencyCheck.failBuildOnCVSS=7.0
 
-  build:
-    name: Quality, tests, and coverage
-    runs-on: ubuntu-24.04
-    needs: security
-    timeout-minutes: 45
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Require Codacy project token
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        run: |
-          if [ -z "${CODACY_PROJECT_TOKEN}" ]; then
-            echo "::error::CODACY_PROJECT_TOKEN secret is required. Add the Codacy project API token (see BADGES-SETUP.md)."
-            exit 1
-          fi
-
-      - name: Setup Gradle for CI
-        uses: ./.github/actions/setup-gradle-ci
+      - name: Save NVD database cache
+        if: always() && steps.nvd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          jdk-version: ${{ env.JDK_VERSION }}
-          jdk-distribution: ${{ env.JDK_DISTRIBUTION }}
-          gradle-memory: ${{ env.GRADLE_MEMORY }}
-          cache-read-only: ${{ env.GRADLE_CACHE_READ_ONLY }}
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
-
-      - name: Quality checks and JVM tests
-        run: |
-          ./gradlew qualityCheck jvmLibraryTests koverXmlReport \
-            --configuration-cache \
-            --configuration-cache-problems=fail
-
-      - name: Codacy static analysis
-        uses: codacy/codacy-analysis-cli-action@562ee3e92b8e92df8b67e0a5ff8aa8e261919c08 # v4.4.7
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          upload: true
-          gh-code-scanning-compat: true
-          # Detekt/KtLint remain the local quality gates; Codacy upload is mandatory.
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: jdbenitez94/criollo-kmp-foundation
-          files: build/reports/kover/report.xml
-          fail_ci_if_error: true
-
-      - name: Upload coverage to Codacy
-        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: build/reports/kover/report.xml
+          path: ${{ env.OWASP_NVD_DIR }}
+          key: owasp-nvd-${{ runner.os }}-${{ steps.nvd-date.outputs.day }}
