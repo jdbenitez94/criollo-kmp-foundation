@@ -307,6 +307,26 @@ class TaskScopeTest {
     }
 
     @Test
+    fun isActive_falseWhenJobCancelledViaHandleBeforeCompletionCallback() = runTest {
+        val scope = TaskScope(backgroundScope)
+        val started = scope.launch(testKey, TaskPolicy.SkipIfActive) {
+            delay(1_000)
+        } as TaskLaunchResult.Started
+
+        runCurrent()
+        expectThat(scope.isActive(testKey)).isTrue()
+        started.handle.cancel()
+        // Completion has not been drained, so the cancelled Job is still registered.
+        expectThat(scope.isActive(testKey)).isFalse()
+
+        val relaunched = scope.launch(testKey, TaskPolicy.SkipIfActive) {
+            delay(1_000)
+        }
+        expectThat(relaunched).isA<TaskLaunchResult.Started>()
+        expectThat(scope.isActive(testKey)).isTrue()
+    }
+
+    @Test
     fun taskState_requiresDefaultTaskScope() {
         val unsupportedScope = object : TaskScope {
             override fun launch(key: TaskKey, policy: TaskPolicy, block: suspend CoroutineScope.() -> Unit): TaskLaunchResult = TaskLaunchResult.Skipped

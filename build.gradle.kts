@@ -16,6 +16,9 @@ plugins {
 
 dependencyCheck {
     failBuildOnCVSS = 7.0f
+    // NVD API 503/outages should not fail CI when cached data + datafeed exist.
+    failOnError = false
+    suppressionFile = "config/owasp/suppressions.xml"
 
     // Without an NVD API key, CVE DB updates are rate-limited and can take tens of minutes.
     // Request a key: https://nvd.nist.gov/developers/request-an-api-key
@@ -23,7 +26,15 @@ dependencyCheck {
     nvd {
         apiKey = providers.environmentVariable("NVD_API_KEY").orNull
             ?: criolloProperty("nvdApiKey")
-        validForHours = 24
+        validForHours = 168
+        datafeedUrl = "https://dependency-check.github.io/DependencyCheck_Builder/nvd_cache/nvdcve-{0}.json.gz"
+    }
+
+    // CI caches this directory separately from Gradle User Home (PR caches are read-only).
+    providers.environmentVariable("OWASP_NVD_DIR").orNull?.let { nvdDir ->
+        data {
+            directory = nvdDir
+        }
     }
 
     // KMP/JVM/Android libraries — skip ecosystem analyzers we never ship.

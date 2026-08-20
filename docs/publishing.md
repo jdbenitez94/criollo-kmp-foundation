@@ -23,7 +23,7 @@ with in-memory PGP signing in CI.
 3. Merge that release PR → release-please creates tag `vX.Y.Z` + GitHub Release.
 4. The same workflow run publishes to Maven Central (see
    [`publish-maven-central.yml`](../.github/workflows/publish-maven-central.yml)).
-5. In https://central.sonatype.com/publishing, publish (or drop) the deployment if
+5. In <https://central.sonatype.com/publishing>, publish (or drop) the deployment if
    `publishing_type=user_managed`.
 
 Bootstrap: `initial-version` is `0.1.0` so the first release PR is `0.1.0`. After that, SemVer follows commit types.
@@ -79,7 +79,7 @@ gpg --export --armor "$FPR" > config/public-key.asc
 # CI needs ASCII-armored secret: gpg --export-secret-keys --armor "$FPR"
 ```
 
-Upload the public key (once) so Central can verify signatures, e.g. https://keys.openpgp.org/
+Upload the public key (once) so Central can verify signatures, e.g. <https://keys.openpgp.org/>
 
 ## Secrets and variables
 
@@ -100,7 +100,7 @@ Public key: `config/public-key.asc`.
 Omit signing props / set `signing.required=false` for unsigned `publishToMavenLocal`.
 
 To rotate the **Central Portal user token**, generate a new one at
-https://central.sonatype.com/usertoken, replace `mavenCentralUsername` /
+<https://central.sonatype.com/usertoken>, replace `mavenCentralUsername` /
 `mavenCentralPassword` in `local.properties`, then ask the agent to resync secrets (or):
 
 ```bash

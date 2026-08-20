@@ -19,7 +19,7 @@ explicitly marked LTS later.
 
 1. Use [GitHub Private Vulnerability Reporting](https://github.com/jdbenitez94/criollo-kmp-foundation/security/advisories/new)
    on this repository (preferred), **or**
-2. Email the maintainer at **jdbenitez94@gmail.com** with subject
+2. Email the maintainer at **<jdbenitez94@gmail.com>** with subject
    `[SECURITY] criollo-kmp-foundation`.
 
 Please include:
