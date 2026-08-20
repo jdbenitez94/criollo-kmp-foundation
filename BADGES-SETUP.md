@@ -54,7 +54,7 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
 5. CI uploads Kover XML via `codacy/codacy-coverage-reporter-action`.
 
 Grade badge: Shields.io `codacy/grade/github/jdbenitez94/criollo-kmp-foundation`
-(dashboard: https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard).
+(dashboard: <https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard>).
 
 ---
 
@@ -62,7 +62,7 @@ Grade badge: Shields.io `codacy/grade/github/jdbenitez94/criollo-kmp-foundation`
 
 Without an NVD key, `dependencyCheckAnalyze` is rate-limited and can take a very long time.
 
-1. Request a free key: https://nvd.nist.gov/developers/request-an-api-key  
+1. Request a free key: <https://nvd.nist.gov/developers/request-an-api-key>
 2. Confirm the email and copy the key.  
 3. Put it in `local.properties` as `nvdApiKey=…` and sync `NVD_API_KEY`:
 
@@ -79,10 +79,10 @@ cached in Actions under `OWASP_NVD_DIR` (not Gradle User Home), including on PRs
 
 ## 4. Automated badges (no extra accounts)
 
-* **GitHub Actions CI** — `.github/workflows/ci.yml`
-* **Kotlin Multiplatform** — static Shields.io badge
-* **Maven Central** — latest `coroutines` under
+- **GitHub Actions CI** — `.github/workflows/ci.yml`
+- **Kotlin Multiplatform** — static Shields.io badge
+- **Maven Central** — latest `coroutines` under
   `io.github.jdbenitez94.criollo.kmp.foundation` (after first publish)
-* **OWASP Dependency Check** — static badge; enforced in CI via
+- **OWASP Dependency Check** — static badge; enforced in CI via
   `./gradlew dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`)
-* **MIT License** — static legal badge
+- **MIT License** — static legal badge

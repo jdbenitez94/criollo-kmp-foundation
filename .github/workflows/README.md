@@ -82,7 +82,7 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 Publish URL is the Portal OSSRH staging API
 (`ossrh-staging-api.central.sonatype.com`). After Gradle upload, publish calls
 `POST /manual/upload/defaultRepository/{namespace}` so the deployment is visible at
-https://central.sonatype.com/publishing.
+<https://central.sonatype.com/publishing>.
 
 ## Composite action: `setup-gradle-ci`
 
