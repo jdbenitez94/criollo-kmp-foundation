@@ -3,7 +3,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.jdbenitez94.criollo.kmp.foundation/coroutines.svg)](https://central.sonatype.com/namespace/io.github.jdbenitez94.criollo.kmp.foundation)
 [![codecov](https://codecov.io/gh/jdbenitez94/criollo-kmp-foundation/graph/badge.svg)](https://codecov.io/gh/jdbenitez94/criollo-kmp-foundation)
 [![Codacy grade](https://img.shields.io/codacy/grade/github/jdbenitez94/criollo-kmp-foundation)](https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard)
-[![OWASP Dependency Check](https://img.shields.io/badge/Security-OWASP_Scan-brightgreen)](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml)
+[![Open Worldwide Application Security Project (OWASP) Dependency Check](https://img.shields.io/badge/Security-OWASP_Scan-brightgreen)](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 # Criollo KMP Foundation

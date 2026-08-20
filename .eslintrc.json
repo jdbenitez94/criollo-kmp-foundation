@@ -1,0 +1,10 @@
+{
+  "overrides": [
+    {
+      "files": ["**/webpack.config.d/**/*.js"],
+      "globals": {
+        "config": "writable"
+      }
+    }
+  ]
+}

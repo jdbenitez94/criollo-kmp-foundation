@@ -38,12 +38,12 @@ Please include:
 | Fix or mitigation plan for accepted reports | as soon as practical; critical issues prioritized |
 
 If a report is **accepted** (reproducible, in scope, and not a duplicate), we will
-coordinate a fix, open a GitHub Security Advisory for issues with CVSS **≥ 4.0** or
-exploitable impact in default library usage, and publish a semver patch release to
-Maven Central within **14 days** of merging the fix (within **7 days** for critical
-issues). If **declined**, we will explain why within the triage window (for example
-out of scope, not reproducible, or accepted risk documented in
-`config/owasp/suppressions.xml`).
+coordinate a fix, open a GitHub Security Advisory for issues with Common Vulnerability
+Scoring System (CVSS) **≥ 4.0** or exploitable impact in default library usage, and
+publish a semantic-versioning patch release to Maven Central within **14 days** of
+merging the fix (within **7 days** for critical issues). If **declined**, we will
+explain why within the triage window (for example out of scope, not reproducible, or
+accepted risk documented in `config/owasp/suppressions.xml`).
 
 ## Scope
 
@@ -53,8 +53,8 @@ issues we can mitigate in this repo.
 
 Out of scope: issues solely in third-party dependencies with no practical mitigation
 here (we track those via Dependabot, Open Worldwide Application Security Project
-(OWASP) Dependency Check, and CodeQL), social engineering, and denial-of-service
-against GitHub or Maven Central infrastructure.
+(OWASP) Dependency Check, and GitHub CodeQL), social engineering, and
+denial-of-service against GitHub or Maven Central infrastructure.
 
 ## Supply chain
 

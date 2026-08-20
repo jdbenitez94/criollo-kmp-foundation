@@ -1,4 +1,4 @@
-/* eslint-disable no-undef -- config is injected by Kotlin/JS webpack.config.d */
+/* eslint-disable no-undef -- config: see .eslintrc.json webpack.config.d override */
 config.resolve.fallback = {
     ...config.resolve.fallback,
     path: false,
