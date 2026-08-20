@@ -1,12 +1,10 @@
-<p align="center">
-  <a href="https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml"><img src="https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml/badge.svg?branch=main&event=push" alt="CI"/></a>
-  <a href="https://kotlinlang.org/docs/multiplatform.html"><img src="https://img.shields.io/badge/Kotlin_Multiplatform-Platform_Support-%237F52FF?logo=kotlin&logoColor=white" alt="Kotlin Multiplatform"/></a>
-  <a href="https://central.sonatype.com/namespace/io.github.jdbenitez94.criollo.kmp.foundation"><img src="https://img.shields.io/maven-central/v/io.github.jdbenitez94.criollo.kmp.foundation/coroutines.svg" alt="Maven Central"/></a>
-  <a href="https://codecov.io/gh/jdbenitez94/criollo-kmp-foundation"><img src="https://codecov.io/gh/jdbenitez94/criollo-kmp-foundation/graph/badge.svg" alt="codecov"/></a>
-  <a href="https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard"><img src="https://img.shields.io/codacy/grade/github/jdbenitez94/criollo-kmp-foundation" alt="Codacy grade"/></a>
-  <a href="https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/Security-OWASP_Scan-brightgreen" alt="OWASP Dependency Check"/></a>
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"/></a>
-</p>
+[![CI](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml)
+[![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin_Multiplatform-Platform_Support-%237F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/docs/multiplatform.html)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.jdbenitez94.criollo.kmp.foundation/coroutines.svg)](https://central.sonatype.com/namespace/io.github.jdbenitez94.criollo.kmp.foundation)
+[![codecov](https://codecov.io/gh/jdbenitez94/criollo-kmp-foundation/graph/badge.svg)](https://codecov.io/gh/jdbenitez94/criollo-kmp-foundation)
+[![Codacy grade](https://img.shields.io/codacy/grade/github/jdbenitez94/criollo-kmp-foundation)](https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard)
+[![OWASP Dependency Check](https://img.shields.io/badge/Security-OWASP_Scan-brightgreen)](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 # Criollo KMP Foundation
 
