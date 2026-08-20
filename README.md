@@ -18,7 +18,7 @@ This release focuses on **keyed coroutine task management** (`TaskScope`): launc
 
 | Artifact | Maven name | Gradle project | Required? | Role |
 |----------|------------|----------------|-----------|------|
-| BOM | `bom` | `:bom` | Recommended | Aligns versions of all foundation modules |
+| Bill of Materials (BOM) | `bom` | `:bom` | Recommended | Aligns versions of all foundation modules |
 | Core | `coroutines` | `:coroutines` | **Yes** | `TaskScope` registry (`TaskKey`, `TaskPolicy`, …) |
 | ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | Optional | `by taskScope()` on `ViewModel` |
 | Compose | `coroutines-compose` | `:coroutines:compose` | Optional | `rememberTaskScope()` in Composables |

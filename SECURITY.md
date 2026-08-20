@@ -38,11 +38,12 @@ Please include:
 | Fix or mitigation plan for accepted reports | as soon as practical; critical issues prioritized |
 
 If a report is **accepted** (reproducible, in scope, and not a duplicate), we will
-coordinate a fix, open a GitHub Security Advisory when coordinated disclosure or a
-CVE identifier is warranted, and publish a semver patch release to Maven Central within
-**14 days** of merging the fix (sooner for critical issues). If **declined**, we will
-explain why within the triage window (for example out of scope, not reproducible, or
-accepted risk documented in `config/owasp/suppressions.xml`).
+coordinate a fix, open a GitHub Security Advisory for issues with CVSS **≥ 4.0** or
+exploitable impact in default library usage, and publish a semver patch release to
+Maven Central within **14 days** of merging the fix (within **7 days** for critical
+issues). If **declined**, we will explain why within the triage window (for example
+out of scope, not reproducible, or accepted risk documented in
+`config/owasp/suppressions.xml`).
 
 ## Scope
 
