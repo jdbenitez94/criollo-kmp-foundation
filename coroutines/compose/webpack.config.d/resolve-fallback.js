@@ -1,3 +1,4 @@
+/* global config */
 config.resolve.fallback = {
     ...config.resolve.fallback,
     path: false,
