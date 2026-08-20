@@ -4,7 +4,9 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 
@@ -25,6 +27,20 @@ fun Project.configureCriolloPublishing(artifactIdOverride: String? = null) {
         extensions.configure<JavaPluginExtension> {
             withSourcesJar()
             withJavadocJar()
+        }
+    }
+
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        afterEvaluate {
+            val javadocJar =
+                tasks.register<Jar>("emptyJavadocJar") {
+                    archiveClassifier.set("javadoc")
+                }
+            extensions.configure<PublishingExtension> {
+                publications.withType<MavenPublication>().matching { it.name == "jvm" }.configureEach {
+                    artifact(javadocJar)
+                }
+            }
         }
     }
 
