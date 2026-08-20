@@ -81,8 +81,10 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 
 Publish URL is the Portal OSSRH staging API
 (`ossrh-staging-api.central.sonatype.com`). After Gradle upload, publish calls
-`POST /manual/upload/defaultRepository/{namespace}` so the deployment is visible at
-<https://central.sonatype.com/publishing>.
+`POST /manual/upload/defaultRepository/{namespace}?publishing_type=user_managed` so the
+deployment is validated and visible at <https://central.sonatype.com/publishing>. CI stays
+green on success; you still **Publish** manually in the Portal (`user_managed`). A red finalize
+step means Central rejected validation (for example missing `-javadoc.jar` on JVM artifacts).
 
 ## Composite action: `setup-gradle-ci`
 

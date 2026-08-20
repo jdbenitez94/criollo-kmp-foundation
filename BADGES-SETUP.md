@@ -53,8 +53,15 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
    wait for a CLI upload we do not send.
 5. CI uploads Kover XML via `codacy/codacy-coverage-reporter-action`.
 
-Grade badge: Shields.io `codacy/grade/github/jdbenitez94/criollo-kmp-foundation`
+Grade badge (use Codacy-hosted URL; Shields `codacy/grade` often lags new repos):
+
+`https://app.codacy.com/project/badge/Grade/09897325adbd4047ab7fc603b46c5a97`
+
 (dashboard: <https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard>).
+
+Coverage badge (optional in README):
+
+`https://app.codacy.com/project/badge/Coverage/09897325adbd4047ab7fc603b46c5a97`
 
 ---
 
@@ -80,9 +87,11 @@ cached in Actions under `OWASP_NVD_DIR` (not Gradle User Home), including on PRs
 ## 4. Automated badges (no extra accounts)
 
 - **GitHub Actions CI** — `.github/workflows/ci.yml`
+- **GitHub Release** — `img.shields.io/github/v/release/...`
 - **Kotlin Multiplatform** — static Shields.io badge
-- **Maven Central** — latest `coroutines` under
-  `io.github.jdbenitez94.criollo.kmp.foundation` (after first publish)
+- **Maven Central** — static `vX.Y.Z` until artifacts index on Central, then switch README to
+  `img.shields.io/maven-central/v/io.github.jdbenitez94.criollo.kmp.foundation/coroutines.svg`
+- **Docs (GitHub Pages)** — `img.shields.io/github/deployments/.../github-pages`
 - **OWASP Dependency Check** — static badge; enforced in CI via
   `./gradlew dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`)
 - **MIT License** — static legal badge

@@ -1,8 +1,10 @@
 [![CI](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/jdbenitez94/criollo-kmp-foundation)](https://github.com/jdbenitez94/criollo-kmp-foundation/releases)
 [![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin_Multiplatform-Platform_Support-%237F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/docs/multiplatform.html)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.jdbenitez94.criollo.kmp.foundation/coroutines.svg)](https://central.sonatype.com/namespace/io.github.jdbenitez94.criollo.kmp.foundation)
+[![Maven Central](https://img.shields.io/badge/Maven_Central-v0.1.0-007ec6?logo=apache-maven&logoColor=white)](https://central.sonatype.com/namespace/io.github.jdbenitez94.criollo.kmp.foundation)
 [![codecov](https://codecov.io/gh/jdbenitez94/criollo-kmp-foundation/graph/badge.svg)](https://codecov.io/gh/jdbenitez94/criollo-kmp-foundation)
-[![Codacy grade](https://img.shields.io/codacy/grade/github/jdbenitez94/criollo-kmp-foundation)](https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard)
+[![Codacy grade](https://app.codacy.com/project/badge/Grade/09897325adbd4047ab7fc603b46c5a97)](https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation/dashboard)
+[![Docs](https://img.shields.io/github/deployments/jdbenitez94/criollo-kmp-foundation/github-pages?label=docs)](https://jdbenitez94.github.io/criollo-kmp-foundation/)
 [![Open Worldwide Application Security Project (OWASP) Dependency Check](https://img.shields.io/badge/Security-OWASP_Scan-brightgreen)](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
