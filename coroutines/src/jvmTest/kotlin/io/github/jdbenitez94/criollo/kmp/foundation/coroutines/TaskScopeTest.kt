@@ -178,6 +178,16 @@ class TaskScopeTest {
         return completed
     }
 
+    /** Scope + Started handle after scheduling a long SkipIfActive job. */
+    private fun TestScope.startLongSkipIfActiveJob(): Pair<TaskScope, TaskLaunchResult.Started> {
+        val scope = TaskScope(backgroundScope)
+        val started = scope.launch(testKey, TaskPolicy.SkipIfActive) {
+            delay(1_000)
+        } as TaskLaunchResult.Started
+        runCurrent()
+        return scope to started
+    }
+
     @Test
     fun blankKey_throws() {
         expectThrows<IllegalArgumentException> {
@@ -308,12 +318,7 @@ class TaskScopeTest {
 
     @Test
     fun isActive_falseWhenJobCancelledViaHandleBeforeCompletionCallback() = runTest {
-        val scope = TaskScope(backgroundScope)
-        val started = scope.launch(testKey, TaskPolicy.SkipIfActive) {
-            delay(1_000)
-        } as TaskLaunchResult.Started
-
-        runCurrent()
+        val (scope, started) = startLongSkipIfActiveJob()
         expectThat(scope.isActive(testKey)).isTrue()
         started.handle.cancel()
         // Completion has not been drained, so the cancelled Job is still registered.
@@ -358,12 +363,7 @@ class TaskScopeTest {
 
     @Test
     fun taskHandle_exposesJobLifecycle() = runTest {
-        val scope = TaskScope(backgroundScope)
-        val started = scope.launch(testKey, TaskPolicy.SkipIfActive) {
-            delay(1_000)
-        } as TaskLaunchResult.Started
-
-        runCurrent()
+        val (_, started) = startLongSkipIfActiveJob()
         expectThat(started.handle.isActive).isTrue()
         started.handle.cancel()
         runCurrent()

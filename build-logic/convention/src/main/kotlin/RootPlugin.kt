@@ -98,8 +98,9 @@ class RootPlugin : Plugin<Project> {
 
         val rootDetekt = tasks.named("detekt")
         val formatAndCheck = tasks.named("formatAndCheck")
+        val buildLogicDetekt = gradle.includedBuild("build-logic").task(":convention:detekt")
         qualityCheck.configure {
-            dependsOn(ktlintCheck, rootDetekt)
+            dependsOn(ktlintCheck, rootDetekt, buildLogicDetekt)
         }
 
         subprojects {

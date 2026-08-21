@@ -7,7 +7,9 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
+import org.gradle.process.ExecSpec
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.Properties
 import javax.inject.Inject
 
@@ -15,7 +17,8 @@ import javax.inject.Inject
  * Optional local DX: markdownlint + jscpd (Codacy-style duplication), then optional Kover XML +
  * best-effort Codecov / Codacy coverage uploads when tokens exist in `local.properties`.
  *
- * Complexity is covered by Detekt (`./gradlew detekt` / `qualityCheck`).
+ * Complexity for library modules is covered by Detekt (`./gradlew detekt` / `qualityCheck`);
+ * `build-logic` sources are covered via `:build-logic:convention:detekt` (same qualityCheck).
  *
  * Enable coverage path with `-PlocalCloudParity.coverage=true` (or the same key in
  * `local.properties` / `gradle.properties`).
@@ -67,7 +70,7 @@ abstract class LocalCloudParityTask @Inject constructor(
         uploadCodacyBestEffort(rootDir, report, props)
     }
 
-    private fun runMarkdownlint(rootDir: java.io.File) {
+    private fun runMarkdownlint(rootDir: File) {
         logger.lifecycle("Running markdownlint-cli2…")
         val result = execOperations.exec {
             workingDir = rootDir
@@ -101,14 +104,14 @@ abstract class LocalCloudParityTask @Inject constructor(
         logger.lifecycle("markdownlint-cli2 passed.")
     }
 
-    private fun runJscpd(rootDir: java.io.File) {
+    private fun runJscpd(rootDir: File) {
         logger.lifecycle("Running jscpd (duplication, Codacy-compatible)…")
         val config = rootDir.resolve(".jscpd.json")
         val command = mutableListOf("npx", "--yes", "jscpd", ".")
-        if (config.isFile) {
-            command += listOf("--config", config.absolutePath)
+        command += if (config.isFile) {
+            listOf("--config", config.absolutePath)
         } else {
-            command += listOf(
+            listOf(
                 "--format",
                 "kotlin",
                 "--threshold",
@@ -140,8 +143,8 @@ abstract class LocalCloudParityTask @Inject constructor(
     }
 
     private fun uploadCodecovBestEffort(
-        rootDir: java.io.File,
-        report: java.io.File,
+        rootDir: File,
+        report: File,
         props: Properties,
     ) {
         val token = firstProp(
@@ -185,8 +188,8 @@ abstract class LocalCloudParityTask @Inject constructor(
     }
 
     private fun uploadCodacyBestEffort(
-        rootDir: java.io.File,
-        report: java.io.File,
+        rootDir: File,
+        report: File,
         props: Properties,
     ) {
         val apiToken = firstProp(props, "codacyApiToken", "codacyToken", "CODACY_API_TOKEN")
@@ -233,7 +236,7 @@ abstract class LocalCloudParityTask @Inject constructor(
         )
     }
 
-    private fun execQuiet(rootDir: java.io.File, configure: org.gradle.process.ExecSpec.() -> Unit): ExecResult {
+    private fun execQuiet(rootDir: File, configure: ExecSpec.() -> Unit): ExecResult {
         val stdout = ByteArrayOutputStream()
         val stderr = ByteArrayOutputStream()
         return execOperations.exec {
@@ -250,7 +253,7 @@ abstract class LocalCloudParityTask @Inject constructor(
         }
     }
 
-    private fun loadLocalProperties(rootDir: java.io.File): Properties {
+    private fun loadLocalProperties(rootDir: File): Properties {
         val props = Properties()
         val file = rootDir.resolve("local.properties")
         if (file.isFile) {
