@@ -40,9 +40,11 @@ via the GitHub Actions secret `GRADLE_ENCRYPTION_KEY`. **Do not commit this key 
 ### GitHub Actions (required for encrypted remote cache)
 
 1. Generate a 64-character hex key, for example:
+
    ```bash
    openssl rand -hex 32
    ```
+
 2. Add it as repository secret **`GRADLE_ENCRYPTION_KEY`** (Settings → Secrets and variables → Actions).
 3. If the previous key was ever committed, **rotate** the secret and invalidate old cache entries.
 
