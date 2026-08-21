@@ -3,7 +3,7 @@
 Optional Gradle plugin that syncs shared style configuration into a consumer repository:
 
 | File | Role |
-|------|------|
+| ------ | ------ |
 | `.editorconfig` | KtLint / IDE indent, imports, trailing commas, line length 180 |
 | `config/detekt/detekt.yml` | Detekt 1 policy (incl. `detekt-formatting`) |
 | `config/detekt/detekt-v2.yml` | Detekt 2 policy |

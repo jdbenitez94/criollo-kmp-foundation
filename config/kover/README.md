@@ -5,7 +5,7 @@ Coverage is configured via Gradle convention plugins (Kover 0.9.x DSL), not a ch
 ## Plugins
 
 | Plugin ID | Applied to | Role |
-| --------- | ---------- | ---- |
+| --- | --- | --- |
 | `convention.kover.library` | Published KMP libraries via `criollo.kmp-library` | Per-module reports |
 | `convention.kover.aggregation` | Root (via `convention.root`) | Merges library modules and enforces verify rules |
 

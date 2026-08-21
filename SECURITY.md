@@ -6,8 +6,8 @@ Security fixes are published for the latest SemVer release line on Maven Central
 
 | Version | Supported |
 | ------- | --------- |
-| 0.1.x   | :white_check_mark: |
-| < 0.1   | :x: (unreleased / pre-Central) |
+| 0.1.x | :white_check_mark: |
+| < 0.1 | :x: (unreleased / pre-Central) |
 
 While the project is on `0.y.z`, breaking changes may land in minor bumps. Security
 patches are backported only to the current supported line above unless a release is

@@ -5,7 +5,7 @@ CI for the Criollo KMP Foundation monorepo.
 ## Workflow: `ci.yml`
 
 | Job | Purpose |
-|-----|---------|
+| ----- | --------- |
 | `build` | `qualityCheck` + `jvmLibraryTests` + `koverXmlReport`; required Codecov coverage + Test Analytics; best-effort Codacy coverage. Runs **in parallel** with security so an NVD timeout cannot skip tests. Static analysis on Codacy is the GitHub App check, not a CLI upload. |
 | `security` | OWASP `dependencyCheckAnalyze` (`failBuildOnCVSS=7.0`). Dedicated Actions cache for the NVD DB (`OWASP_NVD_DIR`); skipped on Dependabot and fork PRs (no secrets). |
 
@@ -18,7 +18,7 @@ changes are skipped via `paths-ignore`), matching Saveable.
 ### Gradle cache policy
 
 | Ref | Cache |
-|-----|--------|
+| ----- | -------- |
 | Push to `main` / `dev` | Read + **write** (seeds shared cache) |
 | PRs into `main` / `dev`, `feature/*`, other branches, tags | **Read-only** |
 
@@ -33,7 +33,7 @@ cache; after release squash, `main` also writes a cache line.
 ## Release automation
 
 | Workflow | Trigger | Role |
-|----------|---------|------|
+| ---------- | --------- | ------ |
 | [`release-please.yml`](release-please.yml) | push to `main` | Conventional-commit release PR; on merge → tag `vX.Y.Z` + GitHub Release + Maven publish |
 | [`release.yml`](release.yml) | push tag `v*` | Manual tag escape hatch → Maven publish (+ GitHub Release if missing) |
 | [`publish-maven-central.yml`](publish-maven-central.yml) | `workflow_call` | Shared quality + Portal publish + finalize |
@@ -50,7 +50,7 @@ Other workflows:
 ## Aggregated Gradle tasks
 
 | Task | CI job |
-|------|--------|
+| ------ | -------- |
 | `qualityCheck` | `ci.yml`, publish workflow (also runs `installGitHooks`) |
 | `jvmLibraryTests` | `ci.yml`, publish workflow |
 | `installGitHooks` | local DX / dependency of `qualityCheck` |
@@ -64,7 +64,7 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 ## Secrets (release)
 
 | Secret | Description |
-|--------|-------------|
+| -------- | ------------- |
 | `OSSRH_USERNAME` / `OSSRH_PASSWORD` | Central Publisher Portal **user token** (not legacy OSSRH) |
 | `SIGNING_KEY_ID` / `SIGNING_KEY` / `SIGNING_PASSWORD` | In-memory PGP signing for publications |
 | `CODECOV_TOKEN` | Codecov upload (required by `ci.yml`) |
@@ -76,7 +76,7 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 ## Variables (release)
 
 | Variable | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | `MAVEN_CENTRAL_NAMESPACE` | Portal namespace for finalize step (e.g. `io.github.jdbenitez94`) |
 
 Publish URL is the Portal OSSRH staging API

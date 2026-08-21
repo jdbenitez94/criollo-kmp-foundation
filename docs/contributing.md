@@ -12,7 +12,7 @@ a dependency of `qualityCheck`). You can also run it manually:
 This sets `core.hooksPath` to [`gradle/hooks/`](../gradle/hooks):
 
 | Hook | What it runs |
-|------|----------------|
+| ------ | ---------------- |
 | `pre-commit` | `ktlintFormat` (re-stages Kotlin files), `ktlintCheck`, `detekt` (non-blocking) |
 | `pre-push` | `qualityCheck jvmLibraryTests` (configuration cache warn) |
 

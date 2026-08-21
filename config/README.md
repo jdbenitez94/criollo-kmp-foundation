@@ -5,7 +5,7 @@
 Shared static-analysis policy lives under [`detekt/`](detekt/):
 
 | File | Role |
-|------|------|
+| ------ | ------ |
 | [`detekt/detekt.yml`](detekt/detekt.yml) | Detekt 1 (`io.gitlab.arturbosch.detekt`) |
 | [`detekt/detekt-v2.yml`](detekt/detekt-v2.yml) | Detekt 2 (`dev.detekt`, default via `convention.detekt`) |
 | [`detekt/baseline.xml`](detekt/baseline.xml) | Shared baseline (project-local suppressions) |

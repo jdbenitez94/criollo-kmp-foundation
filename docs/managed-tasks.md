@@ -18,7 +18,7 @@ implementation("io.github.jdbenitez94.criollo.kmp.foundation:coroutines-compose"
 ## When to use `TaskScope` vs Flow operators
 
 | Situation | Prefer |
-|-----------|--------|
+| ----------- | -------- |
 | One-off actions (submit, sync, save on click) | `TaskScope` with `SkipIfActive` or `ReplaceActive` |
 | Rapid user input coalesced into one network call | `Debounce` or `ReplaceActive` + inline `delay` |
 | Continuous stream of values (search query, sensor) | `Flow.debounce` + `flatMapLatest` |
@@ -29,13 +29,13 @@ implementation("io.github.jdbenitez94.criollo.kmp.foundation:coroutines-compose"
 ## Core types
 
 | Type | Role |
-|------|------|
+| ------ | ------ |
 | `TaskKey` | Stable task identifier (`TaskKey.of("feature.action")`) |
 | `TaskPolicy` | `SkipIfActive`, `ReplaceActive`, `Debounce(Duration)` |
 | `TaskLaunchResult` | `Started(handle)` or `Skipped` |
 | `TaskHandle` | Cancel a started task without exposing raw `Job` |
 | `TaskScope` | Registry bound to a parent `CoroutineScope` |
-| `taskState(key)` | `StateFlow<Idle\|Running>` |
+| `taskState(key)` | `StateFlow<Idle\ | Running>` |
 
 ## ViewModel usage
 
