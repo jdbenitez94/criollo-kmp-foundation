@@ -1,5 +1,5 @@
 # Reusable Maven Central publish (Portal OSSRH staging API + PGP signing).
-# Called from release-please (same workflow run) and from tag-push release.yml.
+# Called from release-please / tag release (releases) and publish-snapshots (dev).
 name: Publish Maven Central
 
 on:
@@ -7,6 +7,16 @@ on:
     inputs:
       ref:
         description: Git ref to checkout (tag or SHA)
+        required: false
+        type: string
+        default: ''
+      snapshot:
+        description: Publish next-patch -SNAPSHOT to Central Portal snapshots (skip Portal finalize)
+        required: false
+        type: boolean
+        default: false
+      version:
+        description: Override version (-Pcriollo.version). Empty + snapshot=true → next patch SNAPSHOT
         required: false
         type: string
         default: ''
@@ -41,15 +51,36 @@ jobs:
           cache-read-only: 'true'
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
+      - name: Resolve publish version
+        id: ver
+        run: |
+          set -euo pipefail
+          BASE="$(grep 'const val version' \
+            build-logic/convention/src/main/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/buildlogic/ProjectConfig.kt \
+            | sed -E 's/.*"([^"]+)".*/\1/')"
+          OVERRIDE="${{ inputs.version }}"
+          if [ -n "$OVERRIDE" ]; then
+            VERSION="$OVERRIDE"
+          elif [ "${{ inputs.snapshot }}" = "true" ]; then
+            CORE="${BASE%%-*}"
+            CORE="${CORE%%+*}"
+            IFS=. read -r MAJ MIN PAT <<< "$CORE"
+            VERSION="${MAJ}.${MIN}.$((PAT + 1))-SNAPSHOT"
+          else
+            VERSION="$BASE"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Publishing version: $VERSION (base ProjectConfig=$BASE, snapshot=${{ inputs.snapshot }})"
+
       - name: Verify tag matches project version
-        if: startsWith(github.ref, 'refs/tags/v') || startsWith(inputs.ref, 'v')
+        if: ${{ !inputs.snapshot && (startsWith(github.ref, 'refs/tags/v') || startsWith(inputs.ref, 'v')) }}
         run: |
           REF="${{ inputs.ref }}"
           if [ -z "$REF" ]; then
             REF="${GITHUB_REF_NAME}"
           fi
           TAG="${REF#v}"
-          EXPECTED="$(grep 'const val version' build-logic/convention/src/main/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/buildlogic/ProjectConfig.kt | sed -E 's/.*"([^"]+)".*/\1/')"
+          EXPECTED="${{ steps.ver.outputs.version }}"
           test "$TAG" = "$EXPECTED"
 
       - name: Ensure Android SDK platform 37
@@ -58,6 +89,7 @@ jobs:
       - name: Quality checks and tests
         run: |
           ./gradlew qualityCheck jvmLibraryTests \
+            -Pcriollo.version=${{ steps.ver.outputs.version }} \
             --configuration-cache \
             --configuration-cache-problems=fail
 
@@ -71,13 +103,16 @@ jobs:
           ORG_GRADLE_PROJECT_signing.required: 'true'
         run: |
           ./gradlew publishAllPublicationsToMavenCentralRepository \
+            -Pcriollo.version=${{ steps.ver.outputs.version }} \
             --configuration-cache \
             --configuration-cache-problems=fail
 
-      # Gradle maven-publish is "Maven-API-like": finalize so the deployment appears in the Portal.
-      # user_managed stops after validation; release the deployment manually in the Portal UI.
+      # Releases only: Gradle maven-publish is "Maven-API-like"; finalize for Portal UI.
+      # Snapshots go to https://central.sonatype.com/repository/maven-snapshots/ (no finalize).
       # https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
+      # https://central.sonatype.org/publish/publish-portal-snapshots/
       - name: Finalize Central Portal deployment
+        if: ${{ !inputs.snapshot }}
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}

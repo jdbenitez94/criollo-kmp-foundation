@@ -9,13 +9,43 @@ with in-memory PGP signing in CI.
 - Group: `io.github.jdbenitez94.criollo.kmp.foundation`
 - Namespace (Portal): `io.github.jdbenitez94` (GitHub username namespace)
 - Version: `ProjectConfig.version` in build-logic (must match git tag `vX.Y.Z` and `version.txt`)
+- Override: `-Pcriollo.version=…` (CI snapshots use the next patch + `-SNAPSHOT`)
 
 ## Release flow (automated)
 
 | Branch | Behavior |
 | -------- | ---------- |
-| `dev` | CI only — no tags, no Maven publish |
+| `dev` | Integration + **SNAPSHOT** publish; tip kept equal to `main` after every `main` push |
 | `main` | [release-please](../.github/workflows/release-please.yml) opens a release PR from conventional commits |
+
+See [Contributing — branch model](contributing.md#branch-model-dev--main-same-tip) for the
+PR loop and `sync-dev-to-main` automation.
+
+### Snapshots (`dev`)
+
+On push to `dev` (non-docs), [`publish-snapshots.yml`](../.github/workflows/publish-snapshots.yml)
+publishes **`{nextPatch}-SNAPSHOT`** (e.g. `ProjectConfig` `0.1.4` → `0.1.5-SNAPSHOT`) to
+[`maven-snapshots`](https://central.sonatype.com/repository/maven-snapshots/).
+No Portal finalize / manual publish step. Snapshots expire (~90 days).
+
+Consume:
+
+```kotlin
+repositories {
+    mavenCentral()
+    maven {
+        name = "Central Portal Snapshots"
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        mavenContent { snapshotsOnly() }
+    }
+}
+dependencies {
+    implementation("io.github.jdbenitez94.criollo.kmp.foundation:coroutines:0.1.5-SNAPSHOT")
+}
+```
+
+Local: `./gradlew publishAllPublicationsToMavenCentralRepository -Pcriollo.version=0.1.5-SNAPSHOT`
+(requires Central + signing props in `local.properties`).
 
 1. Merge work to `main` (via PR). Prefer [Conventional Commits](commit-conventions.md).
 2. release-please opens/updates a PR that bumps `version.txt`, `ProjectConfig.version`,

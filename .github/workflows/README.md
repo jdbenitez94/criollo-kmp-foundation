@@ -36,9 +36,14 @@ cache; after release squash, `main` also writes a cache line.
 | ---------- | --------- | ------ |
 | [`release-please.yml`](release-please.yml) | push to `main` | Conventional-commit release PR; on merge → tag `vX.Y.Z` + GitHub Release + Maven publish |
 | [`release.yml`](release.yml) | push tag `v*` | Manual tag escape hatch → Maven publish (+ GitHub Release if missing) |
-| [`publish-maven-central.yml`](publish-maven-central.yml) | `workflow_call` | Shared quality + Portal publish + finalize |
+| [`publish-snapshots.yml`](publish-snapshots.yml) | push to `dev` / `workflow_dispatch` | Next-patch `-SNAPSHOT` → Central Portal snapshots (no tag / no finalize) |
+| [`publish-maven-central.yml`](publish-maven-central.yml) | `workflow_call` | Shared quality + publish (+ Portal finalize for releases) |
+| [`sync-dev-to-main.yml`](sync-dev-to-main.yml) | push to `main` | Force `origin/dev` to the same tip as `main` (misma punta) |
 
-`dev` never tags or publishes. Version sources: `version.txt`, `ProjectConfig.version` (`x-release-please-version`), `.release-please-manifest.json`.
+`dev` never tags releases; it **does** publish SNAPSHOTs. After each `main` push, `dev` is
+reset to that SHA. Version sources for releases:
+`version.txt`, `ProjectConfig.version` (`x-release-please-version`), `.release-please-manifest.json`.
+SNAPSHOT override: `-Pcriollo.version` / next patch from `ProjectConfig.version`.
 
 See [`docs/publishing.md`](../../docs/publishing.md).
 
@@ -75,6 +80,7 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 | `CODACY_PROJECT_TOKEN` | Codacy project token (fallback if `CODACY_API_TOKEN` is unset) |
 | `GRADLE_ENCRYPTION_KEY` | Encrypts Gradle configuration-cache entries in Actions cache (required for warm CC) |
 | `NVD_API_KEY` | NIST NVD API key for OWASP Dependency Check (required; avoids multi-minute rate limits) |
+| `DEV_SYNC_TOKEN` | Owner PAT (Contents R/W) to force-align `dev` → `main` tip; ruleset User bypass required |
 
 ## Variables (release)
 

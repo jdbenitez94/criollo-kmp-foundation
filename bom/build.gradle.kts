@@ -1,4 +1,5 @@
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
@@ -7,7 +8,7 @@ plugins {
 }
 
 group = ProjectConfig.group
-version = ProjectConfig.version
+version = criolloResolvedVersion()
 
 dependencies {
     constraints {
