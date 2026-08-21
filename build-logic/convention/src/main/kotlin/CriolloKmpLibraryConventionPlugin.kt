@@ -1,6 +1,7 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.KlibModuleNaming
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.isXcodeAvailable
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.libs
 import org.gradle.api.Plugin
@@ -15,7 +16,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class CriolloKmpLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.group = ProjectConfig.group
-        target.version = ProjectConfig.version
+        target.version = target.criolloResolvedVersion()
 
         with(target.pluginManager) {
             apply("convention.kover.library")

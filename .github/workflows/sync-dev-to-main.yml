@@ -1,0 +1,51 @@
+# Keep `dev` at the same tip as `main` after every push to `main`.
+#
+# User-owned repos cannot grant the GitHub Actions app a ruleset bypass. Use a
+# fine-grained or classic PAT for the repo owner (ruleset User bypass) stored as
+# secret DEV_SYNC_TOKEN — see docs/contributing.md.
+name: Sync `dev` to `main` tip
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: sync-dev-to-main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Reset origin/dev to main tip
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require DEV_SYNC_TOKEN
+        env:
+          DEV_SYNC_TOKEN: ${{ secrets.DEV_SYNC_TOKEN }}
+        run: |
+          if [ -z "${DEV_SYNC_TOKEN}" ]; then
+            echo "::error::Secret DEV_SYNC_TOKEN is required to force-update \`dev\` (owner PAT with ruleset bypass). See docs/contributing.md."
+            exit 1
+          fi
+
+      - name: Point refs/heads/dev at this commit
+        env:
+          GH_TOKEN: ${{ secrets.DEV_SYNC_TOKEN }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          CURRENT="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/dev" --jq .object.sha)"
+          echo "main tip:  ${TARGET_SHA}"
+          echo "dev tip:   ${CURRENT}"
+          if [ "$CURRENT" = "$TARGET_SHA" ]; then
+            echo "Already aligned; nothing to do."
+            exit 0
+          fi
+          gh api -X PATCH "repos/${GITHUB_REPOSITORY}/git/refs/heads/dev" \
+            -f sha="${TARGET_SHA}" \
+            -F force=true
+          echo "Updated origin/dev → ${TARGET_SHA}"

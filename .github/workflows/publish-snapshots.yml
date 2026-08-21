@@ -1,0 +1,27 @@
+# Publish next-patch -SNAPSHOT artifacts from `dev` to Central Portal snapshots.
+# Does not tag or create GitHub Releases. Consumers need the snapshots repository.
+name: Publish snapshots
+
+on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+concurrency:
+  group: publish-snapshots-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish SNAPSHOT
+    uses: ./.github/workflows/publish-maven-central.yml
+    with:
+      snapshot: true
+    secrets: inherit

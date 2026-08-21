@@ -1,8 +1,8 @@
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.configureXcodeAvailability
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloBooleanProperty
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.libsVersion
-import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.validateSemVer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -19,12 +19,12 @@ class RootPlugin : Plugin<Project> {
             "convention.root must be applied to the root project"
         }
 
-        validateSemVer(ProjectConfig.version)
+        val resolvedVersion = target.criolloResolvedVersion()
         target.configureXcodeAvailability()
 
         target.allprojects {
             group = ProjectConfig.group
-            version = ProjectConfig.version
+            version = resolvedVersion
         }
 
         // Apply Detekt on root first so convention.ktlint can detect the Detekt 2 line
