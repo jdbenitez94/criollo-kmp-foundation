@@ -30,11 +30,12 @@ app cannot be a ruleset bypass actor, so:
    history, `enforce_admins`), with **force push allowed only for the owner**
    (GraphQL `bypassForcePushAllowances` — not “everyone”).
 3. Create a fine-grained PAT (or classic) for that user with **Contents: Read and write**
-   on this repository.
-4. Store it as Actions secret **`DEV_SYNC_TOKEN`**:
+   on this repository (or reuse the `gh` login token with `repo` scope).
+4. Put it in gitignored `local.properties` as `devSyncToken=…` and sync:
 
 ```bash
-gh secret set DEV_SYNC_TOKEN -R jdbenitez94/criollo-kmp-foundation
+awk -F= '/^devSyncToken=/{print substr($0,index($0,"=")+1)}' local.properties \
+  | gh secret set DEV_SYNC_TOKEN -R jdbenitez94/criollo-kmp-foundation
 ```
 
 ## Local Git hooks
