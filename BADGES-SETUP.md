@@ -14,7 +14,7 @@ Store tokens in gitignored `local.properties` and sync to GitHub Actions secrets
 | `codacyProjectToken` | `CODACY_PROJECT_TOKEN` (fallback) |
 | `gradleEncryptionKey` | `GRADLE_ENCRYPTION_KEY` |
 | `nvdApiKey` | `NVD_API_KEY` |
-| `devSyncToken` | `DEV_SYNC_TOKEN` (`dev` tip sync; owner PAT) |
+| `devSyncSshKeyPath` (path to private key; optional) | `DEV_SYNC_SSH_KEY` (file contents) |
 
 Sync example (values never printed):
 
@@ -23,8 +23,9 @@ awk -F= '/^codecovRepositoryToken=/{print substr($0,index($0,"=")+1)}' local.pro
   | gh secret set CODECOV_TOKEN -R jdbenitez94/criollo-kmp-foundation
 awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties \
   | gh secret set CODACY_API_TOKEN -R jdbenitez94/criollo-kmp-foundation
-awk -F= '/^devSyncToken=/{print substr($0,index($0,"=")+1)}' local.properties \
-  | gh secret set DEV_SYNC_TOKEN -R jdbenitez94/criollo-kmp-foundation
+# Tip sync Deploy Key (preferred over DEV_SYNC_TOKEN):
+KEY="$(awk -F= '/^devSyncSshKeyPath=/{print substr($0,index($0,"=")+1)}' local.properties)"
+gh secret set DEV_SYNC_SSH_KEY -R jdbenitez94/criollo-kmp-foundation < "$KEY"
 ```
 
 ---

@@ -1,8 +1,8 @@
 # Keep `dev` at the same tip as `main` after every push to `main`.
 #
-# User-owned repos cannot grant the GitHub Actions app a ruleset bypass. Use a
-# fine-grained or classic PAT for the repo owner (ruleset User bypass) stored as
-# secret DEV_SYNC_TOKEN — see docs/contributing.md.
+# Hard ruleset protects `main` + `dev`. Sync authenticates as the write Deploy Key
+# `dev-tip-sync`, which has ruleset DeployKey bypass (Actions app cannot).
+# Secret: DEV_SYNC_SSH_KEY (private key). See docs/contributing.md.
 name: Sync `dev` to `main` tip
 
 on:
@@ -23,29 +23,37 @@ jobs:
     name: Reset origin/dev to main tip
     runs-on: ubuntu-24.04
     steps:
-      - name: Require DEV_SYNC_TOKEN
+      - name: Require DEV_SYNC_SSH_KEY
         env:
-          DEV_SYNC_TOKEN: ${{ secrets.DEV_SYNC_TOKEN }}
+          DEV_SYNC_SSH_KEY: ${{ secrets.DEV_SYNC_SSH_KEY }}
         run: |
-          if [ -z "${DEV_SYNC_TOKEN}" ]; then
-            echo "::error::Secret DEV_SYNC_TOKEN is required to force-update \`dev\` (owner PAT with ruleset bypass). See docs/contributing.md."
+          if [ -z "${DEV_SYNC_SSH_KEY}" ]; then
+            echo "::error::Secret DEV_SYNC_SSH_KEY is required (private half of write Deploy Key with ruleset bypass). See docs/contributing.md."
             exit 1
           fi
 
-      - name: Point refs/heads/dev at this commit
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Start ssh-agent with Deploy Key
+        uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.DEV_SYNC_SSH_KEY }}
+
+      - name: Force-update origin/dev to this commit
         env:
-          GH_TOKEN: ${{ secrets.DEV_SYNC_TOKEN }}
           TARGET_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          CURRENT="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/dev" --jq .object.sha)"
+          CURRENT="$(git ls-remote origin refs/heads/dev | awk '{print $1}')"
           echo "main tip:  ${TARGET_SHA}"
           echo "dev tip:   ${CURRENT}"
           if [ "$CURRENT" = "$TARGET_SHA" ]; then
             echo "Already aligned; nothing to do."
             exit 0
           fi
-          gh api -X PATCH "repos/${GITHUB_REPOSITORY}/git/refs/heads/dev" \
-            -f sha="${TARGET_SHA}" \
-            -F force=true
+          git push --force git@github.com:${GITHUB_REPOSITORY}.git "${TARGET_SHA}:refs/heads/dev"
           echo "Updated origin/dev → ${TARGET_SHA}"
