@@ -1,4 +1,5 @@
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -10,7 +11,7 @@ plugins {
 }
 
 group = ProjectConfig.group
-version = ProjectConfig.version
+version = criolloResolvedVersion()
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21

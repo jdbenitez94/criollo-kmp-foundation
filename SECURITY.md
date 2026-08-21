@@ -61,4 +61,5 @@ denial-of-service against GitHub or Maven Central infrastructure.
 Releases are signed for Maven Central, CI runs static analysis and dependency scanning,
 and version tags are produced through the documented release process. Prefer consuming
 artifacts from Maven Central (or the Bill of Materials (BOM)) rather than untrusted
-forks or snapshots.
+forks. Official Central Portal SNAPSHOTs from this repo's `dev` branch are for early
+integration only—not production.

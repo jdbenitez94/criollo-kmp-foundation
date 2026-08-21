@@ -1,5 +1,42 @@
 # Contributing
 
+## Branch model (`dev` ↔ `main`, same tip)
+
+| Branch | Role |
+| -------- | ------ |
+| `dev` | Integration + Central Portal **SNAPSHOT** publishes |
+| `main` | Releases via release-please → Maven Central |
+
+**Invariant:** after every push to `main`, CI resets `origin/dev` to that exact commit
+([`sync-dev-to-main.yml`](../.github/workflows/sync-dev-to-main.yml)). Tips match; do not
+rebase `dev` onto squash commits by hand.
+
+Suggested loop:
+
+1. Open feature PRs into **`dev`** (squash merge).
+2. Promote with PR(s) **`dev` → `main`** (squash; prefer small PRs over one megapr).
+3. Automation sets **`dev` = `main` tip**. Continue from there.
+
+Do not leave long-lived unique history on `dev` after a promotion—the sync will discard it.
+
+### Ruleset bypass + classic protection + `DEV_SYNC_TOKEN` (one-time)
+
+The sync workflow force-updates `dev`. On this user-owned repo the **GitHub Actions**
+app cannot be a ruleset bypass actor, so:
+
+1. **Ruleset** `Protect main and `dev``: **User** bypass for the repo owner
+   (`bypass_mode: always`).
+2. **Classic branch protection** on `dev`: same gates as before (PR, Docs, linear
+   history, `enforce_admins`), with **force push allowed only for the owner**
+   (GraphQL `bypassForcePushAllowances` — not “everyone”).
+3. Create a fine-grained PAT (or classic) for that user with **Contents: Read and write**
+   on this repository.
+4. Store it as Actions secret **`DEV_SYNC_TOKEN`**:
+
+```bash
+gh secret set DEV_SYNC_TOKEN -R jdbenitez94/criollo-kmp-foundation
+```
+
 ## Local Git hooks
 
 Repository hooks are installed when Gradle configures verification (via `installGitHooks`,
