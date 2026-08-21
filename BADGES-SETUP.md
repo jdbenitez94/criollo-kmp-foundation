@@ -51,7 +51,9 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
 4. Leave **Run analysis on your build server** **off**. The GitHub App already
    posts *Codacy Static Code Analysis* on PRs. Enabling that flag makes Codacy
    wait for a CLI upload we do not send.
-5. CI uploads Kover XML via `codacy/codacy-coverage-reporter-action`.
+5. CI uploads Kover XML via `codacy/codacy-coverage-reporter-action` with
+   `language: Kotlin` and `force-coverage-parser: jacoco` (Kover’s Jacoco-format
+   report is otherwise treated as Java and the coverage badge stays at 0%).
 
 Grade badge (use Codacy-hosted URL; Shields `codacy/grade` often lags new repos):
 
