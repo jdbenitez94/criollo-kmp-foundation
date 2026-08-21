@@ -90,8 +90,9 @@ cached in Actions under `OWASP_NVD_DIR` (not Gradle User Home), including on PRs
 - **GitHub Release** — `img.shields.io/github/v/release/...`
 - **Kotlin** — static badge; keep in sync with `gradle/libs.versions.toml` (`kotlin` version)
 - **Kotlin Multiplatform** — static Shields.io badge
-- **Maven Central** — static `vX.Y.Z` until artifacts index on Central, then switch README to
-  `img.shields.io/maven-central/v/io.github.jdbenitez94.criollo.kmp.foundation/coroutines.svg`
+- **Maven Central** — dynamic Shields badge for latest `coroutines` under
+  `io.github.jdbenitez94.criollo.kmp.foundation` (use a static `vX.Y.Z` badge only
+  before the first Central index)
 - **Codacy grade / coverage** — Codacy-hosted badge URLs (see section 2)
 - **CodeQL** — `img.shields.io/github/actions/workflow/status/.../codeql.yml`
 - **Docs (GitHub Pages)** — `img.shields.io/github/deployments/.../github-pages`
