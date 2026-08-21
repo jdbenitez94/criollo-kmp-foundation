@@ -24,6 +24,10 @@ abstract class InstallGitHooksTask @Inject constructor(private val execOperation
         execOperations.exec {
             commandLine("git", "config", "core.hooksPath", "gradle/hooks")
         }
+        // Local-only alias for this clone (not --global): `git pr` → ./bin/pr
+        execOperations.exec {
+            commandLine("git", "config", "alias.pr", "!./bin/pr")
+        }
         val hooksDir = File(rootDir, "gradle/hooks")
         if (hooksDir.exists()) {
             hooksDir.listFiles()?.forEach { file ->
@@ -32,6 +36,9 @@ abstract class InstallGitHooksTask @Inject constructor(private val execOperation
                 }
             }
         }
-        logger.lifecycle("Git hooks installed successfully (core.hooksPath set to gradle/hooks).")
+        File(rootDir, "bin/pr").takeIf { it.isFile }?.setExecutable(true)
+        logger.lifecycle(
+            "Git hooks installed (core.hooksPath=gradle/hooks). Local alias: git pr → ./bin/pr",
+        )
     }
 }

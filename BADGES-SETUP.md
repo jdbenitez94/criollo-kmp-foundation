@@ -55,6 +55,17 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
    `language: Kotlin` and `force-coverage-parser: jacoco` (Kover’s Jacoco-format
    report is otherwise treated as Java and the coverage badge stays at 0%).
 
+### Local parity (optional)
+
+```bash
+./gradlew localCloudParity
+./gradlew localCloudParity -PlocalCloudParity.coverage=true
+```
+
+Markdownlint uses [`.markdownlint.json`](.markdownlint.json). Coverage mode runs
+`jvmLibraryTests` + `koverXmlReport`, then best-effort Codecov/Codacy CLI uploads when
+tokens are present in `local.properties`.
+
 Grade badge (use Codacy-hosted URL; Shields `codacy/grade` often lags new repos):
 
 `https://app.codacy.com/project/badge/Grade/09897325adbd4047ab7fc603b46c5a97`
