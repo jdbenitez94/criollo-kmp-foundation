@@ -91,3 +91,4 @@ site/
 .claude/
 .playwright-mcp/
 .harper-dictionary.txt
+.tmp/

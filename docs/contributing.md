@@ -19,24 +19,31 @@ Suggested loop:
 
 Do not leave long-lived unique history on `dev` after a promotion—the sync will discard it.
 
-### Ruleset bypass + classic protection + `DEV_SYNC_TOKEN` (one-time)
+### Hard ruleset + Deploy Key bypass (one-time)
 
-The sync workflow force-updates `dev`. On this user-owned repo the **GitHub Actions**
-app cannot be a ruleset bypass actor, so:
+`main` and `dev` share the **Protect main and `dev`** ruleset (PR required, Docs + Codacy
+checks, no force-push, no deletion, linear history). Humans stay fully gated.
 
-1. **Ruleset** `Protect main and `dev``: **User** bypass for the repo owner
-   (`bypass_mode: always`).
-2. **Classic branch protection** on `dev`: same gates as before (PR, Docs, linear
-   history, `enforce_admins`), with **force push allowed only for the owner**
-   (GraphQL `bypassForcePushAllowances` — not “everyone”).
-3. Create a fine-grained PAT (or classic) for that user with **Contents: Read and write**
-   on this repository (or reuse the `gh` login token with `repo` scope).
-4. Put it in gitignored `local.properties` as `devSyncToken=…` and sync:
+Sync uses a **write Deploy Key** (`dev-tip-sync`) with ruleset **DeployKey** bypass
+(always). Classic branch protection on `dev` stays **off**: it blocks Deploy Key pushes
+even when the ruleset would bypass. The ruleset alone is the hard gate for `dev`.
+
+Owner **User** bypass remains for emergencies.
+
+Setup:
+
+1. Generate an ed25519 key pair (no passphrase).
+2. Add the **public** key as a repo Deploy Key with **Allow write access** (title
+   `dev-tip-sync`).
+3. Store the **private** key as Actions secret **`DEV_SYNC_SSH_KEY`**.
+4. Optional local mirror (gitignored): keep the private key under `.tmp/dev-sync` and
+   note `devSyncSshKeyPath=.tmp/dev-sync` in `local.properties`.
 
 ```bash
-awk -F= '/^devSyncToken=/{print substr($0,index($0,"=")+1)}' local.properties \
-  | gh secret set DEV_SYNC_TOKEN -R jdbenitez94/criollo-kmp-foundation
+gh secret set DEV_SYNC_SSH_KEY -R jdbenitez94/criollo-kmp-foundation < /path/to/dev-sync
 ```
+
+(`DEV_SYNC_TOKEN` / `devSyncToken` is unused for tip sync; prefer the Deploy Key.)
 
 ## Local Git hooks
 
