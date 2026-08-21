@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `kotlin-dsl`
     alias(libs.plugins.org.jlleitschuh.gradle.ktlint)
+    alias(libs.plugins.dev.detekt)
 }
 
 // Must match ProjectConfig.BuildLogic.group
@@ -19,6 +20,17 @@ kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_21
     }
+}
+
+// Same policy as monorepo modules (Codacy analyzes this included build too).
+detekt {
+    buildUponDefaultConfig.set(true)
+    autoCorrect.set(false)
+    // Included-build root is build-logic/; parent is the monorepo root.
+    val configDir = rootProject.projectDir.resolve("../config/detekt")
+    config.setFrom(configDir.resolve("detekt-v2.yml"))
+    baseline.set(configDir.resolve("baseline.xml"))
+    source.setFrom("src/main/kotlin", "src/test/kotlin")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
