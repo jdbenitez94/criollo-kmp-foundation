@@ -11,6 +11,24 @@ with in-memory PGP signing in CI.
 - Version: `ProjectConfig.version` in build-logic (must match git tag `vX.Y.Z` and `version.txt`)
 - Override: `-Pcriollo.version=…` (CI snapshots use the next patch + `-SNAPSHOT`)
 
+## Apple (iOS) targets
+
+`iosArm64` / `iosSimulatorArm64` are registered only when Xcode is available, or when
+`-Pcriollo.requireAppleTargets=true` is set (fails fast if Xcode is missing).
+
+[`publish-maven-central.yml`](../.github/workflows/publish-maven-central.yml) runs on
+**`macos-15`** with that flag so Maven Central module metadata includes Apple klibs.
+Linux CI keeps skipping Apple targets (no Xcode).
+
+`0.1.5` and earlier Ubuntu publishes omitted iOS variants — Saveable (and other KMP
+consumers with iOS) need a release built on macOS (e.g. `0.1.6`).
+
+Local check:
+
+```bash
+./gradlew :coroutines:outgoingVariants -Pcriollo.requireAppleTargets=true | grep iosArm64ApiElements
+```
+
 ## Release flow (automated)
 
 | Branch | Behavior |

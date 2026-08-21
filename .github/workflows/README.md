@@ -37,7 +37,7 @@ cache; after release squash, `main` also writes a cache line.
 | [`release-please.yml`](release-please.yml) | push to `main` | Conventional-commit release PR; on merge → tag `vX.Y.Z` + GitHub Release + Maven publish |
 | [`release.yml`](release.yml) | push tag `v*` | Manual tag escape hatch → Maven publish (+ GitHub Release if missing) |
 | [`publish-snapshots.yml`](publish-snapshots.yml) | push to `dev` / `workflow_dispatch` | Next-patch `-SNAPSHOT` → Central Portal snapshots (no tag / no finalize) |
-| [`publish-maven-central.yml`](publish-maven-central.yml) | `workflow_call` | Shared quality + publish (+ Portal finalize for releases) |
+| [`publish-maven-central.yml`](publish-maven-central.yml) | `workflow_call` on **macos-15** | Shared quality + publish incl. **iOS klibs** (`-Pcriollo.requireAppleTargets=true`; + Portal finalize for releases) |
 | [`sync-dev-to-main.yml`](sync-dev-to-main.yml) | push to `main` | Force `origin/dev` to the same tip as `main` (misma punta) |
 
 `dev` never tags releases; it **does** publish SNAPSHOTs. After each `main` push, `dev` is

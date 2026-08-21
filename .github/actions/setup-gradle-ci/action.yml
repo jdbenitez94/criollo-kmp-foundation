@@ -54,13 +54,20 @@ runs:
       run: |
         echo "Injecting CI configuration into gradle.properties..."
 
-        sed -i "s/org.gradle.jvmargs=-Xmx[0-9]*[a-zA-Z]*/org.gradle.jvmargs=-Xmx${{ inputs.gradle-memory }}/" gradle.properties
-        sed -i "s/kotlin.daemon.jvmargs=-Xmx[0-9]*[a-zA-Z]*/kotlin.daemon.jvmargs=-Xmx${{ inputs.gradle-memory }}/" gradle.properties
+        # GNU sed (Linux) vs BSD sed (macOS publish runners)
+        if [[ "$(uname -s)" == Darwin ]]; then
+          sedi=(sed -i '')
+        else
+          sedi=(sed -i)
+        fi
 
-        sed -i "s/org.gradle.daemon=true/org.gradle.daemon=false/" gradle.properties
-        sed -i "s/org.gradle.vfs.watch=true/org.gradle.vfs.watch=false/" gradle.properties
+        "${sedi[@]}" "s/org.gradle.jvmargs=-Xmx[0-9]*[a-zA-Z]*/org.gradle.jvmargs=-Xmx${{ inputs.gradle-memory }}/" gradle.properties
+        "${sedi[@]}" "s/kotlin.daemon.jvmargs=-Xmx[0-9]*[a-zA-Z]*/kotlin.daemon.jvmargs=-Xmx${{ inputs.gradle-memory }}/" gradle.properties
 
-        sed -i "s/org.gradle.workers.max=[0-9]*/org.gradle.workers.max=2/" gradle.properties
+        "${sedi[@]}" "s/org.gradle.daemon=true/org.gradle.daemon=false/" gradle.properties
+        "${sedi[@]}" "s/org.gradle.vfs.watch=true/org.gradle.vfs.watch=false/" gradle.properties
+
+        "${sedi[@]}" "s/org.gradle.workers.max=[0-9]*/org.gradle.workers.max=2/" gradle.properties
 
         GRADLE_OPTS="-Dorg.gradle.console=plain -Dfile.encoding=UTF-8"
         echo "GRADLE_OPTS=${GRADLE_OPTS}" >> $GITHUB_ENV
