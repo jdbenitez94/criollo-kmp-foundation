@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.2](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.1...v0.1.2) (2026-08-21)
+
+### Bug Fixes
+
+* clean CHANGELOG and map Codacy Kover as Kotlin ([2d60892](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/2d60892c113ba6dd8414763e1021524593d6c978))
+
 ## [0.1.1](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.0...v0.1.1) (2026-08-20)
 
 ### Bug Fixes
