@@ -2,7 +2,6 @@
 
 ## [0.1.4](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.3...v0.1.4) (2026-08-21)
 
-
 ### Features
 
 * **build:** run Detekt on build-logic ([#20](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/20)) ([9ed9374](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/9ed9374811fe318069f74eaba5e0e9f70263b989))
