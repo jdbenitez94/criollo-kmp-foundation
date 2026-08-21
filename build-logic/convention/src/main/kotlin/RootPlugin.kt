@@ -1,5 +1,6 @@
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.configureXcodeAvailability
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloBooleanProperty
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.libsVersion
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.validateSemVer
 import org.gradle.api.Plugin
@@ -8,6 +9,7 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -51,6 +53,7 @@ class RootPlugin : Plugin<Project> {
 
         target.registerRootVerificationTasks(installGitHooks)
         target.registerRootAggregatorTasks()
+        target.registerLocalCloudParityTask()
 
         target.tasks.withType<Test>().configureEach {
             useJUnit()
@@ -119,6 +122,35 @@ class RootPlugin : Plugin<Project> {
                     dependsOn(subproject.tasks.named("detekt"))
                 }
             }
+        }
+    }
+
+    private fun Project.registerLocalCloudParityTask() {
+        val coverageEnabled = criolloBooleanProperty("localCloudParity.coverage")
+        val localCloudParity = tasks.register<LocalCloudParityTask>("localCloudParity") {
+            group = "verification"
+            description =
+                "Optional local cloud parity: markdownlint + jscpd; with -PlocalCloudParity.coverage=true " +
+                    "also runs tests + koverXmlReport and best-effort Codecov/Codacy uploads. " +
+                    "Complexity: use detekt / qualityCheck."
+            rootDirProperty.set(layout.projectDirectory)
+            codecovSlug.set("jdbenitez94/criollo-kmp-foundation")
+            runCoverageUploads.set(coverageEnabled)
+            failOnMarkdownlint.set(true)
+            failOnJscpd.set(true)
+            koverReportFile.set(layout.buildDirectory.file("reports/kover/report.xml"))
+        }
+        if (coverageEnabled) {
+            localCloudParity.configure {
+                dependsOn("jvmLibraryTests", "koverXmlReport")
+            }
+        }
+
+        tasks.register("preparePullRequest") {
+            group = "verification"
+            description =
+                "Run before opening a PR (localCloudParity). Used by gradle/hooks/pre-pr."
+            dependsOn(localCloudParity)
         }
     }
 

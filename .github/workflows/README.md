@@ -55,6 +55,8 @@ Other workflows:
 | `jvmLibraryTests` | `ci.yml`, publish workflow |
 | `installGitHooks` | local DX / dependency of `qualityCheck` |
 | `formatAndCheck` | local DX (`ktlintFormat` then `qualityCheck`) |
+| `localCloudParity` | optional Markdownlint + jscpd; with `-PlocalCloudParity.coverage=true` also tests + `koverXmlReport` + best-effort Codecov/Codacy CLI uploads (complexity via Detekt/`qualityCheck`) |
+| `preparePullRequest` | runs `localCloudParity` (invoked by manual `gradle/hooks/pre-pr` before `gh pr create`) |
 | `publishToMavenLocal` | root aggregator for `bom`, library modules, and `project-conventions` |
 
 ## Action pinning

@@ -17,3 +17,9 @@ fun Project.criolloProperty(name: String): String? {
     localFile.reader(Charsets.UTF_8).use { props.load(it) }
     return props.getProperty(name)?.takeIf { it.isNotBlank() }
 }
+
+/** `-P` / `gradle.properties` / `local.properties` boolean flag (default false). */
+fun Project.criolloBooleanProperty(name: String, default: Boolean = false): Boolean {
+    criolloProperty(name)?.let { return it.equals("true", ignoreCase = true) }
+    return default
+}

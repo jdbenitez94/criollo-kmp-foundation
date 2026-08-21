@@ -1,0 +1,22 @@
+{
+  "threshold": 5,
+  "format": ["kotlin"],
+  "reporters": ["console"],
+  "ignore": [
+    "**/build/**",
+    "**/.gradle/**",
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/.venv/**",
+    "**/site/**",
+    "**/iosApp/**",
+    "**/gradlew",
+    "**/gradlew.bat",
+    "**/gradle/wrapper/**",
+    "**/KoverAggregationConventionPlugin.kt",
+    "**/KoverLibraryConventionPlugin.kt",
+    "**/TaskScopeLock.*.kt"
+  ],
+  "absolute": true,
+  "gitignore": true
+}

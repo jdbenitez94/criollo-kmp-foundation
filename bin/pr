@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Repo-local PR helper (checked into git). Runs pre-pr checks, then gh pr create.
+# Usage:
+#   ./bin/pr
+#   ./bin/pr --draft --title "feat: …"
+#   PRE_PR_COVERAGE=true ./bin/pr
+# Also installed as a local git alias by ./gradlew installGitHooks:
+#   git pr
+
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$REPO_DIR" || exit 1
+
+if [ ! -x "$REPO_DIR/gradle/hooks/pre-pr" ]; then
+  chmod +x "$REPO_DIR/gradle/hooks/pre-pr" 2>/dev/null || true
+fi
+
+"$REPO_DIR/gradle/hooks/pre-pr"
+
+if ! command -v gh >/dev/null 2>&1; then
+  echo "ERROR: GitHub CLI (gh) not found. Install it, then re-run ./bin/pr or: gh pr create"
+  exit 1
+fi
+
+exec gh pr create "$@"
