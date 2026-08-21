@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/09897325adbd4047ab7fc603b46c5a97)](https://app.codacy.com/gh/jdbenitez94/criollo-kmp-foundation?utm_source=github.com&utm_medium=referral&utm_content=jdbenitez94/criollo-kmp-foundation&utm_campaign=Badge_Grade)
 [![CI](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/jdbenitez94/criollo-kmp-foundation/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/jdbenitez94/criollo-kmp-foundation)](https://github.com/jdbenitez94/criollo-kmp-foundation/releases)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4.10-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/docs/releases.html)
