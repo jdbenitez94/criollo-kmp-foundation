@@ -7,13 +7,13 @@ is missing or the Codecov upload errors. Codacy coverage stays best-effort.
 Store tokens in gitignored `local.properties` and sync to GitHub Actions secrets
 (never commit tokens).
 
-| `local.properties` key                          | GitHub Actions secret |
-|-------------------------------------------------|------------------------|
+| `local.properties` key | GitHub Actions secret |
+| ------------------------------------------------- | ------------------------ |
 | `codecovRepositoryToken` (or `codecovApiToken`) | `CODECOV_TOKEN` |
-| `codacyApiToken` (or `codacyToken`)             | `CODACY_API_TOKEN` (preferred) |
-| `codacyProjectToken`                            | `CODACY_PROJECT_TOKEN` (fallback) |
-| `gradleEncryptionKey`                           | `GRADLE_ENCRYPTION_KEY` |
-| `nvdApiKey`                                     | `NVD_API_KEY` |
+| `codacyApiToken` (or `codacyToken`) | `CODACY_API_TOKEN` (preferred) |
+| `codacyProjectToken` | `CODACY_PROJECT_TOKEN` (fallback) |
+| `gradleEncryptionKey` | `GRADLE_ENCRYPTION_KEY` |
+| `nvdApiKey` | `NVD_API_KEY` |
 
 Sync example (values never printed):
 

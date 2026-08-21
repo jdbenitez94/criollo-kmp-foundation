@@ -13,7 +13,7 @@ with in-memory PGP signing in CI.
 ## Release flow (automated)
 
 | Branch | Behavior |
-|--------|----------|
+| -------- | ---------- |
 | `dev` | CI only — no tags, no Maven publish |
 | `main` | [release-please](../.github/workflows/release-please.yml) opens a release PR from conventional commits |
 

@@ -10,7 +10,7 @@ replace, and debounce side effects by key.
 ## Artifacts
 
 | Artifact | Maven name | Gradle project | Role |
-|----------|------------|----------------|------|
+| ---------- | ------------ | ---------------- | ------ |
 | BOM | `bom` | `:bom` | Aligns versions of all foundation modules |
 | Core | `coroutines` | `:coroutines` | `TaskScope` registry |
 | ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | `by taskScope()` on `ViewModel` |

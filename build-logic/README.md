@@ -26,10 +26,10 @@ The main repo resolves these plugins via `pluginManagement { includeBuild("build
 
 ## Plugin naming
 
-| Prefix         | Purpose                                                                            | Examples                                        |
-|----------------|------------------------------------------------------------------------------------|-------------------------------------------------|
+| Prefix | Purpose | Examples |
+| ---------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------- |
 | `convention.*` | Reusable monorepo engineering (formatting, static analysis, coverage, root wiring) | `convention.ktlint`, `convention.kover.library` |
-| `criollo.*`    | Product policy for this foundation (KMP library targets, Maven publish)            | `criollo.kmp-library`, `criollo.maven-publish`  |
+| `criollo.*` | Product policy for this foundation (KMP library targets, Maven publish) | `criollo.kmp-library`, `criollo.maven-publish` |
 
 Catalog aliases in [`gradle/libs.versions.toml`](../gradle/libs.versions.toml) use kebab-case
 (e.g. `convention-ktlint`), which Gradle exposes as dot-nested properties
@@ -37,16 +37,16 @@ Catalog aliases in [`gradle/libs.versions.toml`](../gradle/libs.versions.toml) u
 
 ## Registered plugins
 
-| Plugin ID                      | Catalog alias                    | Implementation                         |
-|--------------------------------|----------------------------------|----------------------------------------|
-| `convention.root`              | `convention-root`                | `RootPlugin`                           |
-| `convention.kover.library`     | `convention-kover-library`       | `KoverLibraryConventionPlugin`         |
-| `convention.kover.aggregation` | `convention-kover-aggregation`   | `KoverAggregationConventionPlugin`     |
-| `convention.ktlint`            | `convention-ktlint`              | `KtLintConventionPlugin`               |
-| `convention.detekt`            | `convention-detekt`              | `DetektConventionPlugin`               |
-| `convention.dokka`             | `convention-dokka`               | `DokkaConventionPlugin`                |
-| `criollo.kmp-library`          | `criollo-kmp-library`            | `CriolloKmpLibraryConventionPlugin`    |
-| `criollo.maven-publish`        | `criollo-maven-publish`          | `MavenPublishConventionPlugin`         |
+| Plugin ID | Catalog alias | Implementation |
+| -------------------------------- | ---------------------------------- | ---------------------------------------- |
+| `convention.root` | `convention-root` | `RootPlugin` |
+| `convention.kover.library` | `convention-kover-library` | `KoverLibraryConventionPlugin` |
+| `convention.kover.aggregation` | `convention-kover-aggregation` | `KoverAggregationConventionPlugin` |
+| `convention.ktlint` | `convention-ktlint` | `KtLintConventionPlugin` |
+| `convention.detekt` | `convention-detekt` | `DetektConventionPlugin` |
+| `convention.dokka` | `convention-dokka` | `DokkaConventionPlugin` |
+| `criollo.kmp-library` | `criollo-kmp-library` | `CriolloKmpLibraryConventionPlugin` |
+| `criollo.maven-publish` | `criollo-maven-publish` | `MavenPublishConventionPlugin` |
 
 ## Adding a new convention plugin
 
