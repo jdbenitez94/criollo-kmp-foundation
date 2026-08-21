@@ -80,7 +80,7 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 | `CODACY_PROJECT_TOKEN` | Codacy project token (fallback if `CODACY_API_TOKEN` is unset) |
 | `GRADLE_ENCRYPTION_KEY` | Encrypts Gradle configuration-cache entries in Actions cache (required for warm CC) |
 | `NVD_API_KEY` | NIST NVD API key for OWASP Dependency Check (required; avoids multi-minute rate limits) |
-| `DEV_SYNC_TOKEN` | Owner PAT (Contents R/W) to force-align `dev` → `main` tip; ruleset User bypass required |
+| `DEV_SYNC_SSH_KEY` | Private half of write Deploy Key `dev-tip-sync` (ruleset DeployKey bypass) to force-align `dev` → `main` tip |
 
 ## Variables (release)
 
