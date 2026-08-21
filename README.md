@@ -15,7 +15,9 @@
 
 Kotlin Multiplatform building blocks for the Criollo architecture.
 
-This release focuses on **keyed coroutine task management** (`TaskScope`): launch, skip, replace, and debounce side effects by key—without fire-and-forget `launch` calls. More infrastructure modules will land in this monorepo over time.
+This release focuses on **keyed coroutine task management** (`TaskScope`): launch, skip, replace, and
+debounce side effects by key—without fire-and-forget `launch` calls. More infrastructure modules will
+land in this monorepo over time.
 
 **Group:** `io.github.jdbenitez94.criollo.kmp.foundation`
 
