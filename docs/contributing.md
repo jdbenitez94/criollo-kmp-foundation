@@ -15,6 +15,17 @@ This sets `core.hooksPath` to [`gradle/hooks/`](../gradle/hooks):
 | ------ | ---------------- |
 | `pre-commit` | `ktlintFormat` (re-stages Kotlin files), `ktlintCheck`, `detekt` (non-blocking) |
 | `pre-push` | `qualityCheck jvmLibraryTests` (configuration cache warn) |
+| `pre-pr` | **Manual** (Git has no pre-pr event): `preparePullRequest` → `localCloudParity` |
+
+Helpers (after `./gradlew installGitHooks`):
+
+```bash
+./bin/pr                         # pre-pr checks, then gh pr create
+./bin/pr --draft                 # forwards args to gh
+git pr                           # local git alias → ./bin/pr (this clone only)
+PRE_PR_COVERAGE=true ./bin/pr    # optional coverage uploads
+./gradlew preparePullRequest     # checks only (no gh)
+```
 
 Logs: `build/hooks/logs/`.
 
@@ -23,6 +34,23 @@ Logs: `build/hooks/logs/`.
 ```bash
 ./gradlew qualityCheck jvmLibraryTests
 ```
+
+## Local cloud parity (optional)
+
+Catch Codacy-style Markdown issues and duplication (jscpd), and optionally upload coverage
+before opening a PR. Complexity is Detekt (`./gradlew detekt` / `qualityCheck`).
+
+```bash
+# Markdownlint + jscpd (uses .markdownlint.json / .jscpd.json; fails on findings)
+./gradlew localCloudParity
+
+# Also run JVM tests + koverXmlReport, then best-effort Codecov/Codacy uploads
+./gradlew localCloudParity -PlocalCloudParity.coverage=true
+```
+
+Uploads need tokens in `local.properties` (`codecovRepositoryToken` / `codacyApiToken` /
+`codacyProjectToken` — see [BADGES-SETUP.md](../BADGES-SETUP.md)). Missing tokens skip uploads
+with a log line; upload failures never fail the task.
 
 ## Docs site (local)
 

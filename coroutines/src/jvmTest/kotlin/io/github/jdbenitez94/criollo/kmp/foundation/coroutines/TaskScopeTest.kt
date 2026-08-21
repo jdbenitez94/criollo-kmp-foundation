@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -21,6 +22,7 @@ import strikt.assertions.isTrue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.milliseconds
@@ -133,40 +135,22 @@ class TaskScopeTest {
     @Test
     fun cancel_key_stopsJob() = runTest {
         val scope = TaskScope(backgroundScope)
-        var completed = false
-
-        scope.launch(testKey, TaskPolicy.SkipIfActive) {
-            try {
-                delay(1_000)
-                completed = true
-            } catch (_: CancellationException) {
-            }
-        }
-        runCurrent()
+        val completed = launchCancellableLongJob(scope)
         scope.cancel(testKey)
         advanceTimeBy(1_500)
         runCurrent()
-        expectThat(completed).isFalse()
+        expectThat(completed.get()).isFalse()
         expectThat(scope.isActive(testKey)).isFalse()
     }
 
     @Test
     fun cancelAll_clearsRegistry() = runTest {
         val scope = TaskScope(backgroundScope)
-        var completed = false
-
-        scope.launch(testKey, TaskPolicy.SkipIfActive) {
-            try {
-                delay(1_000)
-                completed = true
-            } catch (_: CancellationException) {
-            }
-        }
-        runCurrent()
+        val completed = launchCancellableLongJob(scope)
         scope.cancelAll()
         advanceTimeBy(1_500)
         runCurrent()
-        expectThat(completed).isFalse()
+        expectThat(completed.get()).isFalse()
         expectThat(scope.isActive(testKey)).isFalse()
 
         var relaunched = false
@@ -176,6 +160,22 @@ class TaskScopeTest {
         runCurrent()
         expectThat(result).isA<TaskLaunchResult.Started>()
         expectThat(relaunched).isTrue()
+    }
+
+    /**
+     * Starts a long SkipIfActive job that swallows cancellation; returns whether it completed.
+     */
+    private fun TestScope.launchCancellableLongJob(scope: TaskScope): AtomicBoolean {
+        val completed = AtomicBoolean(false)
+        scope.launch(testKey, TaskPolicy.SkipIfActive) {
+            try {
+                delay(1_000)
+                completed.set(true)
+            } catch (_: CancellationException) {
+            }
+        }
+        runCurrent()
+        return completed
     }
 
     @Test

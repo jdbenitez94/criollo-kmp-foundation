@@ -8,7 +8,6 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
 import dev.detekt.gradle.DetektCreateBaselineTask as DetektCreateBaselineTaskV2
 import dev.detekt.gradle.extensions.DetektExtension as DetektExtensionV2
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask as DetektCreateBaselineTaskV1
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension as DetektExtensionV1
 
 /**
@@ -42,7 +41,7 @@ class DetektConventionPlugin : Plugin<Project> {
             source.setFrom(detektSourceFiles(target))
         }
 
-        registerBaselineTaskIfRoot(target, configFile = "detekt-v2.yml")
+        registerDetekt2BaselineTaskIfRoot(target)
     }
 
     private fun configureDetektV1(target: Project) {
@@ -60,8 +59,7 @@ class DetektConventionPlugin : Plugin<Project> {
             baseline = configDir.resolve("baseline.xml")
             source.setFrom(detektSourceFiles(target))
         }
-
-        registerBaselineTaskIfRoot(target, configFile = "detekt.yml")
+        // Root baseline regeneration is Detekt 2–only (single task definition, no v1/v2 clone).
     }
 
     /**
@@ -84,36 +82,20 @@ class DetektConventionPlugin : Plugin<Project> {
         "src/test/kotlin",
     )
 
-    private fun registerBaselineTaskIfRoot(target: Project, configFile: String) {
+    private fun registerDetekt2BaselineTaskIfRoot(target: Project) {
         if (target != target.rootProject) return
-        if (target.pluginManager.hasPlugin(DETEKT_V2_PLUGIN)) {
-            target.tasks.register<DetektCreateBaselineTaskV2>("detektProjectBaseline") {
-                group = "verification"
-                description =
-                    "Regenerates the shared baseline in config/detekt/baseline.xml for the entire repository."
-                buildUponDefaultConfig.set(true)
-                ignoreFailures.set(true)
-                parallel.set(true)
-                setSource(target.files(target.rootDir))
-                config.setFrom(target.files("${target.rootDir}/config/detekt/$configFile"))
-                baseline.set(target.layout.projectDirectory.file("config/detekt/baseline.xml"))
-                include("**/*.kt", "**/*.kts")
-                exclude("**/build/**", "**/generated/**")
-            }
-        } else if (target.pluginManager.hasPlugin(DETEKT_V1_PLUGIN)) {
-            target.tasks.register<DetektCreateBaselineTaskV1>("detektProjectBaseline") {
-                group = "verification"
-                description =
-                    "Regenerates the shared baseline in config/detekt/baseline.xml for the entire repository."
-                buildUponDefaultConfig.set(true)
-                ignoreFailures.set(true)
-                parallel.set(true)
-                setSource(target.files(target.rootDir))
-                config.setFrom(target.files("${target.rootDir}/config/detekt/$configFile"))
-                baseline.set(target.layout.projectDirectory.file("config/detekt/baseline.xml"))
-                include("**/*.kt", "**/*.kts")
-                exclude("**/build/**", "**/generated/**")
-            }
+        target.tasks.register<DetektCreateBaselineTaskV2>("detektProjectBaseline") {
+            group = "verification"
+            description =
+                "Regenerates the shared baseline in config/detekt/baseline.xml for the entire repository."
+            buildUponDefaultConfig.set(true)
+            ignoreFailures.set(true)
+            parallel.set(true)
+            setSource(target.files(target.rootDir))
+            config.setFrom(target.files("${target.rootDir}/config/detekt/detekt-v2.yml"))
+            baseline.set(target.layout.projectDirectory.file("config/detekt/baseline.xml"))
+            include("**/*.kt", "**/*.kts")
+            exclude("**/build/**", "**/generated/**")
         }
     }
 

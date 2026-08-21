@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Not a native Git hook — Git has no pre-pr event.
+# Run manually before opening a PR, or wrap `gh pr create`:
+#   ./gradle/hooks/pre-pr && gh pr create
+# Optional coverage uploads:
+#   PRE_PR_COVERAGE=true ./gradle/hooks/pre-pr
+
+set -euo pipefail
+
+echo "=========================================="
+echo "pre-pr: local cloud parity"
+echo "=========================================="
+echo ""
+
+REPO_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$REPO_DIR" || exit 1
+
+LOG_DIR="$REPO_DIR/build/hooks/logs"
+mkdir -p "$LOG_DIR"
+
+EXTRA=()
+if [ "${PRE_PR_COVERAGE:-false}" = "true" ]; then
+  EXTRA+=(-PlocalCloudParity.coverage=true)
+  echo "Coverage mode ON (PRE_PR_COVERAGE=true)"
+fi
+
+CMD=(./gradlew preparePullRequest "${EXTRA[@]}" --configuration-cache --configuration-cache-problems=warn --no-daemon)
+echo "Running: ${CMD[*]}"
+
+if ! "${CMD[@]}" >"$LOG_DIR/pre-pr.log" 2>&1; then
+  echo "ERROR: pre-pr checks failed"
+  echo "See: $LOG_DIR/pre-pr.log"
+  echo "Fix: ./gradlew localCloudParity"
+  exit 1
+fi
+
+echo "Pre-pr checks passed. Opening PR via ./bin/pr or: gh pr create"
