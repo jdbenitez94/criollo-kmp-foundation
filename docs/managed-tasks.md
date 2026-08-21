@@ -35,7 +35,7 @@ implementation("io.github.jdbenitez94.criollo.kmp.foundation:coroutines-compose"
 | `TaskLaunchResult` | `Started(handle)` or `Skipped` |
 | `TaskHandle` | Cancel a started task without exposing raw `Job` |
 | `TaskScope` | Registry bound to a parent `CoroutineScope` |
-| `taskState(key)` | `StateFlow<Idle\ | Running>` |
+| `taskState(key)` | `StateFlow<TaskJobState>` (`Idle` / `Running`) |
 
 ## ViewModel usage
 

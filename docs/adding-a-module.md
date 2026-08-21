@@ -17,6 +17,7 @@ For a **published Gradle plugin** (see `:project-conventions`), use `org.jetbrai
    - Extra plugins only if needed (Compose, serialization, …)
 
 2. **Register in** [`settings.gradle.kts`](../settings.gradle.kts):
+
    ```kotlin
    include(":logging")
    ```
