@@ -85,3 +85,6 @@ Both share [`config/detekt/baseline.xml`](../config/detekt/baseline.xml).
 ./gradlew :build-logic:convention:build
 ./gradlew qualityCheck jvmLibraryTests --configuration-cache --configuration-cache-problems=warn
 ```
+
+`qualityCheck` also runs Detekt on this included build (`:convention:detekt`) so
+`build-logic` sources (e.g. `LocalCloudParityTask`) stay aligned with Codacy.
