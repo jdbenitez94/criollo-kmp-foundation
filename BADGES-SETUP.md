@@ -36,6 +36,9 @@ awk -F= '/^codacyApiToken=/{print substr($0,index($0,"=")+1)}' local.properties 
    (`report_type: test_results` on the same SHA-pinned `codecov-action` v7).
    Do not use floating `codecov-action@v5` or deprecated `test-results-action@v1`.
    Missing token or upload errors fail Quality.
+6. Repo policy lives in [`codecov.yml`](codecov.yml) (project/patch target **70%**,
+   aligned with Kover verify; ignores `build-logic` / `project-conventions` / docs).
+   Validate with: `curl --data-binary @codecov.yml https://codecov.io/validate`
 
 ---
 
