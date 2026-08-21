@@ -13,7 +13,7 @@ This repo uses [Conventional Commits](https://www.conventionalcommits.org/):
 ## Types
 
 | Type | When |
-|------|------|
+| ------ | ------ |
 | `feat` | New user-facing capability or published API |
 | `fix` | Bug fix |
 | `docs` | Documentation only |
