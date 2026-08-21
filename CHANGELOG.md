@@ -2,7 +2,6 @@
 
 ## [0.1.5](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.4...v0.1.5) (2026-08-21)
 
-
 ### Features
 
 * **ci:** hard ruleset sync via Deploy Key bypass ([#26](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/26)) ([bfb219b](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/bfb219b0b8abd3946b998be433939ba0ad2761ab))
