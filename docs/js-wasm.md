@@ -2,9 +2,12 @@
 
 ## `webpack.config.d/resolve-fallback.js`
 
-Modules that target **JS browser** and/or **WasmJS browser** may ship a `webpack.config.d/` directory. Kotlin/JS webpack merges every `*.js` file under that folder into the generated webpack config.
+Modules that target **JS browser** and/or **WasmJS browser** may ship a `webpack.config.d/` directory.
+Kotlin/JS webpack merges every `*.js` file under that folder into the generated webpack config.
 
-[`coroutines/webpack.config.d/resolve-fallback.js`](../coroutines/webpack.config.d/resolve-fallback.js) (also under `coroutines/compose` and `coroutines/viewmodel`) disables Node polyfills for `path` and `os`. ESLint treats `config` as a global via [`.eslintrc.json`](../.eslintrc.json).
+[`coroutines/webpack.config.d/resolve-fallback.js`](../coroutines/webpack.config.d/resolve-fallback.js)
+(also under `coroutines/compose` and `coroutines/viewmodel`) disables Node polyfills for `path` and `os`.
+ESLint treats `config` as a global via [`.eslintrc.json`](../.eslintrc.json).
 
 ```js
 config.resolve.fallback = {
@@ -34,4 +37,7 @@ not in this foundation library.
 
 ### Consumer apps
 
-If your CMP web app already configures webpack fallbacks, you may not need anything extra. If you see webpack errors about `path` or `os` after depending on these artifacts, add the same fallback snippet to the **app** `webpack.config.d/` (or rely on the library fragment if webpack merges dependency configs in your toolchain).
+If your CMP web app already configures webpack fallbacks, you may not need anything extra. If you see
+webpack errors about `path` or `os` after depending on these artifacts, add the same fallback snippet to
+the **app** `webpack.config.d/` (or rely on the library fragment if webpack merges dependency configs in
+your toolchain).

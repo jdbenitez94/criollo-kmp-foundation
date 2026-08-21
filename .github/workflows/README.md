@@ -59,7 +59,8 @@ Other workflows:
 
 ## Action pinning
 
-Third-party actions use immutable commit SHAs with a version comment for humans, e.g. `actions/checkout@<sha> # v4`. Dependabot (`github-actions` ecosystem) opens weekly PRs to refresh pins.
+Third-party actions use immutable commit SHAs with a version comment for humans, e.g.
+`actions/checkout@<sha> # v4`. Dependabot (`github-actions` ecosystem) opens weekly PRs to refresh pins.
 
 ## Secrets (release)
 
