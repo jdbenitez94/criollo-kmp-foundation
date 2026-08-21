@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.5](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.4...v0.1.5) (2026-08-21)
+
+
+### Features
+
+* **ci:** hard ruleset sync via Deploy Key bypass ([#26](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/26)) ([bfb219b](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/bfb219b0b8abd3946b998be433939ba0ad2761ab))
+* **ci:** snapshots from dev and keep tips aligned ([#23](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/23)) ([57c4b84](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/57c4b84dcbecc4d1166891d6d6ae98f503ec15a4))
+
 ## [0.1.4](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.3...v0.1.4) (2026-08-21)
 
 ### Features
