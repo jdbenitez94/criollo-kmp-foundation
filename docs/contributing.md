@@ -21,17 +21,16 @@ Do not leave long-lived unique history on `dev` after a promotion—the sync wil
 
 ### Ruleset bypass + classic protection + `DEV_SYNC_TOKEN` (one-time)
 
-The sync workflow force-updates `dev`. On this user-owned repo the **GitHub Actions**
-app cannot be a ruleset bypass actor, so:
+The sync workflow force-updates `dev`.
 
-1. **Ruleset** `Protect main and `dev``: **User** bypass for the repo owner
-   (`bypass_mode: always`).
-2. **Classic branch protection** on `dev`: same gates as before (PR, Docs, linear
-   history, `enforce_admins`), with **force push allowed only for the owner**
-   (GraphQL `bypassForcePushAllowances` — not “everyone”).
-3. Create a fine-grained PAT (or classic) for that user with **Contents: Read and write**
-   on this repository (or reuse the `gh` login token with `repo` scope).
-4. Put it in gitignored `local.properties` as `devSyncToken=…` and sync:
+1. **Ruleset** (strict): applies to **`main` only** (PR + required checks + no
+   force-push). Owner User bypass kept for emergencies.
+2. **Classic branch protection** on **`dev`**: no required PR/checks (so tip sync
+   can force-update), **no deletions**, linear history, **force push only for the
+   owner** (`bypassForcePushAllowances`). Feature work should still land via PRs into
+   `dev` by convention; `main` remains the hard gate.
+3. Create a PAT (or reuse `gh` login token with `repo` scope) and put it in
+   gitignored `local.properties` as `devSyncToken=…`, then sync:
 
 ```bash
 awk -F= '/^devSyncToken=/{print substr($0,index($0,"=")+1)}' local.properties \
