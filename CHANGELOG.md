@@ -2,7 +2,6 @@
 
 ## [0.1.3](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.2...v0.1.3) (2026-08-21)
 
-
 ### Features
 
 * **build:** add local cloud parity and clear jscpd clones ([#18](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/18)) ([5f163b3](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/5f163b3f81fdaf5efb651eca836897ecf060ea06))
