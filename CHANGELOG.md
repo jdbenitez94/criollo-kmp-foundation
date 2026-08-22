@@ -2,7 +2,6 @@
 
 ## [0.1.9](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.8...v0.1.9) (2026-08-22)
 
-
 ### Bug Fixes
 
 * **publish:** upload atomic Portal release bundles ([#37](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/37)) ([a1873eb](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/a1873ebe419e6e05f3e0f7aa9c704f32064067f8))
