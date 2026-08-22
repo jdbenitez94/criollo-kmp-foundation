@@ -2,7 +2,7 @@ package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.android
 
 /**
  * Process-local lazy singleton used by Android Context property delegates (REQ-AND-01).
- * Available on all targets of this module; used from androidMain and jvmTest.
+ * Android/JVM only (`jvmAndAndroidMain`) — not compiled for common metadata / JS / Native.
  */
 internal class LazySingleton<T>(private val create: () -> T) {
     @Volatile

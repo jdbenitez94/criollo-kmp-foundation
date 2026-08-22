@@ -9,6 +9,18 @@ kotlin {
         withHostTest {}
     }
     sourceSets {
+        val jvmAndAndroidMain by creating {
+            dependsOn(commonMain.get())
+        }
+        androidMain {
+            dependsOn(jvmAndAndroidMain)
+            dependencies {
+                implementation(libs.org.jetbrains.kotlinx.coroutines.core)
+            }
+        }
+        jvmMain {
+            dependsOn(jvmAndAndroidMain)
+        }
         commonMain.dependencies {
             // Android-only DX; other targets publish empty metadata artifacts.
             api(project(":kryptostore"))
@@ -17,9 +29,6 @@ kotlin {
             api(libs.androidx.datastore.core.okio)
             api(libs.androidx.datastore.preferences.core)
             implementation(libs.org.jetbrains.kotlinx.serialization.protobuf)
-            implementation(libs.org.jetbrains.kotlinx.coroutines.core)
-        }
-        androidMain.dependencies {
             implementation(libs.org.jetbrains.kotlinx.coroutines.core)
         }
         jvmTest.dependencies {
