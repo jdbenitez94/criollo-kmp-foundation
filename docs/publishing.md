@@ -29,8 +29,9 @@ runs on `release-please--branches--*` pushes and collapses consecutive blanks vi
 **`macos-15`** with that flag so Maven Central module metadata includes Apple klibs.
 Linux CI keeps skipping Apple targets (no Xcode).
 
-`0.1.5` and earlier Ubuntu publishes omitted iOS variants — Saveable (and other KMP
-consumers with iOS) need a release built on macOS (e.g. `0.1.6`).
+`0.1.5` and earlier Ubuntu publishes omitted iOS variants. `0.1.6` was built on macOS but
+only `coroutines-viewmodel` reached repo1 after a partial Portal publish — treat **0.1.7+**
+as the first complete Central set (BOM + coroutines + adapters, including Apple klibs).
 
 Local check:
 
@@ -81,9 +82,9 @@ Local: `./gradlew publishAllPublicationsToMavenCentralRepository -Pcriollo.versi
 3. Merge that release PR → release-please creates tag `vX.Y.Z` + GitHub Release.
 4. The same workflow run publishes to Maven Central (see
    [`publish-maven-central.yml`](../.github/workflows/publish-maven-central.yml)).
-5. CI **Finalize Central Portal deployment** validates the upload and exposes it in the Portal
-   (`publishing_type=user_managed`). When that step is green, publish (or drop) the deployment at
-   <https://central.sonatype.com/publishing>.
+5. CI **Finalize Central Portal deployment** closes the staging bundle with
+   `publishing_type=automatic` so Central publishes the **entire** deployment (avoids
+   partial manual publishes). Status: <https://central.sonatype.com/publishing>.
 
 Bootstrap: `initial-version` is `0.1.0` so the first release PR is `0.1.0`. After that, SemVer follows commit types.
 
