@@ -160,7 +160,7 @@ private fun pomDescriptionFor(artifactId: String): String = when (artifactId) {
     ProjectConfig.Artifacts.result ->
         "Flow Result triad (Loading / Success / Error) and asResult() for Kotlin Multiplatform."
     ProjectConfig.Artifacts.runtime ->
-        "Shared runtime helpers for Criollo KMP (retry with exponential backoff and jitter)."
+        "Shared runtime helpers for Criollo KMP (cancellable runCatching, Result extensions, retry with backoff)."
     ProjectConfig.Artifacts.kryptostore ->
         "Encrypted typed DataStore factories and IndexedDB storage for KryptoStore."
     ProjectConfig.Artifacts.kryptostoreCrypto ->

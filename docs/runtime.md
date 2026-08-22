@@ -9,6 +9,36 @@ implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:<versi
 implementation("io.github.jdbenitez94.criollo.kmp.foundation:runtime")
 ```
 
+## Cancellation-safe `runCatching`
+
+Stdlib `runCatching` catches **all** exceptions, including `CancellationException`. In
+coroutines that exception is control flow, not a failure: swallowing it breaks structured
+concurrency (ViewModel work that never stops, delayed cleanup, silent hangs).
+
+Use foundation wrappers instead:
+
+```kotlin
+val sync = runCatchingCancellable { parse(input) }
+val async = suspendRunCatchingCancellable { api.fetch() }
+
+async
+    .onFailureExceptCancellation { log(it) }
+    .getOrElseCancellable { fallback }
+```
+
+| API | Role |
+| --- | --- |
+| `runCatchingCancellable` | Non-suspend; rethrows `CancellationException` |
+| `suspendRunCatchingCancellable` | Suspend; rethrows `CancellationException` |
+| `Result.rethrowCancellation()` | Defensive if a `Result` might still hold cancellation |
+| `onFailureOrRethrow<E>` | Handle failure unless it is type `E` (rethrow `E`) |
+| `onFailureExceptCancellation` | Handle failures except cancellation |
+| `getOrElseCancellable` | Fallback value without swallowing cancellation |
+
+Prefer producing `Result` with these wrappers so cancellation never enters the wrapper.
+Keep chains short; for one-off local handling, plain `try/catch` with rethrow of cancellation is fine.
+For resources, prefer Kotlin `use { }` over inventing a `finally` on `Result`.
+
 ## Retry with backoff
 
 `retryWithBackoff` runs a suspend block and retries transient failures with exponential

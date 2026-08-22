@@ -132,6 +132,13 @@ val payload = retryWithBackoff(RetryPolicy(maxAttempts = 3)) { attempt ->
 }
 ```
 
+**Cancellation-safe runCatching:**
+
+```kotlin
+val result = suspendRunCatchingCancellable { api.fetch() }
+result.onFailureExceptCancellation { log(it) }
+```
+
 ## KryptoStore quickstarts (REQ-HRD-05)
 
 ```kotlin
