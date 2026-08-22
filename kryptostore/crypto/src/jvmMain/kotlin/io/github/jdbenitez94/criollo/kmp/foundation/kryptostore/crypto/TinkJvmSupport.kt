@@ -9,8 +9,6 @@ import com.sun.jna.NativeLibrary
 import com.sun.jna.Pointer
 import com.sun.jna.ptr.IntByReference
 import com.sun.jna.ptr.PointerByReference
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.reflect.Method
 import java.nio.file.Files
@@ -210,14 +208,4 @@ private interface SecurityLibrary : Library {
     fun secKeychainItemFreeContent(attrList: Pointer?, data: Pointer?): Int
 
     fun cfRelease(cf: Pointer?)
-}
-
-internal class TinkCipher(private val aeadProvider: AlgorithmProvider<Aead>, private val dispatcher: CoroutineDispatcher) : Cipher {
-    override suspend fun encrypt(message: ByteArray, associatedData: ByteArray?): ByteArray = withContext(dispatcher) {
-        aeadProvider.algorithm.encrypt(message, associatedData)
-    }
-
-    override suspend fun decrypt(message: ByteArray, associatedData: ByteArray?): ByteArray = withContext(dispatcher) {
-        aeadProvider.algorithm.decrypt(message, associatedData)
-    }
 }

@@ -74,20 +74,17 @@ private class JvmTimeBasedKeyRotator(
     override suspend fun rotateKeyIfNeeded(): Boolean {
         val lastRotation = rotationFile.takeIf { it.exists() }?.readText()?.toLongOrNull() ?: 0L
         val now = Clock.System.now().toEpochMilliseconds()
-        if (lastRotation != 0L && (now - lastRotation) <= config.rotationPeriod.inWholeMilliseconds) {
+        if (isWithinRotationPeriod(lastRotation, now, config.rotationPeriod.inWholeMilliseconds)) {
             return false
         }
-        if (lastRotation == 0L) {
+        if (isUnsetRotationStamp(lastRotation)) {
             // Existing install without a stamp: record now without rotating.
             rotationFile.writeText(now.toString())
             sealPosixFile(rotationFile)
             return false
         }
-        val newEntry = KeysetHandle.generateEntryFromParameters(PredefinedAeadParameters.AES256_GCM)
-            .withRandomId()
-            .makePrimary()
-        val newHandle = KeysetHandle.newBuilder(keysetHandle).addEntry(newEntry).build()
-        val encrypted = TinkProtoKeysetFormat.serializeEncryptedKeyset(newHandle, masterAead, associatedData)
+        val newHandle = keysetHandle.withRotatedAes256GcmPrimary()
+        val encrypted = newHandle.serializeEncryptedKeyset(masterAead, associatedData)
         keysetFile.writeBytes(encrypted)
         sealPosixFile(keysetFile)
         rotationFile.writeText(now.toString())

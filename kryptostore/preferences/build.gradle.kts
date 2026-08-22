@@ -4,6 +4,13 @@ plugins {
 
 kotlin {
     sourceSets {
+        val nonWebMain by creating {
+            dependsOn(commonMain.get())
+        }
+        androidMain.get().dependsOn(nonWebMain)
+        jvmMain.get().dependsOn(nonWebMain)
+        findByName("iosMain")?.dependsOn(nonWebMain)
+
         commonMain.dependencies {
             api(project(":kryptostore:serializers"))
             api(libs.androidx.datastore.core.okio)

@@ -87,18 +87,15 @@ private class AndroidTimeBasedKeyRotator(
         val prefs = context.getSharedPreferences("$preferenceFileName.rotation", Context.MODE_PRIVATE)
         val lastRotation = prefs.getLong(KEY_LAST_ROTATION, 0L)
         val now = Clock.System.now().toEpochMilliseconds()
-        if (lastRotation != 0L && (now - lastRotation) <= config.rotationPeriod.inWholeMilliseconds) {
+        if (isWithinRotationPeriod(lastRotation, now, config.rotationPeriod.inWholeMilliseconds)) {
             return false
         }
-        if (lastRotation == 0L) {
+        if (isUnsetRotationStamp(lastRotation)) {
             prefs.editCommit { putLong(KEY_LAST_ROTATION, now) }
             return false
         }
-        val newEntry = KeysetHandle.generateEntryFromParameters(PredefinedAeadParameters.AES256_GCM)
-            .withRandomId()
-            .makePrimary()
-        val newHandle = KeysetHandle.newBuilder(keysetHandle).addEntry(newEntry).build()
-        val encrypted = TinkProtoKeysetFormat.serializeEncryptedKeyset(newHandle, keysetEncryptionAead, associatedData)
+        val newHandle = keysetHandle.withRotatedAes256GcmPrimary()
+        val encrypted = newHandle.serializeEncryptedKeyset(keysetEncryptionAead, associatedData)
         context.getSharedPreferences(preferenceFileName, Context.MODE_PRIVATE).editCommit {
             putString(keysetName, Hex.encode(encrypted))
         }
