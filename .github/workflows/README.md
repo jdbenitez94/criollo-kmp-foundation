@@ -90,12 +90,12 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 | `MAVEN_CENTRAL_NAMESPACE` | Portal namespace for finalize step (e.g. `io.github.jdbenitez94`) |
 
 Publish URL is the Portal OSSRH staging API
-(`ossrh-staging-api.central.sonatype.com`). After Gradle upload, release publishes call
-`POST /manual/upload/defaultRepository/{namespace}?publishing_type=portal_api`, poll Portal
-until `PUBLISHED`, then verify the full expected POM set on repo1
-(`scripts/maven-central/`). A green publish job means the coordinates are fetchable from
-Maven Central — not merely that staging upload returned HTTP 2xx. Releases and snapshots
-share concurrency group `criollo-maven-central-publish` so they never interleave.
+(`ossrh-staging-api.central.sonatype.com`) for **snapshots only**. Releases publish to a
+local Maven repo under `build/central-bundle`, assert the expected POM set, zip it, and
+upload via `POST /api/v1/publisher/upload?publishingType=AUTOMATIC`, then poll until
+`PUBLISHED` and verify repo1 (`scripts/maven-central/`). A green release job means the
+coordinates are fetchable from Maven Central. Releases and snapshots still share
+concurrency group `criollo-maven-central-publish`.
 
 ## Composite action: `setup-gradle-ci`
 

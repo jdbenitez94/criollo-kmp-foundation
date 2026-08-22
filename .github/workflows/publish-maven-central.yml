@@ -1,5 +1,7 @@
-# Reusable Maven Central publish (Portal OSSRH staging API + PGP signing).
-# Called from release-please / tag release (releases) and publish-snapshots (dev).
+# Reusable Maven Central publish (PGP signing).
+# Releases: local Maven bundle → Portal Publisher API zip upload (atomic).
+# Snapshots: Central snapshots repo via OSSRH-compatible URL.
+# Called from release-please / tag release and publish-snapshots (dev).
 name: Publish Maven Central
 
 on:
@@ -115,7 +117,8 @@ jobs:
             echo "Apple variants present for :${module}"
           done
 
-      - name: Publish to Maven Central
+      - name: Publish SNAPSHOT to Central snapshots
+        if: ${{ inputs.snapshot }}
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
@@ -130,20 +133,42 @@ jobs:
             --configuration-cache \
             --configuration-cache-problems=fail
 
-      # Releases only: close staging → Portal (portal_api) → wait PUBLISHED → verify repo1.
-      # Do not treat finalize HTTP 2xx alone as success (0.1.6/0.1.7 incomplete sets).
-      # Snapshots: https://central.sonatype.com/repository/maven-snapshots/ (no finalize).
-      # https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
-      - name: Finalize Central Portal deployment
+      # Releases: publish the full set to a local Maven repo, assert completeness, then
+      # upload one atomic zip via the Portal Publisher API. This replaces OSSRH staging
+      # finalize, which repeatedly produced incomplete Central sets (0.1.6–0.1.8).
+      # https://central.sonatype.org/publish/publish-portal-api/
+      - name: Publish release bundle locally
+        if: ${{ !inputs.snapshot }}
+        env:
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signing.required: 'true'
+        run: |
+          ./gradlew publishAllPublicationsToCentralBundleRepository \
+            -Pcriollo.version=${{ steps.ver.outputs.version }} \
+            -Pcriollo.requireAppleTargets=true \
+            --configuration-cache \
+            --configuration-cache-problems=fail
+
+      - name: Assert local release bundle is complete
+        if: ${{ !inputs.snapshot }}
+        env:
+          RELEASE_VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          chmod +x scripts/maven-central/assert-local-bundle.sh
+          scripts/maven-central/assert-local-bundle.sh
+
+      - name: Upload release bundle to Central Portal
         id: portal
         if: ${{ !inputs.snapshot }}
         env:
+          RELEASE_VERSION: ${{ steps.ver.outputs.version }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          MAVEN_CENTRAL_NAMESPACE: ${{ vars.MAVEN_CENTRAL_NAMESPACE }}
         run: |
-          chmod +x scripts/maven-central/finalize-portal-deployment.sh
-          scripts/maven-central/finalize-portal-deployment.sh
+          chmod +x scripts/maven-central/upload-bundle-to-portal.sh
+          scripts/maven-central/upload-bundle-to-portal.sh
 
       - name: Verify full artifact set on Maven Central
         if: ${{ !inputs.snapshot }}
