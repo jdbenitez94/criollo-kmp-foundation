@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.6](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.5...v0.1.6) (2026-08-22)
+
+### Bug Fixes
+
+* **publish:** include iOS klibs on Maven Central ([#27](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/27)) ([db66088](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/db660889283c50abc745cbfba826577f35fb4b3c))
+
 ## [0.1.5](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.4...v0.1.5) (2026-08-21)
 
 ### Features
