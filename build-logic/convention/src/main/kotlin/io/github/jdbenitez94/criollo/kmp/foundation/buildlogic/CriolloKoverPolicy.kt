@@ -5,6 +5,8 @@ val CRIOLLO_KOVER_PUBLISHED_LIBRARY_MODULES = listOf(
     ":coroutines",
     ":coroutines:compose",
     ":coroutines:viewmodel",
+    ":result",
+    ":runtime",
 )
 
 /** Modules that participate in the merged Kover report. */
