@@ -35,9 +35,14 @@ async
 | `onFailureExceptCancellation` | Handle failures except cancellation |
 | `getOrElseCancellable` | Fallback value without swallowing cancellation |
 
+Non-[CancellationException] failures (including [Error] such as `OutOfMemoryError`) become
+`Result.failure` in both sync and suspend wrappers.
+
 Prefer producing `Result` with these wrappers so cancellation never enters the wrapper.
 Keep chains short; for one-off local handling, plain `try/catch` with rethrow of cancellation is fine.
 For resources, prefer Kotlin `use { }` over inventing a `finally` on `Result`.
+
+`RetryPolicy` compares equal by numeric fields only (`shouldRetry` is ignored in `equals`/`hashCode`).
 
 ## Retry with backoff
 

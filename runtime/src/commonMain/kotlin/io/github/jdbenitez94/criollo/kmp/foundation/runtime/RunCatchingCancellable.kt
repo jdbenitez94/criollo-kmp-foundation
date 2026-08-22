@@ -8,18 +8,31 @@ import kotlin.coroutines.cancellation.CancellationException
  * Prefer this over [runCatching] for any block that may run in a cancellable coroutine context
  * (including non-suspend helpers called from suspend code).
  *
+ * Non-[CancellationException] failures (including [Error]) become [Result.failure], matching
+ * [suspendRunCatchingCancellable].
+ *
  * For suspend blocks, use [suspendRunCatchingCancellable] (separate name avoids overload ambiguity).
  */
-inline fun <T> runCatchingCancellable(block: () -> T): Result<T> = runCatching(block).rethrowCancellation()
+@Suppress("TooGenericExceptionCaught")
+inline fun <T> runCatchingCancellable(block: () -> T): Result<T> = try {
+    Result.success(block())
+} catch (cancelled: CancellationException) {
+    throw cancelled
+} catch (error: Throwable) {
+    Result.failure(error)
+}
 
 /**
  * Suspend variant of [runCatchingCancellable]. Use instead of [runCatching] around suspend work.
+ *
+ * Non-[CancellationException] failures (including [Error]) become [Result.failure].
  */
+@Suppress("TooGenericExceptionCaught")
 suspend inline fun <T> suspendRunCatchingCancellable(block: suspend () -> T): Result<T> = try {
     Result.success(block())
 } catch (cancelled: CancellationException) {
     throw cancelled
-} catch (error: Exception) {
+} catch (error: Throwable) {
     Result.failure(error)
 }
 

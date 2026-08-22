@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Async triad for UI / presentation layers: loading → success or error.
@@ -21,7 +22,12 @@ sealed interface Result<out T> {
 /**
  * Maps upstream emissions to [Result.Success], emits [Result.Loading] on start,
  * and [Result.Error] when the upstream fails.
+ *
+ * [CancellationException] is rethrown so structured concurrency is preserved.
  */
 fun <T> Flow<T>.asResult(): Flow<Result<T>> = map<T, Result<T>> { Result.Success(it) }
     .onStart { emit(Result.Loading) }
-    .catch { emit(Result.Error(it)) }
+    .catch { cause ->
+        if (cause is CancellationException) throw cause
+        emit(Result.Error(cause))
+    }

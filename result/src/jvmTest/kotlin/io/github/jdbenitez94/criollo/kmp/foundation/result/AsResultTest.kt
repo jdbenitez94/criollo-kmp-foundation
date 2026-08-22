@@ -4,9 +4,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.containsExactly
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
 
 class AsResultTest {
@@ -37,6 +39,15 @@ class AsResultTest {
         )
         expectThat(values[1]).isA<Result.Error>().and {
             get { exception }.isEqualTo(boom)
+        }
+    }
+
+    @Test
+    fun asResult_rethrowsCancellationException() = runTest {
+        expectThrows<CancellationException> {
+            flow<Int> {
+                throw CancellationException("stop")
+            }.asResult().toList()
         }
     }
 }

@@ -11,6 +11,9 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Policy for [retryWithBackoff].
  *
+ * Not a `data class`: [shouldRetry] is excluded from [equals]/[hashCode] so two policies with the
+ * same numeric settings compare equal regardless of predicate identity.
+ *
  * @param maxAttempts Total tries including the first (must be ≥ 1).
  * @param initialBackoff Delay before the second attempt.
  * @param maxBackoff Cap for exponential backoff growth.
@@ -18,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param shouldRetry Return false to stop retrying and rethrow immediately (after the failed attempt).
  *   [CancellationException] is always rethrown and never retried.
  */
-data class RetryPolicy(
+class RetryPolicy(
     val maxAttempts: Int = DEFAULT_MAX_ATTEMPTS,
     val initialBackoff: Duration = DEFAULT_INITIAL_BACKOFF,
     val maxBackoff: Duration = DEFAULT_MAX_BACKOFF,
@@ -33,6 +36,41 @@ data class RetryPolicy(
         }
         require(jitterFactor in 0.0..1.0) { "jitterFactor must be in 0.0..1.0 (was $jitterFactor)" }
     }
+
+    fun copy(
+        maxAttempts: Int = this.maxAttempts,
+        initialBackoff: Duration = this.initialBackoff,
+        maxBackoff: Duration = this.maxBackoff,
+        jitterFactor: Double = this.jitterFactor,
+        shouldRetry: (Exception) -> Boolean = this.shouldRetry,
+    ): RetryPolicy = RetryPolicy(
+        maxAttempts = maxAttempts,
+        initialBackoff = initialBackoff,
+        maxBackoff = maxBackoff,
+        jitterFactor = jitterFactor,
+        shouldRetry = shouldRetry,
+    )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as RetryPolicy
+        return maxAttempts == other.maxAttempts &&
+            initialBackoff == other.initialBackoff &&
+            maxBackoff == other.maxBackoff &&
+            jitterFactor == other.jitterFactor
+    }
+
+    override fun hashCode(): Int {
+        var result = maxAttempts
+        result = 31 * result + initialBackoff.hashCode()
+        result = 31 * result + maxBackoff.hashCode()
+        result = 31 * result + jitterFactor.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "RetryPolicy(maxAttempts=$maxAttempts, initialBackoff=$initialBackoff, " +
+        "maxBackoff=$maxBackoff, jitterFactor=$jitterFactor)"
 
     companion object {
         const val DEFAULT_MAX_ATTEMPTS = 3

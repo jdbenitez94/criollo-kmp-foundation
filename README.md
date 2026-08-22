@@ -39,9 +39,12 @@ land in this monorepo over time.
 | Android DX (KryptoStore) | `kryptostore-android-delegates` | `:kryptostore:android` | Optional | `Context` property delegates for encrypted/plain stores |
 | Migrate Android (KryptoStore) | `kryptostore-migrate-android` | `:kryptostore:migrate-android` | Optional | Unenveloped AEAD migration helpers |
 
-Only `coroutines` is required. Pick ViewModel and/or Compose adapters when you want the convenience APIs; you can also construct `TaskScope(coroutineScope)` yourself.
+Only `coroutines` is required. Pick ViewModel and/or Compose adapters when you want the convenience
+APIs; you can also construct `TaskScope(coroutineScope)` yourself.
 
-Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`); `…foundation.result`; `…foundation.runtime`; KryptoStore: `…foundation.kryptostore` (+ `.crypto` / `.serializers` / `.preferences` / `.android` / `.migrate`).
+Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`); `…foundation.result`;
+`…foundation.runtime`; KryptoStore: `…foundation.kryptostore`
+(+ `.crypto` / `.serializers` / `.preferences` / `.android` / `.migrate`).
 
 ## Install
 
