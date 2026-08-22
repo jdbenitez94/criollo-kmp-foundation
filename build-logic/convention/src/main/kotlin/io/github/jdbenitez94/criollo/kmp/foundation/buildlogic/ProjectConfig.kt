@@ -14,6 +14,12 @@ object ProjectConfig {
         const val coroutines = "coroutines"
         const val coroutinesCompose = "coroutines-compose"
         const val coroutinesViewmodel = "coroutines-viewmodel"
+        const val kryptostore = "kryptostore"
+        const val kryptostoreCrypto = "kryptostore-crypto"
+        const val kryptostoreSerializers = "kryptostore-serializers"
+        const val kryptostorePreferences = "kryptostore-preferences"
+        const val kryptostoreAndroid = "kryptostore-android-delegates"
+        const val kryptostoreMigrateAndroid = "kryptostore-migrate-android"
         const val projectConventions = "project-conventions"
     }
 
@@ -43,5 +49,11 @@ object ProjectConfig {
         const val coroutines = "$group.coroutines"
         const val coroutinesCompose = "$group.coroutines.compose"
         const val coroutinesViewmodel = "$group.coroutines.viewmodel"
+        const val kryptostore = "$group.kryptostore"
+        const val kryptostoreCrypto = "$group.kryptostore.crypto"
+        const val kryptostoreSerializers = "$group.kryptostore.serializers"
+        const val kryptostorePreferences = "$group.kryptostore.preferences"
+        const val kryptostoreAndroid = "$group.kryptostore.android"
+        const val kryptostoreMigrateAndroid = "$group.kryptostore.migrate"
     }
 }

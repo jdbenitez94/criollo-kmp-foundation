@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+* **kryptostore:** add `kryptostore-crypto` module (Phase A extract from saveable)
+* **kryptostore:** add `kryptostore-serializers` with envelope + fail-closed (Phase B)
+* **kryptostore:** add core factories + IndexedDB storage (Phase C)
+* **kryptostore:** add `kryptostore-preferences` encrypted + plain prefs (Phase D)
+* **kryptostore:** StoreRegistry re-encrypt, `kryptostore-android` delegates, StreamingAead (Phase E)
+* **kryptostore:** BOM DataStore/Tink constraints, migrate-android, compat fixtures, ABI dumps (Phase F)
+* **kryptostore:** publish DX artifact as `kryptostore-android-delegates` (avoid clash with KMP `*-android` target)
+* **kryptostore:** Phase G — saveable dogfoods kryptostore (crypto/serializers/core); CRYPTO_KMP.md corrected
+
 ## [0.1.9](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.8...v0.1.9) (2026-08-22)
 
 ### Bug Fixes

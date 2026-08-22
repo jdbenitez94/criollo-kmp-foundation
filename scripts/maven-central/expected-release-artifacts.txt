@@ -11,6 +11,12 @@ root bom
 root coroutines
 root coroutines-compose
 root coroutines-viewmodel
+root kryptostore
+root kryptostore-crypto
+root kryptostore-serializers
+root kryptostore-preferences
+root kryptostore-android-delegates
+root kryptostore-migrate-android
 root project-conventions
 plugin io.github.jdbenitez94.criollo.kmp.foundation.project-conventions.gradle.plugin
 
@@ -34,3 +40,45 @@ platform coroutines-viewmodel js
 platform coroutines-viewmodel wasmJs
 platform coroutines-viewmodel iosArm64
 platform coroutines-viewmodel iosSimulatorArm64
+
+platform kryptostore-crypto android
+platform kryptostore-crypto jvm
+platform kryptostore-crypto js
+platform kryptostore-crypto wasmJs
+platform kryptostore-crypto iosArm64
+platform kryptostore-crypto iosSimulatorArm64
+
+platform kryptostore-serializers android
+platform kryptostore-serializers jvm
+platform kryptostore-serializers js
+platform kryptostore-serializers wasmJs
+platform kryptostore-serializers iosArm64
+platform kryptostore-serializers iosSimulatorArm64
+
+platform kryptostore android
+platform kryptostore jvm
+platform kryptostore js
+platform kryptostore wasmJs
+platform kryptostore iosArm64
+platform kryptostore iosSimulatorArm64
+
+platform kryptostore-preferences android
+platform kryptostore-preferences jvm
+platform kryptostore-preferences js
+platform kryptostore-preferences wasmJs
+platform kryptostore-preferences iosArm64
+platform kryptostore-preferences iosSimulatorArm64
+
+platform kryptostore-android-delegates android
+platform kryptostore-android-delegates jvm
+platform kryptostore-android-delegates js
+platform kryptostore-android-delegates wasmJs
+platform kryptostore-android-delegates iosArm64
+platform kryptostore-android-delegates iosSimulatorArm64
+
+platform kryptostore-migrate-android android
+platform kryptostore-migrate-android jvm
+platform kryptostore-migrate-android js
+platform kryptostore-migrate-android wasmJs
+platform kryptostore-migrate-android iosArm64
+platform kryptostore-migrate-android iosSimulatorArm64

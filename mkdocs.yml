@@ -21,6 +21,10 @@ nav:
       - JS / Wasm: js-wasm.md
       - Adding a module: adding-a-module.md
       - Publishing: publishing.md
+      - KryptoStore crypto: kryptostore-crypto.md
+      - KryptoStore migration: kryptostore-migration.md
+      - KryptoStore completion: kryptostore-complete.md
+      - KryptoStore spec: spec-final-kryptostore.md
   - Contributing:
       - Contributing: contributing.md
       - Commit conventions: commit-conventions.md

@@ -15,7 +15,19 @@ dependencies {
         api(project(":coroutines"))
         api(project(":coroutines:compose"))
         api(project(":coroutines:viewmodel"))
+        api(project(":kryptostore"))
+        api(project(":kryptostore:crypto"))
+        api(project(":kryptostore:serializers"))
+        api(project(":kryptostore:preferences"))
+        api(project(":kryptostore:android"))
+        api(project(":kryptostore:migrate-android"))
         api(project(":project-conventions"))
+
+        // Align transitive crypto / DataStore versions for kryptostore consumers (REQ-PKG-03).
+        api(libs.androidx.datastore.core.okio)
+        api(libs.androidx.datastore.preferences.core)
+        api(libs.com.google.crypto.tink)
+        api(libs.com.google.crypto.tink.android)
     }
 }
 

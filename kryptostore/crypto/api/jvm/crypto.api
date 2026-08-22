@@ -1,0 +1,146 @@
+public abstract interface class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/AlgorithmProvider {
+	public fun getAlgorithm ()Ljava/lang/Object;
+	public abstract fun initialize (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/AlgorithmProvider$DefaultImpls {
+	public static fun getAlgorithm (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/AlgorithmProvider;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher {
+	public abstract fun decrypt ([B[BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun decrypt$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun encrypt ([B[BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun encrypt$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher$DefaultImpls {
+	public static synthetic fun decrypt$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun encrypt$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntime {
+	public fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KryptoLog;)V
+	public synthetic fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KryptoLog;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoStack;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KryptoLog;)V
+	public synthetic fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoStack;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KryptoLog;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getCipher ()Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;
+	public final fun getRegistry ()Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;
+	public final fun getState ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun initialize (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState {
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState$Error : io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState {
+	public fun <init> (Ljava/lang/Throwable;)V
+	public final fun component1 ()Ljava/lang/Throwable;
+	public final fun copy (Ljava/lang/Throwable;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState$Error;
+	public static synthetic fun copy$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState$Error;Ljava/lang/Throwable;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState$Error;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCause ()Ljava/lang/Throwable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState$Initializing : io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState {
+	public static final field INSTANCE Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState$Initializing;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState$Ready : io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState {
+	public static final field INSTANCE Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/CryptoRuntimeState$Ready;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/EncryptedStoreHandle {
+	public abstract fun reEncryptInPlace (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig {
+	public static final field Companion Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig$Companion;
+	public synthetic fun <init> (JJIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-UwyO8pc ()J
+	public final fun component2-UwyO8pc ()J
+	public final fun component3 ()I
+	public final fun copy-NqJ4yvY (JJI)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig;
+	public static synthetic fun copy-NqJ4yvY$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig;JJIILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getInitialBackoff-UwyO8pc ()J
+	public final fun getMaxRetries ()I
+	public final fun getRotationPeriod-UwyO8pc ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig$Companion {
+	public final fun getDEFAULT ()Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig;
+}
+
+public abstract interface class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator {
+	public abstract fun rotateKeyIfNeeded (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KryptoLog {
+	public static final field Companion Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KryptoLog$Companion;
+	public abstract fun error (Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;)V
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KryptoLog$Companion {
+	public final fun getNoOp ()Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KryptoLog;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoKt {
+	public static final field ENCRYPTED_BLOB_MAGIC Ljava/lang/String;
+	public static final field WEB_CRYPTO_DB_NAME Ljava/lang/String;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoStack {
+	public fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;
+	public final fun component2 ()Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator;
+	public final fun component3 ()Lkotlin/jvm/functions/Function1;
+	public final fun component4 ()Lkotlin/jvm/functions/Function1;
+	public final fun copy (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoStack;
+	public static synthetic fun copy$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoStack;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoStack;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCipher ()Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;
+	public final fun getKeyRotator ()Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotator;
+	public final fun getPostMigrationCleanup ()Lkotlin/jvm/functions/Function1;
+	public final fun getPostRotationInit ()Lkotlin/jvm/functions/Function1;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCrypto_jvmKt {
+	public static final fun createPlatformCryptoStack (Ljava/lang/String;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoStack;
+	public static synthetic fun createPlatformCryptoStack$default (Ljava/lang/String;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/KeyRotationConfig;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/PlatformCryptoStack;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry {
+	public fun <init> ()V
+	public final fun reEncryptAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun register (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/EncryptedStoreHandle;)V
+	public final fun size ()I
+	public final fun unregister (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/EncryptedStoreHandle;)V
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StreamingAeadCipher : io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher {
+	public fun <init> (Lcom/google/crypto/tink/StreamingAead;Lkotlinx/coroutines/CoroutineDispatcher;)V
+	public synthetic fun <init> (Lcom/google/crypto/tink/StreamingAead;Lkotlinx/coroutines/CoroutineDispatcher;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decrypt ([B[BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun encrypt ([B[BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StreamingAeadCipherKt {
+	public static final fun createStreamingAeadCipher (Lkotlinx/coroutines/CoroutineDispatcher;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StreamingAeadCipher;
+	public static synthetic fun createStreamingAeadCipher$default (Lkotlinx/coroutines/CoroutineDispatcher;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StreamingAeadCipher;
+}
+
