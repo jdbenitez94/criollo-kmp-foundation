@@ -123,10 +123,11 @@ jobs:
             --configuration-cache \
             --configuration-cache-problems=fail
 
-      # Releases only: Gradle maven-publish is "Maven-API-like"; finalize for Portal UI.
-      # Snapshots go to https://central.sonatype.com/repository/maven-snapshots/ (no finalize).
+      # Releases only: close the OSSRH staging bundle and publish the *whole* deployment.
+      # Use publishing_type=automatic so Central does not leave a partial set for manual
+      # "Publish" clicks (0.1.6 shipped only coroutines-viewmodel that way).
+      # Snapshots: https://central.sonatype.com/repository/maven-snapshots/ (no finalize).
       # https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
-      # https://central.sonatype.org/publish/publish-portal-snapshots/
       - name: Finalize Central Portal deployment
         if: ${{ !inputs.snapshot }}
         env:
@@ -136,7 +137,7 @@ jobs:
         run: |
           set -o pipefail
           AUTH="$(printf '%s:%s' "$OSSRH_USERNAME" "$OSSRH_PASSWORD" | base64 | tr -d '\n')"
-          URL="https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${MAVEN_CENTRAL_NAMESPACE}?publishing_type=user_managed"
+          URL="https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${MAVEN_CENTRAL_NAMESPACE}?publishing_type=automatic"
           RESPONSE="$(curl --silent --show-error --connect-timeout 30 --max-time 300 \
             --write-out $'\n%{http_code}' \
             -X POST \
@@ -147,7 +148,7 @@ jobs:
           BODY="${RESPONSE%$'\n'*}"
 
           if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "::notice title=Maven Central::Upload finalized (user_managed). Publish manually at https://central.sonatype.com/publishing"
+            echo "::notice title=Maven Central::Deployment uploaded with publishing_type=automatic (full set). Track status at https://central.sonatype.com/publishing"
             exit 0
           fi
 
