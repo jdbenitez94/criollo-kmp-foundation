@@ -42,7 +42,8 @@ cache; after release squash, `main` also writes a cache line.
 
 `dev` never tags releases; it **does** publish SNAPSHOTs. After each `main` push, `dev` is
 reset to that SHA. Version sources for releases:
-`version.txt`, `ProjectConfig.version` (`x-release-please-version`), `.release-please-manifest.json`.
+`version.txt`, `ProjectConfig.version` (`x-release-please-version`), `.release-please-manifest.json`,
+and the install snippet BOM version in `README.md` (`x-release-please-version`).
 SNAPSHOT override: `-Pcriollo.version` / next patch from `ProjectConfig.version`.
 
 See [`docs/publishing.md`](../../docs/publishing.md).
