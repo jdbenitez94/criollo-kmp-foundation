@@ -1,7 +1,7 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.migrate
 
+import org.junit.jupiter.api.Test
 import java.io.File
-import kotlin.test.Test
 import kotlin.test.assertFalse
 
 /** REQ-PKG-04 */

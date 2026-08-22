@@ -5,10 +5,10 @@ import androidx.datastore.core.DataStore
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.Cipher
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.Serializable
+import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isSameInstanceAs
-import kotlin.test.Test
 
 /** REQ-AND-01..04 — Context delegate singleton semantics (androidHostTest). */
 class AndroidDelegateTest {

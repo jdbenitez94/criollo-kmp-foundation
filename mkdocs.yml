@@ -19,6 +19,7 @@ nav:
       - Managed tasks: managed-tasks.md
       - Flow Result: result.md
       - Runtime retry: runtime.md
+      - Testing: testing.md
       - Project conventions: project-conventions.md
       - JS / Wasm: js-wasm.md
       - Adding a module: adding-a-module.md

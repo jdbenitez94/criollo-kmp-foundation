@@ -76,6 +76,7 @@ include(":kryptostore:serializers")
 include(":kryptostore:preferences")
 include(":kryptostore:android")
 include(":kryptostore:migrate-android")
+include(":testing")
 include(":project-conventions")
 
 check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {

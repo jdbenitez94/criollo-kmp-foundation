@@ -9,8 +9,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 import okio.Buffer
 import okio.Path.Companion.toPath
+import org.junit.jupiter.api.Test
 import java.nio.file.Files
-import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertTrue

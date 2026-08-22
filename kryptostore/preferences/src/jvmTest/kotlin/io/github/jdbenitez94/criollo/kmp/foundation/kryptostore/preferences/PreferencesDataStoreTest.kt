@@ -8,8 +8,8 @@ import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.Encr
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
+import org.junit.jupiter.api.Test
 import java.nio.file.Files
-import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertFailsWith

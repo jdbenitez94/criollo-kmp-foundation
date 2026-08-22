@@ -4,8 +4,8 @@ import androidx.datastore.core.CorruptionException
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
-import kotlin.test.AfterTest
-import kotlin.test.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -15,7 +15,7 @@ class FailClosedCorruptionHandlerTest {
     private val fakeFileSystem = FakeFileSystem()
     private val path = "/tmp/settings.pb".toPath()
 
-    @AfterTest
+    @AfterEach
     fun closeFakeFileSystem() {
         fakeFileSystem.close()
     }

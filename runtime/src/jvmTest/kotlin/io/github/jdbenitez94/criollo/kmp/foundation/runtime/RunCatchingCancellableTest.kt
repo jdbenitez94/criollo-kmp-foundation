@@ -3,6 +3,7 @@ package io.github.jdbenitez94.criollo.kmp.foundation.runtime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isA
@@ -15,7 +16,6 @@ import strikt.assertions.isNull
 import strikt.assertions.isTrue
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.random.Random
-import kotlin.test.Test
 import kotlin.time.Duration.Companion.milliseconds
 
 class RunCatchingCancellableTest {

@@ -22,6 +22,7 @@ object ProjectConfig {
         const val kryptostorePreferences = "kryptostore-preferences"
         const val kryptostoreAndroid = "kryptostore-android-delegates"
         const val kryptostoreMigrateAndroid = "kryptostore-migrate-android"
+        const val testing = "testing"
         const val projectConventions = "project-conventions"
     }
 

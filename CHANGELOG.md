@@ -4,6 +4,8 @@
 
 ### Features
 
+* **testing:** add `testing` artifact with JUnit 5 `MainTestDispatcherExtension`
+* **build:** adopt JUnit 5 + `@Nested` for JVM tests (`convention.junit5`, aligned with saveable)
 * **result:** add Flow `Result` triad (`Loading` / `Success` / `Error`) and `asResult()`
 * **runtime:** add `retryWithBackoff` with exponential backoff, jitter, and `RetryPolicy`
 * **runtime:** add `runCatchingCancellable` / `suspendRunCatchingCancellable` and cancellation-safe `Result` extensions

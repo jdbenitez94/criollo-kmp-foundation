@@ -1,9 +1,9 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.android
 
+import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isSameInstanceAs
-import kotlin.test.Test
 
 /**
  * REQ-AND-01 — singleton identity for Context delegates (logic under [ContextDataStoreSingleton]).

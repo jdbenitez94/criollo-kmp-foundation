@@ -3,13 +3,13 @@ package io.github.jdbenitez94.criollo.kmp.foundation.result
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.containsExactly
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.test.Test
 
 class AsResultTest {
     @Test
