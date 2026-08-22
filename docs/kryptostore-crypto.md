@@ -7,7 +7,7 @@ See also the module notes in `kryptostore/crypto/CRYPTO.md`.
 ## Rotation
 
 | Target | Behavior |
-|--------|----------|
+| -------- | ---------- |
 | Android / JVM | Time-based Tink keyset rotation via `KeyRotationConfig` (default 90 days) |
 | iOS | Time-based AES-GCM key rotation; master keys in **Keychain** (not sandbox files) |
 | Web (JS/Wasm) | **Honest no-op** — rotator returns `false` after ensuring the WebCrypto key exists (no multi-key scheme yet) |

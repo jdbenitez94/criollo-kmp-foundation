@@ -181,13 +181,14 @@ private object WebIndexedDbLockRegistry {
             validateStoreName(name)
             ensureIndexedDbHelpersInstalled()
             val acquired = IndexedDbBindings.tryLock(name).awaitJs()?.toString()?.toBooleanStrictOrNull() == true
-            if (!acquired) {
-                return block(false)
-            }
-            try {
-                block(true)
-            } finally {
-                IndexedDbBindings.unlock(name).awaitJs()
+            if (acquired) {
+                try {
+                    block(true)
+                } finally {
+                    IndexedDbBindings.unlock(name).awaitJs()
+                }
+            } else {
+                block(false)
             }
         } finally {
             state.reentrantDepth = 0

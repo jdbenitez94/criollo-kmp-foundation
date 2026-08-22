@@ -3,7 +3,7 @@
 G1–G10 from `docs/spec-final-kryptostore.md` §1.3:
 
 | ID | Status | Evidence |
-|----|--------|----------|
+| ---- | -------- | ---------- |
 | G1 | Done | Published `kryptostore-*` under foundation group; saveable consumes via Maven Local 0.1.9 |
 | G2 | Done | Android, JVM, iOS, JS, Wasm targets on kryptostore modules |
 | G3 | Done | Encrypted proto + encrypted prefs + plain prefs factories |

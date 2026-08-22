@@ -102,19 +102,28 @@ async function incrementVersion(name: string): Promise<number> {
     return nextVersion;
 }
 
+function lockResolvers(): Record<string, (value: boolean) => void> {
+    let resolvers = globalThis.__appProtoLockResolvers;
+    if (!resolvers) {
+        resolvers = {};
+        globalThis.__appProtoLockResolvers = resolvers;
+    }
+    return resolvers;
+}
+
 async function lock(name: string): Promise<boolean> {
     const lockName = `app-proto:${name}`;
     if (!globalThis.navigator?.locks) {
         return true;
     }
 
-    globalThis.__appProtoLockResolvers ??= {};
+    const resolvers = lockResolvers();
     await new Promise<void>((resolve, reject) => {
         navigator.locks
             .request(lockName, { mode: 'exclusive' }, () => {
                 resolve();
                 return new Promise<boolean>((release) => {
-                    globalThis.__appProtoLockResolvers![lockName] = release;
+                    resolvers[lockName] = release;
                 });
             })
             .catch((error) => {
@@ -134,7 +143,7 @@ async function tryLock(name: string): Promise<boolean> {
         return true;
     }
 
-    globalThis.__appProtoLockResolvers ??= {};
+    const resolvers = lockResolvers();
     let acquired = false;
     await navigator.locks.request(lockName, { mode: 'exclusive', ifAvailable: true }, (lock) => {
         if (lock == null) {
@@ -142,7 +151,7 @@ async function tryLock(name: string): Promise<boolean> {
         }
         acquired = true;
         return new Promise<boolean>((release) => {
-            globalThis.__appProtoLockResolvers![lockName] = release;
+            resolvers[lockName] = release;
         });
     });
     return acquired;
@@ -150,10 +159,14 @@ async function tryLock(name: string): Promise<boolean> {
 
 async function unlock(name: string): Promise<boolean> {
     const lockName = `app-proto:${name}`;
-    const resolver = globalThis.__appProtoLockResolvers?.[lockName];
+    const resolvers = globalThis.__appProtoLockResolvers;
+    if (!resolvers) {
+        return true;
+    }
+    const resolver = resolvers[lockName];
     if (resolver) {
         resolver(true);
-        delete globalThis.__appProtoLockResolvers![lockName];
+        delete resolvers[lockName];
     }
     return true;
 }

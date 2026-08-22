@@ -91,7 +91,7 @@ function postToWorker(request: Omit<WorkerRequest, 'requestId'>): Promise<unknow
 }
 
 function install(): void {
-    const subtle = globalThis.crypto && globalThis.crypto.subtle;
+    const subtle = globalThis.crypto?.subtle;
     if (!subtle) {
         throw new Error(
             'WebCrypto (crypto.subtle) is unavailable. ' +

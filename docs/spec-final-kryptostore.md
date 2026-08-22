@@ -4,14 +4,16 @@
 **Status:** AUTHORITATIVE for implementation  
 **Library product name:** KryptoStore  
 **Date:** 2026-08-22 (amended same day: home repo = criollo-kmp-foundation)  
-**Authority order:** this file **overrides** `encrypted-datastore-lib.md`, `encrypted-datastore-conversation-handoff.md`, and stale notes in `composeApp/docs/CRYPTO_KMP.md` wherever they conflict.
+**Authority order:** this file **overrides** `encrypted-datastore-lib.md`,
+`encrypted-datastore-conversation-handoff.md`, and stale notes in
+`composeApp/docs/CRYPTO_KMP.md` wherever they conflict.
 
 **Home repository (normative):**
 
 | Item | Value |
-|------|--------|
+| ------ | -------- |
 | Local path | `/Users/jbenitez/Projects/criollo-kmp-foundation` |
-| GitHub | https://github.com/jdbenitez94/criollo-kmp-foundation |
+| GitHub | [jdbenitez94/criollo-kmp-foundation](https://github.com/jdbenitez94/criollo-kmp-foundation) |
 | Note | There is **no** `criollo-kmp-infrastructure` folder under Projects; the owner’s “infrastructure” monorepo is **`criollo-kmp-foundation`** (README: more infrastructure modules land here over time). |
 | Existing artifacts | `bom`, `coroutines`, `coroutines-viewmodel`, `coroutines-compose`, `project-conventions` |
 | Maven group (repo) | `io.github.jdbenitez94.criollo.kmp.foundation` |
@@ -21,7 +23,7 @@
 **Source extraction (dogfood / migrate from):**
 
 | Item | Value |
-|------|--------|
+| ------ | -------- |
 | Sample / donor repo | `/Users/jbenitez/Projects/saveable` (`composeApp/core/crypto`, `composeApp/core/datastore`, settings wiring) |
 | This spec file lives in | **`criollo-kmp-foundation/docs/spec-final-kryptostore.md`** (authoritative). Saveable keeps a short pointer at `saveable/docs/spec-final-kryptostore.md`. |
 
@@ -60,7 +62,10 @@ No production code for a requirement lands without: (1) a REQ id in this spec, (
 
 ### 1.1 One-liner
 
-**KryptoStore** is a Kotlin Multiplatform library that encrypts Jetpack DataStore payloads with platform-native key storage (Tink + Android Keystore, Tink on JVM, AES-GCM on iOS, WebCrypto on JS/Wasm), exposing an osipxd-like API without depending on deprecated Jetpack Security Crypto.
+**KryptoStore** is a Kotlin Multiplatform library that encrypts Jetpack DataStore
+payloads with platform-native key storage (Tink + Android Keystore, Tink on JVM,
+AES-GCM on iOS, WebCrypto on JS/Wasm), exposing an osipxd-like API without
+depending on deprecated Jetpack Security Crypto.
 
 ### 1.2 Tagline (README)
 
@@ -69,7 +74,7 @@ No production code for a requirement lands without: (1) a REQ id in this spec, (
 ### 1.3 Goals (complete product, not MVP-only)
 
 | ID | Goal |
-|----|------|
+| ---- | ------ |
 | G1 | Publishable multi-artifact KMP library usable without copying composeApp code |
 | G2 | Targets: Android, JVM, iOS, JS, Wasm |
 | G3 | Typed (proto/kotlinx) encrypted DataStore + encrypted Preferences + **plain** Preferences |
@@ -84,7 +89,7 @@ No production code for a requirement lands without: (1) a REQ id in this spec, (
 ### 1.4 Non-goals (still explicit)
 
 | ID | Non-goal |
-|----|----------|
+| ---- | ---------- |
 | NG1 | Portable ciphertext / keys across OS families |
 | NG2 | Replacing Jetpack DataStore |
 | NG3 | Using `security-crypto` or `EncryptedFile` as a backend |
@@ -98,7 +103,7 @@ No production code for a requirement lands without: (1) a REQ id in this spec, (
 Every formerly “open” question is decided here. Changing one requires an explicit owner amendment to this file.
 
 | ID | Decision | Choice | Rationale |
-|----|----------|--------|-----------|
+| ---- | ---------- | -------- | ----------- |
 | DEC-01 | Product / artifact name | **KryptoStore** / Maven artifact ids `kryptostore`, `kryptostore-crypto`, … | Owner filename; family of artifacts under foundation |
 | DEC-02 | Maven `groupId` | **`io.github.jdbenitez94.criollo.kmp.foundation`** (same as coroutines/bom) | Matches foundation publishing; one BOM aligns all infrastructure modules |
 | DEC-03 | Monorepo / path | **`criollo-kmp-foundation`**, projects under `kryptostore/` (e.g. `:kryptostore`, `:kryptostore:crypto`) | Owner: library is part of Criollo KMP infrastructure monorepo; follow `docs/adding-a-module.md` |
@@ -169,7 +174,7 @@ Existing: foundation :bom (extended)
 All modules live in **`criollo-kmp-foundation`**. Hyphenated Maven ids via existing `canonicalArtifactId` / nested projects (same pattern as `:coroutines:compose` → `coroutines-compose`).
 
 | Project path | Artifact id | Targets |
-|--------------|-------------|---------|
+| -------------- | ------------- | --------- |
 | `:kryptostore:crypto` | `kryptostore-crypto` | KMP all |
 | `:kryptostore:serializers` | `kryptostore-serializers` | KMP all |
 | `:kryptostore` (or `:kryptostore:core`) | `kryptostore` | KMP all |
@@ -191,7 +196,9 @@ criollo-kmp-foundation/
   bom/                         → existing; extend
 ```
 
-Exact nesting (`:kryptostore` as umbrella vs leaf) must follow `adding-a-module.md` and `canonicalArtifactId` so Maven names stay `kryptostore-*`. Agent must verify naming with one `publishToMavenLocal` dry-run in Phase A.
+Exact nesting (`:kryptostore` as umbrella vs leaf) must follow `adding-a-module.md`
+and `canonicalArtifactId` so Maven names stay `kryptostore-*`. Agent must verify
+naming with one `publishToMavenLocal` dry-run in Phase A.
 
 **GroupId for all:** `io.github.jdbenitez94.criollo.kmp.foundation`  
 **Packages:** `io.github.jdbenitez94.criollo.kmp.foundation.kryptostore…`
@@ -209,7 +216,7 @@ Exact nesting (`:kryptostore` as umbrella vs leaf) must follow `adding-a-module.
 **Platform crypto:**
 
 | Source set | Deps |
-|------------|------|
+| ------------ | ------ |
 | androidMain | `tink-android` |
 | jvmMain | `tink` (+ JNA only if still required for sealed master key file) |
 | iosMain | `dev.whyoleg.cryptography` core + apple provider |
@@ -225,7 +232,7 @@ Exact nesting (`:kryptostore` as umbrella vs leaf) must follow `adding-a-module.
 ### 3.4 Extraction map (from saveable sample → foundation)
 
 | Source (saveable today) | Destination (criollo-kmp-foundation) |
-|-------------------------|--------------------------------------|
+| ------------------------- | -------------------------------------- |
 | `composeApp/core/crypto/**` | `:kryptostore:crypto` |
 | Serializers + fail-closed in `composeApp/core/datastore` | `:kryptostore:serializers` |
 | `IndexedDbStorage*`, FileSystem expect/actual, typed factories | `:kryptostore` (core artifact) |
@@ -239,7 +246,9 @@ Exact nesting (`:kryptostore` as umbrella vs leaf) must follow `adding-a-module.
 1. During development: `includeBuild("../criollo-kmp-foundation")` + dependencySubstitution (same pattern used for foundation coroutines / TaskScope if present).
 2. After Maven Central: version catalog + foundation `bom`.
 
-**Version alignment:** saveable pins DataStore in its catalog (`1.3.0-alpha09` today). Foundation `libs.versions.toml` / BOM must pin a tested DataStore version for kryptostore; prefer stable for Maven 1.0 line (DEC-20).
+**Version alignment:** saveable pins DataStore in its catalog (`1.3.0-alpha09`
+today). Foundation `libs.versions.toml` / BOM must pin a tested DataStore version
+for kryptostore; prefer stable for Maven 1.0 line (DEC-20).
 
 ---
 
@@ -258,7 +267,7 @@ Constant: `ENCRYPTED_BLOB_MAGIC = "SVBLENC1"`.
 ### 4.2 Inner plaintext
 
 | Store kind | Inner bytes |
-|------------|-------------|
+| ------------ | ------------- |
 | Typed | kotlinx.serialization protobuf encoding of `T` |
 | Preferences | AndroidX `PreferencesSerializer` Okio encoding |
 
@@ -512,7 +521,7 @@ If a format cannot be read without security-crypto, document destructive migrati
 ## 6. Platform storage matrix (normative)
 
 | Target | Typed encrypted | Prefs encrypted | Prefs plain | Key material |
-|--------|-----------------|-----------------|-------------|--------------|
+| -------- | ----------------- | ----------------- | ------------- | -------------- |
 | Android | Okio file | Okio `*.preferences_pb` | Okio / `PreferenceDataStoreFactory.createWithPath` | Tink keyset + Android Keystore |
 | JVM | Okio file | Okio | Okio / createWithPath | Tink + sealed local master |
 | iOS | Okio file | Okio | Okio / createWithPath | AES-GCM; Keychain for master in complete scope |
@@ -527,7 +536,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.1 Product & packaging
 
 | ID | Requirement | Acceptance criteria | Tests |
-|----|-------------|---------------------|-------|
+| ---- | ------------- | --------------------- | ------- |
 | REQ-PKG-01 | `kryptostore/` modules exist in **criollo-kmp-foundation** and are included from its `settings.gradle.kts` per `adding-a-module.md` | `./gradlew :kryptostore:crypto:compileKotlinJvm` (from foundation root) succeeds | Build smoke |
 | REQ-PKG-02 | Maven coordinates use foundation `group` + `kryptostore-*` artifact ids (DEC-01/02) | `publishToMavenLocal` dry-run shows correct coords | Publish dry-run |
 | REQ-PKG-03 | Existing foundation `:bom` gains kryptostore (+ DataStore / Tink) constraints | Importing foundation BOM resolves kryptostore modules | BOM resolution test |
@@ -539,7 +548,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.2 Crypto
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-CRY-01 | `Cipher` encrypt/decrypt round-trip with AAD on every target | Round-trip equality; wrong AAD fails | jvmTest, androidHostTest, iosSimulator if CI, jsTest |
 | REQ-CRY-02 | `CryptoRuntime.initialize()` is idempotent and mutex-safe | Concurrent initialize → single Ready | jvmTest |
 | REQ-CRY-03 | Initialize failure → `Error` state, not Ready | State machine | jvmTest |
@@ -554,7 +563,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.3 Serializers / envelope
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-SER-01 | Writes start with `SVBLENC1` + version byte `1` | Byte prefix asserts | jvmTest (port EncryptedSerializersTest) |
 | REQ-SER-02 | Missing magic + `allowPlaintextRead=false` → CorruptionException | Exact behavior | jvmTest |
 | REQ-SER-03 | Missing magic + `allowPlaintextRead=true` → decode plain inner | Migration path | jvmTest |
@@ -568,7 +577,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.4 Corruption
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-COR-01 | Fail-closed handler quarantines file to `*.corrupt` when FS available | File moved; exception rethrown; default not written | jvmTest (FailClosedCorruptionHandlerTest) |
 | REQ-COR-02 | IndexedDB corruption does not silently return defaults without signaling | Defined behavior in API docs + test | jsTest |
 | REQ-COR-03 | Library docs warn against replace-with-default as security footgun | MIGRATION/CRYPTO text | Doc checklist |
@@ -576,7 +585,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.5 Storage / factories
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-STO-01 | File targets use OkioStorage + platform FileSystem | create + updateData round-trip | jvmTest |
 | REQ-STO-02 | Web typed store uses IndexedDbStorage | Data persists across DataStore recreate in same origin | jsTest |
 | REQ-STO-03 | Web encrypted prefs use WebLocalStorage | Persist in localStorage key space | jsTest |
@@ -588,7 +597,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.6 Rotation & re-encrypt
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-ROT-01 | `StoreRegistry.reEncryptAll` rewrites ciphertext under current Cipher | After forced rotation simulation, old ciphertext decryptable with new key path | jvmTest with fake Cipher/KeyRotator |
 | REQ-ROT-02 | `CryptoRuntime.initialize` calls reEncrypt when rotator returns true | Order: rotate → reEncrypt → Ready | jvmTest |
 | REQ-ROT-03 | Failed reEncrypt → Error state | — | jvmTest |
@@ -598,7 +607,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.7 Android DX
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-AND-01 | `encryptedProtoDataStore` delegate singleton per fileName | Same instance | androidHostTest |
 | REQ-AND-02 | `encryptedPreferencesDataStore` works | Round-trip | androidHostTest |
 | REQ-AND-03 | `plainPreferencesDataStore` works | Round-trip | androidHostTest |
@@ -607,7 +616,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.8 Migration artifact
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-MIG-01 | Documented migration from plaintext DataStore using `allowPlaintextRead` | Guide + test | jvmTest |
 | REQ-MIG-02 | Best-effort reader for Tink AEAD blobs without magic (AeadSerializer-like) on Android | Test with fixture generated by Tink Aead | androidHostTest |
 | REQ-MIG-03 | Document osipxd security-crypto users: migrate off EncryptedFile; provide guide even if automatic decrypt is limited | MIGRATION.md | Doc checklist |
@@ -616,7 +625,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.9 Hardening (complete scope)
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-HRD-01 | Frozen blob fixtures per target for envelope v1 | Compat suite never broken without version bump | `compat` source set tests |
 | REQ-HRD-02 | Binary compatibility validator on JVM public API | `.api` dump in CI | BCV task |
 | REQ-HRD-03 | Optional StreamingAead encrypting path for large payloads (Android/JVM) | Feature flag / alternate serializer; documented | jvmTest |
@@ -626,7 +635,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 7.10 Sample / consumer
 
 | ID | Requirement | AC | Tests |
-|----|-------------|----|-------|
+| ---- | ------------- | ---- | ------- |
 | REQ-SMP-01 | composeApp uses kryptostore artifacts for crypto + encrypted stores | No duplicate Encrypted*Serializer in composeApp | compile + grep gate |
 | REQ-SMP-02 | Remember-email uses **plain** preferences API | Logout → email restored when flag set | commonTest / UI test |
 | REQ-SMP-03 | CRYPTO_KMP.md corrected (keys IndexedDB; fail-closed; AAD derive; rotation/re-encrypt) | Matches code | Doc review |
@@ -675,7 +684,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 9.2 Test catalog (minimum)
 
 | Test class (suggested) | Covers |
-|------------------------|--------|
+| ------------------------ | -------- |
 | `EnvelopeFormatTest` | REQ-SER-01..04, 09 |
 | `AssociatedDataFallbackTest` | REQ-SER-05 |
 | `DecryptCancellationTest` | REQ-SER-06 |
@@ -695,7 +704,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 ### 9.3 CI matrix (target)
 
 | Task | Phase required from |
-|------|---------------------|
+| ------ | --------------------- |
 | `jvmTest` on all kryptostore modules | Phase A+ |
 | `androidHostTest` crypto + android | Phase B+ / D |
 | `jsTest` storage + crypto bindings | Phase C+ |
@@ -798,7 +807,10 @@ Execute in order. Each phase is a PR-sized unit unless owner batches.
 
 KryptoStore is **complete** when:
 
-1. Another KMP repo can depend on `io.github.jdbenitez94.criollo.kmp.foundation:bom` + `kryptostore` + `kryptostore-preferences` and run encrypted proto + encrypted prefs + plain prefs on Android, JVM, iOS, JS, Wasm without copying saveable internals.
+1. Another KMP repo can depend on
+   `io.github.jdbenitez94.criollo.kmp.foundation:bom` + `kryptostore` +
+   `kryptostore-preferences` and run encrypted proto + encrypted prefs + plain
+   prefs on Android, JVM, iOS, JS, Wasm without copying saveable internals.
 2. Web matrix holds: IndexedDB / localStorage / WebCrypto / keys in IndexedDB.
 3. Forbidden deps absent.
 4. Fail-closed default + opt-in plaintext migration.
@@ -813,7 +825,7 @@ KryptoStore is **complete** when:
 ## 12. Risks & mitigations
 
 | Risk | Mitigation |
-|------|------------|
+| ------ | ------------ |
 | DataStore 1.3 alphas break consumers | DEC-20; pin in BOM; consider stable for Maven 1.0 |
 | Re-encrypt bugs brick user data | Fail closed; quarantine; extensive ROT tests; backup guidance |
 | Web rotation impossible with non-extractable keys | Honest no-op + docs; future multi-key design |
@@ -843,7 +855,7 @@ Phase _:
 ## 14. Supersession notice
 
 | Document | Role after this spec |
-|----------|----------------------|
+| ---------- | ---------------------- |
 | `saveable/docs/encrypted-datastore-lib.md` | Historical design; follow **this** file |
 | `saveable/docs/encrypted-datastore-conversation-handoff.md` | Rationale archive; decisions closed in §2 |
 | `saveable/composeApp/docs/CRYPTO_KMP.md` | Must be corrected when saveable consumes kryptostore |
@@ -902,7 +914,7 @@ After each phase, output the phase checklist (§13) and stop for review unless I
 ## 16. Document history
 
 | Date | Change |
-|------|--------|
+| ------ | -------- |
 | 2026-08-22 | Initial authoritative SDD/TDD spec; closed DEC-01..30; named KryptoStore |
 | 2026-08-22 | Amended: home = criollo-kmp-foundation; group/packages/BOM/phases/prompt; DEC-31..33 |
 | 2026-08-22 | Phase 0: living copy in foundation `docs/`; saveable file reduced to pointer |
