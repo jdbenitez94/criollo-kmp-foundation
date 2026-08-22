@@ -47,9 +47,11 @@ jobs:
           PR_JSON: ${{ steps.release.outputs.pr }}
         run: |
           set -euo pipefail
-          BRANCH="$(printf '%s' "$PR_JSON" | jq -r '.headBranchName // empty')"
+          BRANCH="$(printf '%s' "$PR_JSON" | jq -r '.headBranchName // .headRefName // .head.ref // empty')"
           if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
-            echo "No headBranchName in release PR JSON; skipping"
+            echo "No release PR head branch in JSON; skipping"
+            printf '%s
+' "$PR_JSON" | jq -c 'keys' || true
             exit 0
           fi
           git fetch origin "$BRANCH"
