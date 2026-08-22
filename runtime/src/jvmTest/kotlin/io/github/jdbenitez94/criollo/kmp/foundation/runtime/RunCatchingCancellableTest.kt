@@ -213,6 +213,7 @@ class RetryPolicyTest {
     @Test
     fun equals_rejectsNullAndOtherTypes() {
         val policy = RetryPolicy()
+        @Suppress("EqualsNullCall")
         expectThat(policy.equals(null)).isFalse()
         expectThat(policy.equals("RetryPolicy")).isFalse()
     }
