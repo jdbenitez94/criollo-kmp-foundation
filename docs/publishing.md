@@ -76,7 +76,8 @@ Local: `./gradlew publishAllPublicationsToMavenCentralRepository -Pcriollo.versi
 
 1. Merge work to `main` (via PR). Prefer [Conventional Commits](commit-conventions.md).
 2. release-please opens/updates a PR that bumps `version.txt`, `ProjectConfig.version`,
-   `.release-please-manifest.json`, and `CHANGELOG.md`.
+   `.release-please-manifest.json`, `CHANGELOG.md`, and the BOM version in `README.md`
+   (`// x-release-please-version`).
 3. Merge that release PR → release-please creates tag `vX.Y.Z` + GitHub Release.
 4. The same workflow run publishes to Maven Central (see
    [`publish-maven-central.yml`](../.github/workflows/publish-maven-central.yml)).

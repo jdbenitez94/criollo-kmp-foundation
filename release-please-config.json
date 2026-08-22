@@ -16,6 +16,10 @@
         {
           "type": "generic",
           "path": "build-logic/convention/src/main/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/buildlogic/ProjectConfig.kt"
+        },
+        {
+          "type": "generic",
+          "path": "README.md"
         }
       ]
     }
