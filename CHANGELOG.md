@@ -2,7 +2,6 @@
 
 ## [0.1.7](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.6...v0.1.7) (2026-08-22)
 
-
 ### Bug Fixes
 
 * **publish:** auto-publish full Central deployments ([#31](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/31)) ([f1dc417](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/f1dc417070013cb8b7b1af1aabf5b8aeebfd0a4a))
