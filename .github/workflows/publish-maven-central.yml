@@ -35,7 +35,12 @@ jobs:
     # macOS + Xcode so iosArm64 / iosSimulatorArm64 publications are included.
     # Ubuntu-only publishes omit Apple variants (isXcodeAvailable() == false).
     runs-on: macos-15
-    timeout-minutes: 90
+    timeout-minutes: 120
+    # Releases and snapshots share the OSSRH default staging repo (per credentials).
+    # Overlapping uploads produced incomplete Central sets (0.1.6 / 0.1.7).
+    concurrency:
+      group: criollo-maven-central-publish
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -99,14 +104,16 @@ jobs:
       - name: Verify Apple KMP targets are registered
         run: |
           set -euo pipefail
-          ./gradlew :coroutines:outgoingVariants \
-            -Pcriollo.version=${{ steps.ver.outputs.version }} \
-            -Pcriollo.requireAppleTargets=true \
-            --quiet \
-            | tee /tmp/coroutines-variants.txt
-          grep -q 'iosArm64ApiElements' /tmp/coroutines-variants.txt
-          grep -q 'iosSimulatorArm64ApiElements' /tmp/coroutines-variants.txt
-          echo "Apple variants present for :coroutines"
+          for module in coroutines coroutines:compose coroutines:viewmodel; do
+            ./gradlew ":${module}:outgoingVariants" \
+              -Pcriollo.version=${{ steps.ver.outputs.version }} \
+              -Pcriollo.requireAppleTargets=true \
+              --quiet \
+              | tee "/tmp/${module//:/_}-variants.txt"
+            grep -q 'iosArm64ApiElements' "/tmp/${module//:/_}-variants.txt"
+            grep -q 'iosSimulatorArm64ApiElements' "/tmp/${module//:/_}-variants.txt"
+            echo "Apple variants present for :${module}"
+          done
 
       - name: Publish to Maven Central
         env:
@@ -123,34 +130,25 @@ jobs:
             --configuration-cache \
             --configuration-cache-problems=fail
 
-      # Releases only: close the OSSRH staging bundle and publish the *whole* deployment.
-      # Use publishing_type=automatic so Central does not leave a partial set for manual
-      # "Publish" clicks (0.1.6 shipped only coroutines-viewmodel that way).
+      # Releases only: close staging → Portal (portal_api) → wait PUBLISHED → verify repo1.
+      # Do not treat finalize HTTP 2xx alone as success (0.1.6/0.1.7 incomplete sets).
       # Snapshots: https://central.sonatype.com/repository/maven-snapshots/ (no finalize).
       # https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
       - name: Finalize Central Portal deployment
+        id: portal
         if: ${{ !inputs.snapshot }}
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_CENTRAL_NAMESPACE: ${{ vars.MAVEN_CENTRAL_NAMESPACE }}
         run: |
-          set -o pipefail
-          AUTH="$(printf '%s:%s' "$OSSRH_USERNAME" "$OSSRH_PASSWORD" | base64 | tr -d '\n')"
-          URL="https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${MAVEN_CENTRAL_NAMESPACE}?publishing_type=automatic"
-          RESPONSE="$(curl --silent --show-error --connect-timeout 30 --max-time 300 \
-            --write-out $'\n%{http_code}' \
-            -X POST \
-            -H "Authorization: Bearer ${AUTH}" \
-            -H "Content-Type: application/json" \
-            "$URL")"
-          HTTP_CODE="${RESPONSE##*$'\n'}"
-          BODY="${RESPONSE%$'\n'*}"
+          chmod +x scripts/maven-central/finalize-portal-deployment.sh
+          scripts/maven-central/finalize-portal-deployment.sh
 
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "::notice title=Maven Central::Deployment uploaded with publishing_type=automatic (full set). Track status at https://central.sonatype.com/publishing"
-            exit 0
-          fi
-
-          echo "::error title=Central Portal finalize failed (HTTP ${HTTP_CODE})::${BODY}"
-          exit 1
+      - name: Verify full artifact set on Maven Central
+        if: ${{ !inputs.snapshot }}
+        env:
+          RELEASE_VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          chmod +x scripts/maven-central/verify-release-on-central.sh
+          scripts/maven-central/verify-release-on-central.sh

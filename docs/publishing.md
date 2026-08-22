@@ -82,9 +82,12 @@ Local: `./gradlew publishAllPublicationsToMavenCentralRepository -Pcriollo.versi
 3. Merge that release PR → release-please creates tag `vX.Y.Z` + GitHub Release.
 4. The same workflow run publishes to Maven Central (see
    [`publish-maven-central.yml`](../.github/workflows/publish-maven-central.yml)).
-5. CI **Finalize Central Portal deployment** closes the staging bundle with
-   `publishing_type=automatic` so Central publishes the **entire** deployment (avoids
-   partial manual publishes). Status: <https://central.sonatype.com/publishing>.
+5. CI **Finalize Central Portal deployment** uploads the staging bundle with
+   `publishing_type=portal_api`, polls until Portal reports `PUBLISHED`, then
+   **verifies every expected POM on repo1** (`scripts/maven-central/`). The job fails if
+   any coordinate is missing (this is what 0.1.6 / 0.1.7 lacked). Releases and snapshots
+   also share a concurrency lock so they cannot interleave uploads into the same staging
+   repo. Status: <https://central.sonatype.com/publishing>.
 
 Bootstrap: `initial-version` is `0.1.0` so the first release PR is `0.1.0`. After that, SemVer follows commit types.
 
