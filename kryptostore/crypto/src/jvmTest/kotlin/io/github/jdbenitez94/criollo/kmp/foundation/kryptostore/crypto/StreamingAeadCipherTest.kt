@@ -1,10 +1,10 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto
 
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNotEqualTo
-import kotlin.test.Test
 
 /** REQ-HRD-03 */
 class StreamingAeadCipherTest {

@@ -1,6 +1,6 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers
 
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

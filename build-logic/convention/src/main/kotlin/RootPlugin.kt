@@ -7,10 +7,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 class RootPlugin : Plugin<Project> {
@@ -43,6 +41,7 @@ class RootPlugin : Plugin<Project> {
             ":kryptostore:preferences",
             ":kryptostore:android",
             ":kryptostore:migrate-android",
+            ":testing",
         ).forEach { path ->
             dokkaDeps.add("dokka", dokkaDeps.project(mapOf("path" to path)))
         }
@@ -65,9 +64,7 @@ class RootPlugin : Plugin<Project> {
         target.registerRootAggregatorTasks()
         target.registerLocalCloudParityTask()
 
-        target.tasks.withType<Test>().configureEach {
-            useJUnit()
-        }
+        // JUnit Platform is configured by convention.junit5 on library / JVM modules.
 
         target.libsVersion("kotlin")
     }
@@ -96,8 +93,13 @@ class RootPlugin : Plugin<Project> {
 
         val qualityCheck = tasks.register("qualityCheck") {
             group = "verification"
-            description = "Runs Detekt, KtLint, Kover verification, and project-conventions tests."
-            dependsOn(installGitHooks, "koverVerify", ":project-conventions:test")
+            description = "Runs Detekt, KtLint, Kover verification, and JVM tooling tests."
+            dependsOn(
+                installGitHooks,
+                "koverVerify",
+                ":project-conventions:test",
+                ":testing:test",
+            )
         }
 
         tasks.register("formatAndCheck") {
@@ -179,6 +181,7 @@ class RootPlugin : Plugin<Project> {
                 ":kryptostore:preferences:jvmTest",
                 ":kryptostore:android:jvmTest",
                 ":kryptostore:migrate-android:jvmTest",
+                ":testing:test",
             )
         }
 
@@ -222,6 +225,7 @@ class RootPlugin : Plugin<Project> {
                 ":kryptostore:preferences:publishToMavenLocal",
                 ":kryptostore:android:publishToMavenLocal",
                 ":kryptostore:migrate-android:publishToMavenLocal",
+                ":testing:publishToMavenLocal",
                 ":project-conventions:publishToMavenLocal",
             )
         }

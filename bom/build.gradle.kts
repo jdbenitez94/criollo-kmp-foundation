@@ -21,6 +21,7 @@ dependencies {
         api(project(":kryptostore:preferences"))
         api(project(":kryptostore:android"))
         api(project(":kryptostore:migrate-android"))
+        api(project(":testing"))
         api(project(":project-conventions"))
 
         // Align transitive crypto / DataStore versions for kryptostore consumers (REQ-PKG-03).

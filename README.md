@@ -36,10 +36,11 @@ land in this monorepo over time.
 | Preferences (KryptoStore) | `kryptostore-preferences` | `:kryptostore:preferences` | Optional | Encrypted + plain Preferences DataStore factories |
 | Android DX (KryptoStore) | `kryptostore-android-delegates` | `:kryptostore:android` | Optional | `Context` property delegates for encrypted/plain stores |
 | Migrate Android (KryptoStore) | `kryptostore-migrate-android` | `:kryptostore:migrate-android` | Optional | Unenveloped AEAD migration helpers |
+| Testing | `testing` | `:testing` | Optional | JUnit 5 helpers (`MainTestDispatcherExtension`) |
 
 Only `coroutines` is required. Pick ViewModel and/or Compose adapters when you want the convenience APIs; you can also construct `TaskScope(coroutineScope)` yourself.
 
-Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`); KryptoStore: `…foundation.kryptostore` (+ `.crypto` / `.serializers` / `.preferences` / `.android` / `.migrate`).
+Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`); KryptoStore: `…foundation.kryptostore` (+ `.crypto` / `.serializers` / `.preferences` / `.android` / `.migrate`); testing: `…foundation.testing`.
 
 ## Install
 

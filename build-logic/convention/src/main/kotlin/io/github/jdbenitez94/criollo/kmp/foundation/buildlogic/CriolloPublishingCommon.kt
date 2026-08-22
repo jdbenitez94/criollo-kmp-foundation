@@ -142,6 +142,7 @@ private fun canonicalArtifactId(projectPath: String, projectName: String): Strin
     ":kryptostore:android" -> ProjectConfig.Artifacts.kryptostoreAndroid
     ":kryptostore:migrate-android" -> ProjectConfig.Artifacts.kryptostoreMigrateAndroid
     ":bom" -> ProjectConfig.Artifacts.bom
+    ":testing" -> ProjectConfig.Artifacts.testing
     ":project-conventions" -> ProjectConfig.Artifacts.projectConventions
     else -> projectName
 }
@@ -167,6 +168,8 @@ private fun pomDescriptionFor(artifactId: String): String = when (artifactId) {
         "Android Context property delegates for KryptoStore (artifact kryptostore-android-delegates)."
     ProjectConfig.Artifacts.kryptostoreMigrateAndroid ->
         "Optional Android migration helpers onto KryptoStore envelopes (unenveloped AEAD, guides)."
+    ProjectConfig.Artifacts.testing ->
+        "JUnit 5 helpers for Criollo KMP Foundation consumers (Main dispatcher test extension)."
     ProjectConfig.Artifacts.projectConventions ->
         "Gradle plugin that syncs Criollo .editorconfig and Detekt configs into consumer projects."
     else -> "Criollo KMP Foundation library module."

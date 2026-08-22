@@ -1,7 +1,7 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.android
 
+import org.junit.jupiter.api.Test
 import java.io.File
-import kotlin.test.Test
 import kotlin.test.assertFalse
 
 /** REQ-AND-04 / REQ-PKG-04 */

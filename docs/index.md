@@ -22,10 +22,12 @@ replace, and debounce side effects by key.
 | Preferences | `kryptostore-preferences` | `:kryptostore:preferences` | Encrypted + plain Preferences factories |
 | Android DX | `kryptostore-android-delegates` | `:kryptostore:android` | Context property delegates |
 | Migrate Android | `kryptostore-migrate-android` | `:kryptostore:migrate-android` | Unenveloped AEAD migration helpers |
+| Testing | `testing` | `:testing` | JUnit 5 helpers (`MainTestDispatcherExtension`) |
 
 ## Guides
 
 - [Managed tasks (`TaskScope`)](managed-tasks.md)
+- [Testing (JUnit 5)](testing.md)
 - [Project conventions](project-conventions.md)
 - [Publishing](publishing.md)
 - [API reference (Dokka)](api.md)

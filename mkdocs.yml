@@ -17,6 +17,7 @@ nav:
   - Home: index.md
   - Guides:
       - Managed tasks: managed-tasks.md
+      - Testing: testing.md
       - Project conventions: project-conventions.md
       - JS / Wasm: js-wasm.md
       - Adding a module: adding-a-module.md

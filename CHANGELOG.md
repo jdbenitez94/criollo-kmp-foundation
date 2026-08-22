@@ -4,6 +4,8 @@
 
 ### Features
 
+* **testing:** add `testing` artifact with JUnit 5 `MainTestDispatcherExtension`
+* **build:** adopt JUnit 5 + `@Nested` for JVM tests (`convention.junit5`, aligned with saveable)
 * **kryptostore:** add `kryptostore-crypto` module (Phase A extract from saveable)
 * **kryptostore:** add `kryptostore-serializers` with envelope + fail-closed (Phase B)
 * **kryptostore:** add core factories + IndexedDB storage (Phase C)

@@ -28,6 +28,8 @@ class CriolloKmpLibraryConventionPlugin : Plugin<Project> {
         }
 
         target.configureKmpTargets()
+        // After KMP targets exist so jvmTest / androidHostTest source sets are present.
+        target.pluginManager.apply("convention.junit5")
         target.plugins.withId("org.jetbrains.kotlin.multiplatform") {
             KlibModuleNaming.configureUniqueModuleName(target)
             KlibModuleNaming.configureDuplicatedUniqueNameStrategy(target)

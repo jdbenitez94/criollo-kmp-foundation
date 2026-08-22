@@ -17,6 +17,7 @@ root kryptostore-serializers
 root kryptostore-preferences
 root kryptostore-android-delegates
 root kryptostore-migrate-android
+root testing
 root project-conventions
 plugin io.github.jdbenitez94.criollo.kmp.foundation.project-conventions.gradle.plugin
 

@@ -1,11 +1,11 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto
 
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
 import java.nio.file.Files
-import kotlin.test.Test
 import kotlin.test.assertFails
 
 /** REQ-CRY-01, REQ-CRY-05 (permissions best-effort), REQ-CRY-07 (DB name constant). */
