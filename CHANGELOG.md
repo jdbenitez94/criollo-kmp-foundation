@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+* **testing:** add `testing` artifact with JUnit 5 `MainTestDispatcherExtension`
+* **build:** adopt JUnit 5 + `@Nested` for JVM tests (`convention.junit5`, aligned with saveable)
+* **result:** add Flow `Result` triad (`Loading` / `Success` / `Error`) and `asResult()`
+* **runtime:** add `retryWithBackoff` with exponential backoff, jitter, and `RetryPolicy`
+* **runtime:** add `runCatchingCancellable` / `suspendRunCatchingCancellable` and cancellation-safe `Result` extensions
+* **runtime:** align Error wrapping, harden `RetryPolicy` equality, expand coverage tests
+* **result:** rethrow `CancellationException` explicitly from `asResult()`
+* **kryptostore:** add `kryptostore-crypto` module (Phase A extract from saveable)
+* **kryptostore:** add `kryptostore-serializers` with envelope + fail-closed (Phase B)
+* **kryptostore:** add core factories + IndexedDB storage (Phase C)
+* **kryptostore:** add `kryptostore-preferences` encrypted + plain prefs (Phase D)
+* **kryptostore:** StoreRegistry re-encrypt, `kryptostore-android` delegates, StreamingAead (Phase E)
+* **kryptostore:** BOM DataStore/Tink constraints, migrate-android, compat fixtures, ABI dumps (Phase F)
+* **kryptostore:** publish DX artifact as `kryptostore-android-delegates` (avoid clash with KMP `*-android` target)
+* **kryptostore:** Phase G — saveable dogfoods kryptostore (crypto/serializers/core); CRYPTO_KMP.md corrected
+
 ## [0.1.9](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.8...v0.1.9) (2026-08-22)
 
 ### Bug Fixes

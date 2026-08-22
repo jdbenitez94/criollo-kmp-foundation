@@ -8,11 +8,11 @@ import io.github.jdbenitez94.criollo.kmp.foundation.coroutines.TaskKey
 import io.github.jdbenitez94.criollo.kmp.foundation.coroutines.TaskPolicy
 import io.github.jdbenitez94.criollo.kmp.foundation.coroutines.TaskScope
 import kotlinx.coroutines.delay
+import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isFalse
 import strikt.assertions.isNotNull
 import strikt.assertions.isTrue
-import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalTestApi::class)

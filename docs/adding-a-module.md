@@ -10,6 +10,10 @@ For a **published Gradle plugin** (see `:project-conventions`), use `org.jetbrai
 `java-gradle-plugin` + `criollo.maven-publish` instead of `criollo.kmp-library`, and wire
 `publishToMavenLocal` / tests in [`RootPlugin`](../build-logic/convention/src/main/kotlin/RootPlugin.kt).
 
+For a **JVM-only library** (see `:testing`), use `org.jetbrains.kotlin.jvm` + `java-library` +
+`convention.junit5` + `criollo.maven-publish`, create a `mavenJava` publication from
+`components["java"]`, and wire BOM / `expected-release-artifacts.txt` / RootPlugin aggregators.
+
 1. **Create the project directory** (e.g. `logging/`) with `build.gradle.kts` applying:
    - `criollo.kmp-library` (applies Kotlin Multiplatform + Android KMP library + quality/publish conventions)
    - Extra plugins only if needed (Compose, serialization, …) — apply `criollo.kmp-library` first

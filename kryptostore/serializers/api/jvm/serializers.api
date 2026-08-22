@@ -1,0 +1,60 @@
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/CipherFailureHandlingKt {
+	public static final fun failClosedCorruptionHandler (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;
+	public static synthetic fun failClosedCorruptionHandler$default (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedPreferencesSerializer : androidx/datastore/core/okio/OkioSerializer {
+	public fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;)V
+	public synthetic fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BZ)V
+	public synthetic fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getDefaultValue ()Landroidx/datastore/preferences/core/Preferences;
+	public synthetic fun getDefaultValue ()Ljava/lang/Object;
+	public fun readFrom (Lokio/BufferedSource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun writeTo (Landroidx/datastore/preferences/core/Preferences;Lokio/BufferedSink;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun writeTo (Ljava/lang/Object;Lokio/BufferedSink;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedProtoSerializer : androidx/datastore/core/okio/OkioSerializer {
+	public fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/ProtoOkioSerializer;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;)V
+	public synthetic fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/ProtoOkioSerializer;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/ProtoOkioSerializer;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BZ)V
+	public synthetic fun <init> (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/ProtoOkioSerializer;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getDefaultValue ()Ljava/lang/Object;
+	public fun readFrom (Lokio/BufferedSource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun writeTo (Ljava/lang/Object;Lokio/BufferedSink;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions {
+	public fun <init> ()V
+	public final fun getAllowPlaintextRead ()Z
+	public final fun getAssociatedData ()[B
+	public final fun getLegacyAssociatedData ()[B
+	public final fun getSchemaVersion ()I
+	public final fun getStoreName ()Ljava/lang/String;
+	public final fun resolvedAssociatedData ()[B
+	public final fun setAllowPlaintextRead (Z)V
+	public final fun setAssociatedData ([B)V
+	public final fun setLegacyAssociatedData ([B)V
+	public final fun setSchemaVersion (I)V
+	public final fun setStoreName (Ljava/lang/String;)V
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptionsKt {
+	public static final fun EncryptedStoreOptions (Lkotlin/jvm/functions/Function1;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;
+	public static final fun deriveStoreAssociatedData (Ljava/lang/String;I)[B
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/KryptostoreFileSystemKt {
+	public static final fun getKryptostoreFileSystem ()Lokio/FileSystem;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/ProtoOkioSerializer : androidx/datastore/core/okio/OkioSerializer {
+	public fun <init> (Lkotlinx/serialization/KSerializer;Ljava/lang/Object;)V
+	public final fun decodeBytes ([B)Ljava/lang/Object;
+	public final fun encodeBytes (Ljava/lang/Object;)[B
+	public fun getDefaultValue ()Ljava/lang/Object;
+	public fun readFrom (Lokio/BufferedSource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun writeTo (Ljava/lang/Object;Lokio/BufferedSink;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+

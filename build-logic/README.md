@@ -45,6 +45,7 @@ Catalog aliases in [`gradle/libs.versions.toml`](../gradle/libs.versions.toml) u
 | `convention.ktlint` | `convention-ktlint` | `KtLintConventionPlugin` |
 | `convention.detekt` | `convention-detekt` | `DetektConventionPlugin` |
 | `convention.dokka` | `convention-dokka` | `DokkaConventionPlugin` |
+| `convention.junit5` | `convention-junit5` | `Junit5ConventionPlugin` |
 | `criollo.kmp-library` | `criollo-kmp-library` | `CriolloKmpLibraryConventionPlugin` |
 | `criollo.maven-publish` | `criollo-maven-publish` | `MavenPublishConventionPlugin` |
 

@@ -1,0 +1,6 @@
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/migrate/LegacyAeadMigration {
+	public static final field INSTANCE Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/migrate/LegacyAeadMigration;
+	public final fun decryptUnenveloped (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun decryptUnenveloped$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/migrate/LegacyAeadMigration;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;[B[BLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+

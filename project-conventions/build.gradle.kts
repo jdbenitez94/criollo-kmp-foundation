@@ -7,6 +7,7 @@ plugins {
     `java-gradle-plugin`
     alias(libs.plugins.convention.ktlint)
     alias(libs.plugins.convention.detekt)
+    alias(libs.plugins.convention.junit5)
     alias(libs.plugins.criollo.maven.publish)
 }
 
@@ -57,10 +58,6 @@ tasks.processResources {
         include("detekt.yml", "detekt-v2.yml")
         into("criollo-kmp-foundation/conventions")
     }
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
 
 tasks.named("compileKotlin") {

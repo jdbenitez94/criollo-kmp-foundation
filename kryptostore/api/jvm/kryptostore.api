@@ -1,0 +1,18 @@
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/EncryptedProtoDataStoreKt {
+	public static final fun createEncryptedProtoDataStore (Landroidx/datastore/core/Storage;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;)Landroidx/datastore/core/DataStore;
+	public static final fun createEncryptedProtoDataStore (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lkotlinx/serialization/KSerializer;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;)Landroidx/datastore/core/DataStore;
+	public static synthetic fun createEncryptedProtoDataStore$default (Landroidx/datastore/core/Storage;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;ILjava/lang/Object;)Landroidx/datastore/core/DataStore;
+	public static synthetic fun createEncryptedProtoDataStore$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lkotlinx/serialization/KSerializer;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;ILjava/lang/Object;)Landroidx/datastore/core/DataStore;
+	public static final fun encryptedProtoSerializer (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lkotlinx/serialization/KSerializer;Ljava/lang/Object;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedProtoSerializer;
+	public static synthetic fun encryptedProtoSerializer$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lkotlinx/serialization/KSerializer;Ljava/lang/Object;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedProtoSerializer;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/EncryptedProtoDataStore_jvmKt {
+	public static final fun createEncryptedProtoDataStoreIndexedDb (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lkotlinx/serialization/KSerializer;Ljava/lang/Object;Ljava/lang/String;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;Ljava/util/List;)Landroidx/datastore/core/DataStore;
+	public static synthetic fun createEncryptedProtoDataStoreIndexedDb$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lkotlinx/serialization/KSerializer;Ljava/lang/Object;Ljava/lang/String;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;Ljava/util/List;ILjava/lang/Object;)Landroidx/datastore/core/DataStore;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/EncryptedStoreHandlesKt {
+	public static final fun asEncryptedStoreHandle (Landroidx/datastore/core/DataStore;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/EncryptedStoreHandle;
+}
+

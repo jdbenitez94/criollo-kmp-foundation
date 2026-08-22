@@ -1,10 +1,10 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.coroutines
 
 import kotlinx.coroutines.Job
+import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.hasSize
 import strikt.assertions.isEmpty
-import kotlin.test.Test
 
 class RemoveJobIfCurrentTest {
 

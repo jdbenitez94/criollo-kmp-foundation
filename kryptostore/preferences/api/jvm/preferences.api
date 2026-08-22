@@ -1,0 +1,23 @@
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/preferences/PreferencesDataStoreKt {
+	public static final fun createEncryptedPreferencesDataStore (Landroidx/datastore/core/Storage;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;)Landroidx/datastore/core/DataStore;
+	public static final fun createEncryptedPreferencesDataStore (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lkotlin/jvm/functions/Function0;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;)Landroidx/datastore/core/DataStore;
+	public static synthetic fun createEncryptedPreferencesDataStore$default (Landroidx/datastore/core/Storage;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;ILjava/lang/Object;)Landroidx/datastore/core/DataStore;
+	public static synthetic fun createEncryptedPreferencesDataStore$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lkotlin/jvm/functions/Function0;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/StoreRegistry;ILjava/lang/Object;)Landroidx/datastore/core/DataStore;
+	public static final fun createPlainPreferencesDataStore (Lkotlin/jvm/functions/Function0;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;)Landroidx/datastore/core/DataStore;
+	public static synthetic fun createPlainPreferencesDataStore$default (Lkotlin/jvm/functions/Function0;Ljava/util/List;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;ILjava/lang/Object;)Landroidx/datastore/core/DataStore;
+	public static final fun encryptedPreferencesSerializer (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedPreferencesSerializer;
+	public static synthetic fun encryptedPreferencesSerializer$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedPreferencesSerializer;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/preferences/PreferencesDataStore_jvmKt {
+	public static final fun createEncryptedPreferencesDataStoreLocalStorage (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Ljava/lang/String;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;Ljava/util/List;)Landroidx/datastore/core/DataStore;
+	public static synthetic fun createEncryptedPreferencesDataStoreLocalStorage$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/crypto/Cipher;Ljava/lang/String;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;Ljava/util/List;ILjava/lang/Object;)Landroidx/datastore/core/DataStore;
+	public static final fun createPlainPreferencesDataStoreLocalStorage (Ljava/lang/String;Ljava/util/List;)Landroidx/datastore/core/DataStore;
+	public static synthetic fun createPlainPreferencesDataStoreLocalStorage$default (Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Landroidx/datastore/core/DataStore;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/preferences/PreferencesPathKt {
+	public static final field PREFERENCES_PB_EXTENSION Ljava/lang/String;
+	public static final fun requirePreferencesPbExtension (Lokio/Path;)Lokio/Path;
+}
+
