@@ -80,6 +80,10 @@ gradlePlugin {
             id = "convention.dokka"
             implementationClass = "DokkaConventionPlugin"
         }
+        register("junit5") {
+            id = "convention.junit5"
+            implementationClass = "Junit5ConventionPlugin"
+        }
         register("koverLibrary") {
             id = "convention.kover.library"
             implementationClass = "KoverLibraryConventionPlugin"

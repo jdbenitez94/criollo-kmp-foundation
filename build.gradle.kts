@@ -12,6 +12,18 @@ plugins {
     alias(libs.plugins.io.gitlab.arturbosch.detekt) apply false
     alias(libs.plugins.dev.detekt) apply false
     alias(libs.plugins.org.owasp.dependencycheck)
+    alias(libs.plugins.org.jetbrains.kotlinx.binary.compatibility.validator)
+}
+
+apiValidation {
+    // REQ-HRD-02 — JVM public API dumps for kryptostore family only
+    ignoredProjects += listOf(
+        "bom",
+        "coroutines",
+        "compose",
+        "viewmodel",
+        "project-conventions",
+    )
 }
 
 dependencyCheck {
