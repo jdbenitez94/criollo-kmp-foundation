@@ -1,0 +1,36 @@
+# Root coordinates published for every criollo-kmp-foundation release.
+# Format:
+#   root <artifactId>
+#   plugin <plugin-marker-artifactId>
+#   platform <baseArtifactId> <kotlinTargetName>
+#
+# Keep in sync with ProjectConfig.Artifacts and KMP targets registered when
+# -Pcriollo.requireAppleTargets=true (see publish-maven-central.yml).
+
+root bom
+root coroutines
+root coroutines-compose
+root coroutines-viewmodel
+root project-conventions
+plugin io.github.jdbenitez94.criollo.kmp.foundation.project-conventions.gradle.plugin
+
+platform coroutines android
+platform coroutines jvm
+platform coroutines js
+platform coroutines wasmJs
+platform coroutines iosArm64
+platform coroutines iosSimulatorArm64
+
+platform coroutines-compose android
+platform coroutines-compose jvm
+platform coroutines-compose js
+platform coroutines-compose wasmJs
+platform coroutines-compose iosArm64
+platform coroutines-compose iosSimulatorArm64
+
+platform coroutines-viewmodel android
+platform coroutines-viewmodel jvm
+platform coroutines-viewmodel js
+platform coroutines-viewmodel wasmJs
+platform coroutines-viewmodel iosArm64
+platform coroutines-viewmodel iosSimulatorArm64
