@@ -6,6 +6,7 @@ name: Normalize release CHANGELOG
 on:
   push:
     branches:
+      - 'release-please--branches--*'
       - 'release-please--branches--**'
     paths:
       - 'CHANGELOG.md'
