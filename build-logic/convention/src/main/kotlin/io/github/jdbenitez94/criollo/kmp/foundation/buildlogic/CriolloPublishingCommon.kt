@@ -89,6 +89,7 @@ fun Project.configureCriolloPublishing(artifactIdOverride: String? = null) {
         }
 
         repositories {
+            // Snapshots + legacy OSSRH staging uploads.
             maven {
                 name = "mavenCentral"
                 val releaseUrl = ProjectConfig.Publishing.mavenCentralReleaseUrl
@@ -99,6 +100,12 @@ fun Project.configureCriolloPublishing(artifactIdOverride: String? = null) {
                     username = criolloProperty("mavenCentralUsername")
                     password = criolloProperty("mavenCentralPassword")
                 }
+            }
+            // Release CI: publish the full set to a local Maven repo, zip it, and upload
+            // one atomic Portal bundle (avoids incomplete OSSRH staging publishes).
+            maven {
+                name = "centralBundle"
+                url = uri(rootProject.layout.buildDirectory.dir("central-bundle"))
             }
         }
     }
