@@ -11,6 +11,15 @@ with in-memory PGP signing in CI.
 - Version: `ProjectConfig.version` in build-logic (must match git tag `vX.Y.Z` and `version.txt`)
 - Override: `-Pcriollo.version=…` (CI snapshots use the next patch + `-SNAPSHOT`)
 
+## CHANGELOG blank lines (MD012)
+
+[release-please](https://github.com/googleapis/release-please/issues/2085) inserts an extra
+blank line before `###` sections. Codacy markdownlint (MD012) rejects that.
+
+[`normalize-release-changelog.yml`](../.github/workflows/normalize-release-changelog.yml)
+runs on `release-please--branches--*` pushes and collapses consecutive blanks via
+[`scripts/normalize-changelog-blanks.py`](../scripts/normalize-changelog-blanks.py).
+
 ## Apple (iOS) targets
 
 `iosArm64` / `iosSimulatorArm64` are registered only when Xcode is available, or when
