@@ -4,6 +4,8 @@
 
 ### Features
 
+* **result:** add Flow `Result` triad (`Loading` / `Success` / `Error`) and `asResult()`
+* **runtime:** add `retryWithBackoff` with exponential backoff, jitter, and `RetryPolicy`
 * **kryptostore:** add `kryptostore-crypto` module (Phase A extract from saveable)
 * **kryptostore:** add `kryptostore-serializers` with envelope + fail-closed (Phase B)
 * **kryptostore:** add core factories + IndexedDB storage (Phase C)
