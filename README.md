@@ -40,7 +40,10 @@ land in this monorepo over time.
 
 Only `coroutines` is required. Pick ViewModel and/or Compose adapters when you want the convenience APIs; you can also construct `TaskScope(coroutineScope)` yourself.
 
-Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`); KryptoStore: `…foundation.kryptostore` (+ `.crypto` / `.serializers` / `.preferences` / `.android` / `.migrate`); testing: `…foundation.testing`.
+Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`);
+KryptoStore: `…foundation.kryptostore`
+(+ `.crypto` / `.serializers` / `.preferences` / `.android` / `.migrate`);
+testing: `…foundation.testing`.
 
 ## Install
 
