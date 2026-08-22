@@ -39,7 +39,8 @@ Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`).
 
 ```kotlin
 dependencies {
-    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.1.0"))
+    // Version is bumped by release-please with each GitHub Release / Maven Central publish.
+    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.1.6")) // x-release-please-version
     implementation("io.github.jdbenitez94.criollo.kmp.foundation:coroutines")
 
     // Optional adapters — add what you use:
@@ -48,7 +49,9 @@ dependencies {
 }
 ```
 
-`kotlinx-coroutines-core` is exposed transitively (`api`) from `coroutines`.
+Pin the BOM to a release (see the Maven Central badge above for the latest). With the BOM on the
+classpath, omit versions on the module lines. `kotlinx-coroutines-core` is exposed transitively
+(`api`) from `coroutines`.
 
 ## Quick start
 
