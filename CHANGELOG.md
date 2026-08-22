@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.7...v0.1.8) (2026-08-22)
+
+
+### Bug Fixes
+
+* **publish:** gate releases on full Central set ([#34](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/34)) ([6cc2c91](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/6cc2c9167a1af9ec3caa323a4c24480ec0971bfa))
+* **release:** repair release-please workflow YAML ([#35](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/35)) ([5b2ffbd](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/5b2ffbdd5963cd05efb4654f565d87ea77b9534d))
+
 ## [0.1.7](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.6...v0.1.7) (2026-08-22)
 
 ### Bug Fixes
