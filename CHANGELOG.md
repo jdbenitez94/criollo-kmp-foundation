@@ -2,7 +2,6 @@
 
 ## [0.1.8](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.7...v0.1.8) (2026-08-22)
 
-
 ### Bug Fixes
 
 * **publish:** gate releases on full Central set ([#34](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/34)) ([6cc2c91](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/6cc2c9167a1af9ec3caa323a4c24480ec0971bfa))
