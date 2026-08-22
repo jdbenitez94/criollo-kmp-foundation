@@ -40,7 +40,7 @@ Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`).
 ```kotlin
 dependencies {
     // Version is bumped by release-please with each GitHub Release / Maven Central publish.
-    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.1.7")) // x-release-please-version
+    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.1.8")) // x-release-please-version
     implementation("io.github.jdbenitez94.criollo.kmp.foundation:coroutines")
 
     // Optional adapters — add what you use:
