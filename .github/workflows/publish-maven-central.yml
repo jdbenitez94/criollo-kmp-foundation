@@ -32,8 +32,10 @@ env:
 jobs:
   publish:
     name: Publish to Maven Central
-    runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    # macOS + Xcode so iosArm64 / iosSimulatorArm64 publications are included.
+    # Ubuntu-only publishes omit Apple variants (isXcodeAvailable() == false).
+    runs-on: macos-15
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -90,8 +92,21 @@ jobs:
         run: |
           ./gradlew qualityCheck jvmLibraryTests \
             -Pcriollo.version=${{ steps.ver.outputs.version }} \
+            -Pcriollo.requireAppleTargets=true \
             --configuration-cache \
             --configuration-cache-problems=fail
+
+      - name: Verify Apple KMP targets are registered
+        run: |
+          set -euo pipefail
+          ./gradlew :coroutines:outgoingVariants \
+            -Pcriollo.version=${{ steps.ver.outputs.version }} \
+            -Pcriollo.requireAppleTargets=true \
+            --quiet \
+            | tee /tmp/coroutines-variants.txt
+          grep -q 'iosArm64ApiElements' /tmp/coroutines-variants.txt
+          grep -q 'iosSimulatorArm64ApiElements' /tmp/coroutines-variants.txt
+          echo "Apple variants present for :coroutines"
 
       - name: Publish to Maven Central
         env:
@@ -104,6 +119,7 @@ jobs:
         run: |
           ./gradlew publishAllPublicationsToMavenCentralRepository \
             -Pcriollo.version=${{ steps.ver.outputs.version }} \
+            -Pcriollo.requireAppleTargets=true \
             --configuration-cache \
             --configuration-cache-problems=fail
 

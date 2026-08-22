@@ -2,6 +2,7 @@ import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.KlibModuleNaming
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloBooleanProperty
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.isXcodeAvailable
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.libs
 import org.gradle.api.Plugin
@@ -57,7 +58,17 @@ class CriolloKmpLibraryConventionPlugin : Plugin<Project> {
                 }
             }
 
-            if (isXcodeAvailable()) {
+            // Apple targets need Xcode (klibs). Linux CI skips them; Maven publish must
+            // run on macOS with -Pcriollo.requireAppleTargets=true so Central gets iOS.
+            val requireAppleTargets = criolloBooleanProperty("criollo.requireAppleTargets")
+            val xcodeAvailable = isXcodeAvailable()
+            if (requireAppleTargets && !xcodeAvailable) {
+                error(
+                    "criollo.requireAppleTargets=true but Xcode is not available. " +
+                        "Publish Apple klibs from a macOS runner (see docs/publishing.md).",
+                )
+            }
+            if (requireAppleTargets || xcodeAvailable) {
                 iosArm64()
                 iosSimulatorArm64()
             }
