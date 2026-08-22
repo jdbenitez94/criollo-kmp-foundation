@@ -40,6 +40,8 @@ class CriolloKmpLibraryConventionPlugin : Plugin<Project> {
             ":coroutines" -> ProjectConfig.Namespaces.coroutines
             ":coroutines:compose" -> ProjectConfig.Namespaces.coroutinesCompose
             ":coroutines:viewmodel" -> ProjectConfig.Namespaces.coroutinesViewmodel
+            ":result" -> ProjectConfig.Namespaces.result
+            ":runtime" -> ProjectConfig.Namespaces.runtime
             ":kryptostore" -> ProjectConfig.Namespaces.kryptostore
             ":kryptostore:crypto" -> ProjectConfig.Namespaces.kryptostoreCrypto
             ":kryptostore:serializers" -> ProjectConfig.Namespaces.kryptostoreSerializers

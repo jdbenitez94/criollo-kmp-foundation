@@ -135,6 +135,8 @@ private fun canonicalArtifactId(projectPath: String, projectName: String): Strin
     ":coroutines" -> ProjectConfig.Artifacts.coroutines
     ":coroutines:compose" -> ProjectConfig.Artifacts.coroutinesCompose
     ":coroutines:viewmodel" -> ProjectConfig.Artifacts.coroutinesViewmodel
+    ":result" -> ProjectConfig.Artifacts.result
+    ":runtime" -> ProjectConfig.Artifacts.runtime
     ":kryptostore" -> ProjectConfig.Artifacts.kryptostore
     ":kryptostore:crypto" -> ProjectConfig.Artifacts.kryptostoreCrypto
     ":kryptostore:serializers" -> ProjectConfig.Artifacts.kryptostoreSerializers
@@ -155,6 +157,10 @@ private fun pomDescriptionFor(artifactId: String): String = when (artifactId) {
         "Compose rememberTaskScope() adapter for Criollo TaskScope."
     ProjectConfig.Artifacts.coroutinesViewmodel ->
         "ViewModel taskScope() property delegate for Criollo TaskScope."
+    ProjectConfig.Artifacts.result ->
+        "Flow Result triad (Loading / Success / Error) and asResult() for Kotlin Multiplatform."
+    ProjectConfig.Artifacts.runtime ->
+        "Shared runtime helpers for Criollo KMP (cancellable runCatching, Result extensions, retry with backoff)."
     ProjectConfig.Artifacts.kryptostore ->
         "Encrypted typed DataStore factories and IndexedDB storage for KryptoStore."
     ProjectConfig.Artifacts.kryptostoreCrypto ->

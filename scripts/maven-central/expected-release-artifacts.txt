@@ -11,6 +11,8 @@ root bom
 root coroutines
 root coroutines-compose
 root coroutines-viewmodel
+root result
+root runtime
 root kryptostore
 root kryptostore-crypto
 root kryptostore-serializers
@@ -40,6 +42,20 @@ platform coroutines-viewmodel js
 platform coroutines-viewmodel wasmJs
 platform coroutines-viewmodel iosArm64
 platform coroutines-viewmodel iosSimulatorArm64
+
+platform result android
+platform result jvm
+platform result js
+platform result wasmJs
+platform result iosArm64
+platform result iosSimulatorArm64
+
+platform runtime android
+platform runtime jvm
+platform runtime js
+platform runtime wasmJs
+platform runtime iosArm64
+platform runtime iosSimulatorArm64
 
 platform kryptostore-crypto android
 platform kryptostore-crypto jvm

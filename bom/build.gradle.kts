@@ -15,6 +15,8 @@ dependencies {
         api(project(":coroutines"))
         api(project(":coroutines:compose"))
         api(project(":coroutines:viewmodel"))
+        api(project(":result"))
+        api(project(":runtime"))
         api(project(":kryptostore"))
         api(project(":kryptostore:crypto"))
         api(project(":kryptostore:serializers"))
