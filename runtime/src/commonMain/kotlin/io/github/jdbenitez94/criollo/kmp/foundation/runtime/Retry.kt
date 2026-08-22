@@ -91,15 +91,13 @@ class RetryPolicy(
 suspend fun <T> retryWithBackoff(policy: RetryPolicy = RetryPolicy.DEFAULT, random: Random = Random.Default, block: suspend (attempt: Int) -> T): T {
     var attempt = 1
     var currentBackoff = policy.initialBackoff
-    var lastError: Exception? = null
 
-    while (attempt <= policy.maxAttempts) {
+    while (true) {
         try {
             return block(attempt)
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (error: Exception) {
-            lastError = error
             val retriesLeft = attempt < policy.maxAttempts
             if (!retriesLeft || !policy.shouldRetry(error)) {
                 throw error
@@ -109,8 +107,6 @@ suspend fun <T> retryWithBackoff(policy: RetryPolicy = RetryPolicy.DEFAULT, rand
             attempt++
         }
     }
-
-    throw checkNotNull(lastError) { "retryWithBackoff exhausted without capturing an error" }
 }
 
 internal fun backoffWithJitter(backoff: Duration, jitterFactor: Double, random: Random): Duration {

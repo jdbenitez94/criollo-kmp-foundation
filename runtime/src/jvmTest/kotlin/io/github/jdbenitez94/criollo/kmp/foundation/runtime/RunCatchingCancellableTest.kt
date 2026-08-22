@@ -196,6 +196,28 @@ class RetryPolicyTest {
     }
 
     @Test
+    fun copy_keepsMaxAttemptsWhenOnlyOtherFieldsChange() {
+        val base = RetryPolicy(maxAttempts = 4, jitterFactor = 0.0)
+        val copied = base.copy(jitterFactor = 0.2, shouldRetry = { false })
+        expectThat(copied.maxAttempts).isEqualTo(4)
+        expectThat(copied.jitterFactor).isEqualTo(0.2)
+        expectThat(copied.shouldRetry(IllegalStateException())).isFalse()
+    }
+
+    @Test
+    fun equals_sameInstance() {
+        val policy = RetryPolicy()
+        expectThat(policy == policy).isTrue()
+    }
+
+    @Test
+    fun equals_rejectsNullAndOtherTypes() {
+        val policy = RetryPolicy()
+        expectThat(policy.equals(null)).isFalse()
+        expectThat(policy.equals("RetryPolicy")).isFalse()
+    }
+
+    @Test
     fun rejectsInvalidInitialBackoff() {
         expectThrows<IllegalArgumentException> {
             RetryPolicy(initialBackoff = 0.milliseconds)
