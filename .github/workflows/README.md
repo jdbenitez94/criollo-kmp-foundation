@@ -90,11 +90,12 @@ Third-party actions use immutable commit SHAs with a version comment for humans,
 | `MAVEN_CENTRAL_NAMESPACE` | Portal namespace for finalize step (e.g. `io.github.jdbenitez94`) |
 
 Publish URL is the Portal OSSRH staging API
-(`ossrh-staging-api.central.sonatype.com`). After Gradle upload, publish calls
-`POST /manual/upload/defaultRepository/{namespace}?publishing_type=user_managed` so the
-deployment is validated and visible at <https://central.sonatype.com/publishing>. CI stays
-green on success; you still **Publish** manually in the Portal (`user_managed`). A red finalize
-step means Central rejected validation (for example missing `-javadoc.jar` on JVM artifacts).
+(`ossrh-staging-api.central.sonatype.com`). After Gradle upload, release publishes call
+`POST /manual/upload/defaultRepository/{namespace}?publishing_type=portal_api`, poll Portal
+until `PUBLISHED`, then verify the full expected POM set on repo1
+(`scripts/maven-central/`). A green publish job means the coordinates are fetchable from
+Maven Central — not merely that staging upload returned HTTP 2xx. Releases and snapshots
+share concurrency group `criollo-maven-central-publish` so they never interleave.
 
 ## Composite action: `setup-gradle-ci`
 
