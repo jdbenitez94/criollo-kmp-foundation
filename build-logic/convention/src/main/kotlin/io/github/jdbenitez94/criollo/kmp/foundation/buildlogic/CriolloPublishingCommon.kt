@@ -135,6 +135,12 @@ private fun canonicalArtifactId(projectPath: String, projectName: String): Strin
     ":coroutines" -> ProjectConfig.Artifacts.coroutines
     ":coroutines:compose" -> ProjectConfig.Artifacts.coroutinesCompose
     ":coroutines:viewmodel" -> ProjectConfig.Artifacts.coroutinesViewmodel
+    ":kryptostore" -> ProjectConfig.Artifacts.kryptostore
+    ":kryptostore:crypto" -> ProjectConfig.Artifacts.kryptostoreCrypto
+    ":kryptostore:serializers" -> ProjectConfig.Artifacts.kryptostoreSerializers
+    ":kryptostore:preferences" -> ProjectConfig.Artifacts.kryptostorePreferences
+    ":kryptostore:android" -> ProjectConfig.Artifacts.kryptostoreAndroid
+    ":kryptostore:migrate-android" -> ProjectConfig.Artifacts.kryptostoreMigrateAndroid
     ":bom" -> ProjectConfig.Artifacts.bom
     ":project-conventions" -> ProjectConfig.Artifacts.projectConventions
     else -> projectName
@@ -149,6 +155,18 @@ private fun pomDescriptionFor(artifactId: String): String = when (artifactId) {
         "Compose rememberTaskScope() adapter for Criollo TaskScope."
     ProjectConfig.Artifacts.coroutinesViewmodel ->
         "ViewModel taskScope() property delegate for Criollo TaskScope."
+    ProjectConfig.Artifacts.kryptostore ->
+        "Encrypted typed DataStore factories and IndexedDB storage for KryptoStore."
+    ProjectConfig.Artifacts.kryptostoreCrypto ->
+        "Platform crypto (Tink / Keystore / WebCrypto) for KryptoStore encrypted DataStore."
+    ProjectConfig.Artifacts.kryptostoreSerializers ->
+        "Encrypted Okio serializers and fail-closed corruption handling for KryptoStore."
+    ProjectConfig.Artifacts.kryptostorePreferences ->
+        "Encrypted and plain Preferences DataStore factories for KryptoStore."
+    ProjectConfig.Artifacts.kryptostoreAndroid ->
+        "Android Context property delegates for KryptoStore (artifact kryptostore-android-delegates)."
+    ProjectConfig.Artifacts.kryptostoreMigrateAndroid ->
+        "Optional Android migration helpers onto KryptoStore envelopes (unenveloped AEAD, guides)."
     ProjectConfig.Artifacts.projectConventions ->
         "Gradle plugin that syncs Criollo .editorconfig and Detekt configs into consumer projects."
     else -> "Criollo KMP Foundation library module."

@@ -30,10 +30,16 @@ land in this monorepo over time.
 | ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | Optional | `by taskScope()` on `ViewModel` |
 | Compose | `coroutines-compose` | `:coroutines:compose` | Optional | `rememberTaskScope()` in Composables |
 | Tooling | `project-conventions` | `:project-conventions` | Optional | Gradle plugin to sync `.editorconfig` + Detekt configs |
+| Crypto (KryptoStore) | `kryptostore-crypto` | `:kryptostore:crypto` | Optional | Platform crypto for upcoming encrypted DataStore (Tink / Keystore / WebCrypto) |
+| Serializers (KryptoStore) | `kryptostore-serializers` | `:kryptostore:serializers` | Optional | Encrypted Okio envelope serializers + fail-closed corruption handler |
+| Core (KryptoStore) | `kryptostore` | `:kryptostore` | Optional | Encrypted typed DataStore factories + IndexedDB storage |
+| Preferences (KryptoStore) | `kryptostore-preferences` | `:kryptostore:preferences` | Optional | Encrypted + plain Preferences DataStore factories |
+| Android DX (KryptoStore) | `kryptostore-android-delegates` | `:kryptostore:android` | Optional | `Context` property delegates for encrypted/plain stores |
+| Migrate Android (KryptoStore) | `kryptostore-migrate-android` | `:kryptostore:migrate-android` | Optional | Unenveloped AEAD migration helpers |
 
 Only `coroutines` is required. Pick ViewModel and/or Compose adapters when you want the convenience APIs; you can also construct `TaskScope(coroutineScope)` yourself.
 
-Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`).
+Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`); KryptoStore: `…foundation.kryptostore` (+ `.crypto` / `.serializers` / `.preferences` / `.android` / `.migrate`).
 
 ## Install
 
@@ -94,6 +100,51 @@ tasks.launch(TaskKey.of("sync.refresh"), TaskPolicy.ReplaceActive) {
 }
 ```
 
+## KryptoStore quickstarts (REQ-HRD-05)
+
+```kotlin
+dependencies {
+    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.1.9")) // x-release-please-version
+    implementation("io.github.jdbenitez94.criollo.kmp.foundation:kryptostore")
+    implementation("io.github.jdbenitez94.criollo.kmp.foundation:kryptostore-preferences")
+    // Android Context delegates (artifact id avoids clash with kryptostore's android KMP target):
+    implementation("io.github.jdbenitez94.criollo.kmp.foundation:kryptostore-android-delegates")
+}
+```
+
+**JVM / Android / iOS (file):** initialize crypto, then create an encrypted proto store:
+
+```kotlin
+val stack = createPlatformCryptoStack("my.app")
+val runtime = CryptoRuntime(stack)
+runtime.initialize() // Ready before use
+val store = createEncryptedProtoDataStore(
+    cipher = runtime.cipher,
+    kSerializer = Settings.serializer(),
+    defaultValue = Settings(),
+    producePath = { path },
+    registry = runtime.registry,
+)
+```
+
+**Android delegates:**
+
+```kotlin
+val Context.settings by encryptedProtoDataStore(
+    fileName = "settings.pb",
+    kSerializer = Settings.serializer(),
+    defaultValue = Settings(),
+    cipher = { runtime.cipher },
+    registry = runtime.registry,
+)
+```
+
+**Web:** typed store → IndexedDB (`createEncryptedProtoDataStoreIndexedDb`); prefs → localStorage
+(`createEncryptedPreferencesDataStoreLocalStorage` / plain variant). Keys stay in IndexedDB (`app-crypto`).
+
+Migration guides: [kryptostore-migration.md](docs/kryptostore-migration.md). Crypto notes:
+[kryptostore-crypto.md](docs/kryptostore-crypto.md).
+
 ## Docs
 
 Site (MkDocs + Dokka API HTML): [jdbenitez94.github.io/criollo-kmp-foundation](https://jdbenitez94.github.io/criollo-kmp-foundation/).
@@ -105,6 +156,8 @@ Site (MkDocs + Dokka API HTML): [jdbenitez94.github.io/criollo-kmp-foundation](h
 - [JS / Wasm webpack notes](docs/js-wasm.md) — `webpack.config.d` fallbacks
 - [Adding a module](docs/adding-a-module.md) — checklist for new artifacts in this repo
 - [Publishing](docs/publishing.md)
+- [KryptoStore spec](docs/spec-final-kryptostore.md) — encrypted DataStore KMP (SDD+TDD)
+- [KryptoStore completion](docs/kryptostore-complete.md) — G1–G10 checklist
 - [Config overview](config/README.md) — Detekt, Kover, Gradle cache encryption
 
 ## Build

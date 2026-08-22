@@ -16,7 +16,15 @@ dokka = "2.2.0"
 jackson = "2.22.2"
 kover = "0.9.9"
 dependencycheck = "13.0.0"
+binary-compatibility-validator = "0.18.1"
 strikt = "0.35.1"
+tink = "1.23.0"
+cryptography = "0.6.0"
+jna = "5.19.1"
+# DataStore: alpha aligns with saveable dogfood; prefer stable for Maven 1.0 (DEC-20).
+androidx-datastore = "1.3.0-alpha10"
+okio = "3.18.1"
+kotlinx-serialization = "1.11.0"
 
 [plugins]
 org-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
@@ -28,6 +36,7 @@ org-jlleitschuh-gradle-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.
 io-gitlab-arturbosch-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dev-detekt = { id = "dev.detekt", version.ref = "detekt2" }
 org-jetbrains-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+org-jetbrains-kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 # Convention plugins (build-logic) — kebab-case aliases → libs.plugins.convention.*
 convention-root = { id = "convention.root" }
@@ -40,6 +49,7 @@ criollo-kmp-library = { id = "criollo.kmp-library" }
 criollo-maven-publish = { id = "criollo.maven-publish" }
 criollo-project-conventions = { id = "io.github.jdbenitez94.criollo.kmp.foundation.project-conventions" }
 org-owasp-dependencycheck = { id = "org.owasp.dependencycheck", version.ref = "dependencycheck" }
+org-jetbrains-kotlinx-binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
 
 [libraries]
 com-android-tools-build-gradle = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -60,3 +70,13 @@ org-jetbrains-androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.l
 org-jetbrains-androidx-lifecycle-viewmodel-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle-kmp" }
 io-strikt-bom = { group = "io.strikt", name = "strikt-bom", version.ref = "strikt" }
 io-strikt-core = { group = "io.strikt", name = "strikt-core" }
+com-google-crypto-tink-android = { group = "com.google.crypto.tink", name = "tink-android", version.ref = "tink" }
+com-google-crypto-tink = { group = "com.google.crypto.tink", name = "tink", version.ref = "tink" }
+net-java-dev-jna = { group = "net.java.dev.jna", name = "jna", version.ref = "jna" }
+net-java-dev-jna-platform = { group = "net.java.dev.jna", name = "jna-platform", version.ref = "jna" }
+dev-whyoleg-cryptography-core = { group = "dev.whyoleg.cryptography", name = "cryptography-core", version.ref = "cryptography" }
+dev-whyoleg-cryptography-provider-apple = { group = "dev.whyoleg.cryptography", name = "cryptography-provider-apple", version.ref = "cryptography" }
+androidx-datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "androidx-datastore" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "androidx-datastore" }
+com-squareup-okio-fakefilesystem = { group = "com.squareup.okio", name = "okio-fakefilesystem", version.ref = "okio" }
+org-jetbrains-kotlinx-serialization-protobuf = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-protobuf", version.ref = "kotlinx-serialization" }

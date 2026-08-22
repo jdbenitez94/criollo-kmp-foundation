@@ -33,7 +33,17 @@ class RootPlugin : Plugin<Project> {
         target.pluginManager.apply("convention.kover.aggregation")
         target.pluginManager.apply("convention.dokka")
         val dokkaDeps = target.dependencies
-        listOf(":coroutines", ":coroutines:compose", ":coroutines:viewmodel").forEach { path ->
+        listOf(
+            ":coroutines",
+            ":coroutines:compose",
+            ":coroutines:viewmodel",
+            ":kryptostore",
+            ":kryptostore:crypto",
+            ":kryptostore:serializers",
+            ":kryptostore:preferences",
+            ":kryptostore:android",
+            ":kryptostore:migrate-android",
+        ).forEach { path ->
             dokkaDeps.add("dokka", dokkaDeps.project(mapOf("path" to path)))
         }
 
@@ -163,6 +173,38 @@ class RootPlugin : Plugin<Project> {
                 ":coroutines:jvmTest",
                 ":coroutines:compose:jvmTest",
                 ":coroutines:viewmodel:jvmTest",
+                ":kryptostore:jvmTest",
+                ":kryptostore:crypto:jvmTest",
+                ":kryptostore:serializers:jvmTest",
+                ":kryptostore:preferences:jvmTest",
+                ":kryptostore:android:jvmTest",
+                ":kryptostore:migrate-android:jvmTest",
+            )
+        }
+
+        tasks.register("checkKryptostoreAbi") {
+            group = "verification"
+            description = "Checks kryptostore JVM ABI dumps via binary-compatibility-validator (REQ-HRD-02)."
+            dependsOn(
+                ":kryptostore:apiCheck",
+                ":kryptostore:crypto:apiCheck",
+                ":kryptostore:serializers:apiCheck",
+                ":kryptostore:preferences:apiCheck",
+                ":kryptostore:android:apiCheck",
+                ":kryptostore:migrate-android:apiCheck",
+            )
+        }
+
+        tasks.register("dumpKryptostoreAbi") {
+            group = "verification"
+            description = "Updates kryptostore JVM ABI dumps (run separately from check)."
+            dependsOn(
+                ":kryptostore:apiDump",
+                ":kryptostore:crypto:apiDump",
+                ":kryptostore:serializers:apiDump",
+                ":kryptostore:preferences:apiDump",
+                ":kryptostore:android:apiDump",
+                ":kryptostore:migrate-android:apiDump",
             )
         }
 
@@ -174,6 +216,12 @@ class RootPlugin : Plugin<Project> {
                 ":coroutines:publishToMavenLocal",
                 ":coroutines:compose:publishToMavenLocal",
                 ":coroutines:viewmodel:publishToMavenLocal",
+                ":kryptostore:publishToMavenLocal",
+                ":kryptostore:crypto:publishToMavenLocal",
+                ":kryptostore:serializers:publishToMavenLocal",
+                ":kryptostore:preferences:publishToMavenLocal",
+                ":kryptostore:android:publishToMavenLocal",
+                ":kryptostore:migrate-android:publishToMavenLocal",
                 ":project-conventions:publishToMavenLocal",
             )
         }
