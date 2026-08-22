@@ -1,7 +1,7 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.buildlogic
 
 object ProjectConfig {
-    const val version = "0.1.6" // x-release-please-version
+    const val version = "0.1.7" // x-release-please-version
     const val group = "io.github.jdbenitez94.criollo.kmp.foundation"
 
     /** Must match `group` in `build-logic/convention/build.gradle.kts`. */
