@@ -36,8 +36,8 @@ Setup:
 2. Add the **public** key as a repo Deploy Key with **Allow write access** (title
    `dev-tip-sync`).
 3. Store the **private** key as Actions secret **`DEV_SYNC_SSH_KEY`**.
-4. Optional local mirror (gitignored): keep the private key under `.tmp/dev-sync` and
-   note `devSyncSshKeyPath=.tmp/dev-sync` in `local.properties`.
+4. Optional local mirror (gitignored): keep the private key under `.ssh/dev-sync` and
+   note `devSyncSshKeyPath=.ssh/dev-sync` in `local.properties`.
 
 ```bash
 gh secret set DEV_SYNC_SSH_KEY -R jdbenitez94/criollo-kmp-foundation < /path/to/dev-sync
