@@ -32,6 +32,41 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+      # release-please pushes with GITHUB_TOKEN do not trigger other workflows, so
+      # normalize-release-changelog.yml never sees that branch push. Fix MD012 here.
+      - name: Checkout for CHANGELOG normalize
+        if: steps.release.outputs.pr != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          token: ${{ github.token }}
+
+      - name: Collapse consecutive CHANGELOG blank lines
+        if: steps.release.outputs.pr != ''
+        env:
+          PR_JSON: ${{ steps.release.outputs.pr }}
+        run: |
+          set -euo pipefail
+          BRANCH="$(printf '%s' "$PR_JSON" | jq -r '.headBranchName // .headRefName // .head.ref // empty')"
+          if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
+            echo "No release PR head branch in JSON; skipping"
+            printf '%s
+' "$PR_JSON" | jq -c 'keys' || true
+            exit 0
+          fi
+          git fetch origin "$BRANCH"
+          git checkout -B "$BRANCH" "origin/$BRANCH"
+          python3 scripts/normalize-changelog-blanks.py CHANGELOG.md
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "CHANGELOG already clean"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore(changelog): collapse consecutive blank lines"
+          git push origin "HEAD:$BRANCH"
+
   publish:
     name: Publish Maven Central
     needs: release-please
