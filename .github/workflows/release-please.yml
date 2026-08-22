@@ -50,8 +50,7 @@ jobs:
           BRANCH="$(printf '%s' "$PR_JSON" | jq -r '.headBranchName // .headRefName // .head.ref // empty')"
           if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
             echo "No release PR head branch in JSON; skipping"
-            printf '%s
-' "$PR_JSON" | jq -c 'keys' || true
+            printf '%s\n' "$PR_JSON" | jq -c 'keys' || true
             exit 0
           fi
           git fetch origin "$BRANCH"
