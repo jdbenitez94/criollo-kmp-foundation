@@ -87,13 +87,58 @@ class CriolloKmpLibraryConventionPlugin : Plugin<Project> {
             js { browser() }
             wasmJs { browser() }
 
+            if (path in NON_WEB_HIERARCHY_MODULES) {
+                val nonWebMain = sourceSets.create("nonWebMain") {
+                    dependsOn(sourceSets.getByName("commonMain"))
+                }
+                sourceSets.getByName("androidMain").dependsOn(nonWebMain)
+                sourceSets.getByName("jvmMain").dependsOn(nonWebMain)
+                sourceSets.findByName("iosMain")?.dependsOn(nonWebMain)
+            }
+
+            val exposeCoroutinesApi = path in COROUTINES_API_MODULES
+            val kryptostoreModule = path.startsWith(":kryptostore")
+            val testingProject = rootProject.project(":testing")
             sourceSets.configureEach {
-                if (name == "commonTest") {
-                    dependencies {
-                        implementation(libs.findLibrary("org-jetbrains-kotlin-test").get())
+                when (name) {
+                    "commonMain" -> {
+                        dependencies {
+                            val coroutines =
+                                libs.findLibrary("org-jetbrains-kotlinx-coroutines-core").get()
+                            if (exposeCoroutinesApi) {
+                                api(coroutines)
+                            } else {
+                                implementation(coroutines)
+                            }
+                        }
+                    }
+                    "commonTest" -> {
+                        dependencies {
+                            implementation(libs.findLibrary("org-jetbrains-kotlin-test").get())
+                            implementation(libs.findLibrary("org-jetbrains-kotlinx-coroutines-test").get())
+                        }
+                    }
+                    "jvmTest", "androidHostTest" -> {
+                        dependencies {
+                            implementation(
+                                project.dependencies.platform(libs.findLibrary("io-strikt-bom").get()),
+                            )
+                            implementation(libs.findLibrary("io-strikt-core").get())
+                            if (kryptostoreModule) {
+                                implementation(testingProject)
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    private companion object {
+        /** Modules that publish kotlinx-coroutines-core as an API dependency. */
+        val COROUTINES_API_MODULES = setOf(":coroutines", ":result", ":runtime")
+
+        /** nonWebMain intermediate source set (android/jvm/ios share native-ish storage). */
+        val NON_WEB_HIERARCHY_MODULES = setOf(":kryptostore", ":kryptostore:preferences")
     }
 }

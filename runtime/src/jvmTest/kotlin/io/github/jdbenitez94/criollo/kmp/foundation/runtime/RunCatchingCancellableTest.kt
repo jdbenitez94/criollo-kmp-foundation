@@ -123,6 +123,16 @@ class RunCatchingCancellableTest {
     }
 
     @Test
+    fun onFailureOrRethrow_passesThroughSuccess() {
+        var handled = false
+        val result = Result.success("ok").onFailureOrRethrow<IllegalStateException, String> {
+            handled = true
+        }
+        expectThat(handled).isFalse()
+        expectThat(result.getOrNull()).isEqualTo("ok")
+    }
+
+    @Test
     fun onFailureOrRethrow_rethrowsMatchingType() {
         val result: Result<String> = Result.failure(IllegalArgumentException("bad"))
         expectThrows<IllegalArgumentException> {
@@ -184,6 +194,40 @@ class RetryPolicyTest {
         val a = RetryPolicy(maxAttempts = 2)
         val b = RetryPolicy(maxAttempts = 3)
         expectThat(a == b).isFalse()
+    }
+
+    @Test
+    fun equals_considersInitialBackoff() {
+        val a = RetryPolicy(initialBackoff = 100.milliseconds, maxBackoff = 1_000.milliseconds)
+        val b = RetryPolicy(initialBackoff = 200.milliseconds, maxBackoff = 1_000.milliseconds)
+        expectThat(a == b).isFalse()
+    }
+
+    @Test
+    fun equals_considersMaxBackoff() {
+        val a = RetryPolicy(initialBackoff = 100.milliseconds, maxBackoff = 500.milliseconds)
+        val b = RetryPolicy(initialBackoff = 100.milliseconds, maxBackoff = 1_000.milliseconds)
+        expectThat(a == b).isFalse()
+    }
+
+    @Test
+    fun equals_considersJitterFactor() {
+        val a = RetryPolicy(jitterFactor = 0.0)
+        val b = RetryPolicy(jitterFactor = 1.0)
+        expectThat(a == b).isFalse()
+    }
+
+    @Test
+    fun acceptsBoundaryJitterFactors() {
+        expectThat(RetryPolicy(jitterFactor = 0.0).jitterFactor).isEqualTo(0.0)
+        expectThat(RetryPolicy(jitterFactor = 1.0).jitterFactor).isEqualTo(1.0)
+    }
+
+    @Test
+    fun rejectsNegativeJitterFactor() {
+        expectThrows<IllegalArgumentException> {
+            RetryPolicy(jitterFactor = -0.1)
+        }
     }
 
     @Test
