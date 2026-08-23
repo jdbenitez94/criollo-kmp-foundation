@@ -54,7 +54,7 @@ testing: `…foundation.testing`.
 ```kotlin
 dependencies {
     // Version is bumped by release-please with each GitHub Release / Maven Central publish.
-    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.1.9")) // x-release-please-version
+    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.2.0")) // x-release-please-version
     implementation("io.github.jdbenitez94.criollo.kmp.foundation:coroutines")
 
     // Optional adapters — add what you use:
@@ -112,7 +112,7 @@ tasks.launch(TaskKey.of("sync.refresh"), TaskPolicy.ReplaceActive) {
 
 ```kotlin
 dependencies {
-    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.1.9")) // x-release-please-version
+    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.2.0")) // x-release-please-version
     implementation("io.github.jdbenitez94.criollo.kmp.foundation:result")
     implementation("io.github.jdbenitez94.criollo.kmp.foundation:runtime")
 }
@@ -149,7 +149,7 @@ result.onFailureExceptCancellation { log(it) }
 
 ```kotlin
 dependencies {
-    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.1.9")) // x-release-please-version
+    implementation(platform("io.github.jdbenitez94.criollo.kmp.foundation:bom:0.2.0")) // x-release-please-version
     implementation("io.github.jdbenitez94.criollo.kmp.foundation:kryptostore")
     implementation("io.github.jdbenitez94.criollo.kmp.foundation:kryptostore-preferences")
     // Android Context delegates (artifact id avoids clash with kryptostore's android KMP target):
