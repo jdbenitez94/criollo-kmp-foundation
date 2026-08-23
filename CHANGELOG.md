@@ -22,7 +22,6 @@
 
 ## [0.2.0](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.9...v0.2.0) (2026-08-23)
 
-
 ### Features
 
 * publish kryptostore, result, runtime, and testing ([5ee3365](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/5ee3365b07fe739f73d4cb0643ca89b7fb7c9b4f))
