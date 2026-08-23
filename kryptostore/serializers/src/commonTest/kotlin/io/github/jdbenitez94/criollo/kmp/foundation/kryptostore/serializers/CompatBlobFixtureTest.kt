@@ -4,9 +4,9 @@ import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.Cipher
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.ENCRYPTED_BLOB_MAGIC
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
-import okio.Buffer
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import okio.Buffer as CompatBlobBuffer
 
 /**
  * REQ-HRD-01 — frozen envelope v1 fixture.
@@ -27,7 +27,7 @@ class CompatBlobFixtureTest {
             cipher = IdentityCompatCipher,
             associatedData = FIXTURE_AAD,
         )
-        assertEquals(CompatSample(enabled = true, label = "v1"), serializer.readFrom(Buffer().write(bytes)))
+        assertEquals(CompatSample(enabled = true, label = "v1"), serializer.readFrom(CompatBlobBuffer().write(bytes)))
     }
 
     @Test
@@ -37,7 +37,7 @@ class CompatBlobFixtureTest {
             cipher = IdentityCompatCipher,
             associatedData = FIXTURE_AAD,
         )
-        val buffer = Buffer()
+        val buffer = CompatBlobBuffer()
         serializer.writeTo(CompatSample(enabled = true, label = "v1"), buffer)
         assertEquals(FROZEN_ENVELOPE_V1_HEX, buffer.readByteArray().toHex())
     }

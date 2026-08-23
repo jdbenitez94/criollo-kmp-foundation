@@ -2,10 +2,8 @@ package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore
 
 import androidx.datastore.core.DataMigration
 import androidx.datastore.core.DataStore
-import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Storage
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
-import androidx.datastore.core.okio.OkioStorage
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.Cipher
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.StoreRegistry
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.EncryptedProtoSerializer
@@ -15,6 +13,8 @@ import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.fail
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.kryptostoreFileSystem
 import kotlinx.serialization.KSerializer
 import okio.Path
+import androidx.datastore.core.DataStoreFactory as EncryptedDataStoreFactory
+import androidx.datastore.core.okio.OkioStorage as EncryptedOkioStorage
 
 /**
  * Creates a [DataStore] over a caller-supplied [storage] (Okio, IndexedDB, etc.).
@@ -30,7 +30,7 @@ fun <T : Any> createEncryptedProtoDataStore(
     migrations: List<DataMigration<T>> = emptyList(),
     corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
     registry: StoreRegistry? = null,
-): DataStore<T> = DataStoreFactory.create(
+): DataStore<T> = EncryptedDataStoreFactory.create(
     storage = storage,
     corruptionHandler = corruptionHandler,
     migrations = migrations,
@@ -62,7 +62,7 @@ fun <T : Any> createEncryptedProtoDataStore(
                 "use createEncryptedProtoDataStoreIndexedDb on JS/Wasm.",
         )
     return createEncryptedProtoDataStore(
-        storage = OkioStorage(
+        storage = EncryptedOkioStorage(
             fileSystem = fileSystem,
             serializer = serializer,
             producePath = producePath,
