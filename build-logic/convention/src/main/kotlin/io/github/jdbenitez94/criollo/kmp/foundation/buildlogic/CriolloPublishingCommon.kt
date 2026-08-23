@@ -22,14 +22,22 @@ fun Project.configureCriolloPublishing(artifactIdOverride: String? = null) {
     group = ProjectConfig.group
 
     val baseArtifactId = artifactIdOverride ?: canonicalArtifactId(path, name)
+    configureJavaSourcesAndJavadocJars()
+    configureEmptyKmpJavadocJar()
+    configureMavenPublications(baseArtifactId, versionString)
+    configurePublicationSigning()
+}
 
+private fun Project.configureJavaSourcesAndJavadocJars() {
     plugins.withId("java") {
         extensions.configure<JavaPluginExtension> {
             withSourcesJar()
             withJavadocJar()
         }
     }
+}
 
+private fun Project.configureEmptyKmpJavadocJar() {
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
         afterEvaluate {
             val javadocJar =
@@ -43,7 +51,9 @@ fun Project.configureCriolloPublishing(artifactIdOverride: String? = null) {
             }
         }
     }
+}
 
+private fun Project.configureMavenPublications(baseArtifactId: String, versionString: String) {
     fun configurePublicationArtifactIds() {
         extensions.configure<PublishingExtension> {
             publications.withType<MavenPublication>().configureEach {
@@ -89,20 +99,16 @@ fun Project.configureCriolloPublishing(artifactIdOverride: String? = null) {
         }
 
         repositories {
-            // Snapshots + legacy OSSRH staging uploads.
             maven {
                 name = "mavenCentral"
                 val releaseUrl = ProjectConfig.Publishing.mavenCentralReleaseUrl
                 val snapshotUrl = ProjectConfig.Publishing.mavenCentralSnapshotUrl
                 url = uri(if (versionString.endsWith("SNAPSHOT")) snapshotUrl else releaseUrl)
-
                 credentials {
                     username = criolloProperty("mavenCentralUsername")
                     password = criolloProperty("mavenCentralPassword")
                 }
             }
-            // Release CI: publish the full set to a local Maven repo, zip it, and upload
-            // one atomic Portal bundle (avoids incomplete OSSRH staging publishes).
             maven {
                 name = "centralBundle"
                 url = uri(rootProject.layout.buildDirectory.dir("central-bundle"))
@@ -112,7 +118,9 @@ fun Project.configureCriolloPublishing(artifactIdOverride: String? = null) {
 
     configurePublicationArtifactIds()
     afterEvaluate { configurePublicationArtifactIds() }
+}
 
+private fun Project.configurePublicationSigning() {
     extensions.configure<SigningExtension> {
         val key = criolloProperty("signingInMemoryKey")
         val password = criolloProperty("signingInMemoryPassword")
@@ -125,7 +133,7 @@ fun Project.configureCriolloPublishing(artifactIdOverride: String? = null) {
         val isRequired = criolloProperty("signing.required")?.toBoolean() ?: false
         setRequired(isRequired)
 
-        this@configureCriolloPublishing.extensions.configure<PublishingExtension> {
+        this@configurePublicationSigning.extensions.configure<PublishingExtension> {
             sign(publications)
         }
     }

@@ -24,9 +24,7 @@ import javax.inject.Inject
  * `local.properties` / `gradle.properties`).
  */
 @UntrackedTask(because = "Invokes network CLIs and local tooling outside Gradle inputs.")
-abstract class LocalCloudParityTask @Inject constructor(
-    private val execOperations: ExecOperations,
-) : DefaultTask() {
+abstract class LocalCloudParityTask @Inject constructor(private val execOperations: ExecOperations) : DefaultTask() {
     @get:Internal
     abstract val rootDirProperty: DirectoryProperty
 
@@ -142,17 +140,8 @@ abstract class LocalCloudParityTask @Inject constructor(
         logger.lifecycle("jscpd passed (Kotlin duplication within .jscpd.json threshold).")
     }
 
-    private fun uploadCodecovBestEffort(
-        rootDir: File,
-        report: File,
-        props: Properties,
-    ) {
-        val token = firstProp(
-            props,
-            "codecovRepositoryToken",
-            "codecovApiToken",
-            "CODECOV_TOKEN",
-        )
+    private fun uploadCodecovBestEffort(rootDir: File, report: File, props: Properties) {
+        val token = firstProp(props, "codecovRepositoryToken", "codecovApiToken", "CODECOV_TOKEN")
         if (token == null) {
             logger.lifecycle(
                 "Codecov: skipped (set codecovRepositoryToken or codecovApiToken in local.properties).",
@@ -187,11 +176,7 @@ abstract class LocalCloudParityTask @Inject constructor(
         )
     }
 
-    private fun uploadCodacyBestEffort(
-        rootDir: File,
-        report: File,
-        props: Properties,
-    ) {
+    private fun uploadCodacyBestEffort(rootDir: File, report: File, props: Properties) {
         val apiToken = firstProp(props, "codacyApiToken", "codacyToken", "CODACY_API_TOKEN")
         val projectToken = firstProp(props, "codacyProjectToken", "CODACY_PROJECT_TOKEN")
         if (apiToken == null && projectToken == null) {
@@ -270,9 +255,8 @@ abstract class LocalCloudParityTask @Inject constructor(
         return props
     }
 
-    private fun firstProp(props: Properties, vararg keys: String): String? =
-        keys.firstNotNullOfOrNull { key ->
-            props.getProperty(key)?.takeIf { it.isNotBlank() }
-                ?: System.getenv(key)?.takeIf { it.isNotBlank() }
-        }
+    private fun firstProp(props: Properties, vararg keys: String): String? = keys.firstNotNullOfOrNull { key ->
+        props.getProperty(key)?.takeIf { it.isNotBlank() }
+            ?: System.getenv(key)?.takeIf { it.isNotBlank() }
+    }
 }
