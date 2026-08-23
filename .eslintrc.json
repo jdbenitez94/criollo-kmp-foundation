@@ -1,4 +1,7 @@
 {
+  "ignorePatterns": [
+    "**/webMain/resources/**/*.ts"
+  ],
   "overrides": [
     {
       "files": ["**/webpack.config.d/**/*.js"],

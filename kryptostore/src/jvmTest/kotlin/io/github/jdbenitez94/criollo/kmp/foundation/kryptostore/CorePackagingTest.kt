@@ -1,5 +1,6 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore
 
+import io.github.jdbenitez94.criollo.kmp.foundation.testing.KryptostorePackagingAssertions
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -11,17 +12,12 @@ class CorePackagingTest {
         val pkg = Class.forName(
             "io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.EncryptedProtoDataStoreKt",
         ).packageName
-        assertTrue(pkg.startsWith("io.github.jdbenitez94.criollo.kmp.foundation.kryptostore"))
-        assertFalse(pkg.contains("composeApp"))
-        assertFalse(pkg.contains("saveable"))
+        KryptostorePackagingAssertions.assertFoundationKryptostorePackage(pkg)
     }
 
     @Test
     fun jvmClasspath_excludesForbiddenArtifacts() {
-        val classpath = System.getProperty("java.class.path").orEmpty()
-        listOf("security-crypto", "datastore-tink", "jdbenitez94.saveable").forEach { token ->
-            assertFalse(classpath.contains(token), "Forbidden token '$token' on classpath")
-        }
+        KryptostorePackagingAssertions.assertJvmClasspathExcludesForbiddenArtifacts()
     }
 
     @Test

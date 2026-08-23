@@ -97,6 +97,13 @@ Uploads need tokens in `local.properties` (`codecovRepositoryToken` / `codacyApi
 `codacyProjectToken` — see [BADGES-SETUP.md](../BADGES-SETUP.md)). Missing tokens skip uploads
 with a log line; upload failures never fail the task.
 
+Pull Codacy issues / complexity / duplication (and optional PR deltas) via API:
+
+```bash
+./scripts/codacy-report.sh
+./scripts/codacy-report.sh --pr 45
+```
+
 ## Docs site (local)
 
 ```bash
