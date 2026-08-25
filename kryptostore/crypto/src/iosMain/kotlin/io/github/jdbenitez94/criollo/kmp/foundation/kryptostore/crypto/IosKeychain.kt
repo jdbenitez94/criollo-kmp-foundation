@@ -145,7 +145,8 @@ internal class IosKeychain(private val service: String) {
     }
 }
 
-internal fun String.toKeychainCfString(): CFStringRef? = CFStringCreateWithCString(kCFAllocatorDefault, this, kCFStringEncodingUTF8)
+internal fun String.toKeychainCfString(): CFStringRef? =
+    CFStringCreateWithCString(kCFAllocatorDefault, this, kCFStringEncodingUTF8)
 
 internal fun NSData.toByteArray(): ByteArray {
     val length = this.length.toInt()

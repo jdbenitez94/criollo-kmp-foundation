@@ -1,10 +1,10 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.KlibModuleNaming
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
-import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloBooleanProperty
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.isXcodeAvailable
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.libs
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.localProperty
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -70,7 +70,7 @@ class CriolloKmpLibraryConventionPlugin : Plugin<Project> {
 
             // Apple targets need Xcode (klibs). Linux CI skips them; Maven publish must
             // run on macOS with -Pcriollo.requireAppleTargets=true so Central gets iOS.
-            val requireAppleTargets = criolloBooleanProperty("criollo.requireAppleTargets")
+            val requireAppleTargets = localProperty("criollo.requireAppleTargets", false)
             val xcodeAvailable = isXcodeAvailable()
             if (requireAppleTargets && !xcodeAvailable) {
                 error(
@@ -84,7 +84,17 @@ class CriolloKmpLibraryConventionPlugin : Plugin<Project> {
             }
 
             jvm()
-            js { browser() }
+            js {
+                browser {
+                    if (path in KRYPTOSTORE_JS_BROWSER_TEST_MODULES) {
+                        testTask {
+                            useKarma {
+                                useChromeHeadless()
+                            }
+                        }
+                    }
+                }
+            }
             wasmJs { browser() }
 
             if (path in NON_WEB_HIERARCHY_MODULES) {
@@ -140,5 +150,12 @@ class CriolloKmpLibraryConventionPlugin : Plugin<Project> {
 
         /** nonWebMain intermediate source set (android/jvm/ios share native-ish storage). */
         val NON_WEB_HIERARCHY_MODULES = setOf(":kryptostore", ":kryptostore:preferences")
+
+        /** Modules that run Karma Chrome Headless storage tests (REQ-STO-02..04). */
+        val KRYPTOSTORE_JS_BROWSER_TEST_MODULES = setOf(
+            ":kryptostore",
+            ":kryptostore:preferences",
+            ":kryptostore:crypto",
+        )
     }
 }

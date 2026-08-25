@@ -53,7 +53,7 @@ class RunCatchingCancellableTest {
     @Test
     fun suspend_success() = runTest {
         val result = suspendRunCatchingCancellable {
-            delay(1)
+            delay(1.milliseconds)
             "ok"
         }
         expectThat(result.isSuccess).isTrue()
@@ -63,7 +63,7 @@ class RunCatchingCancellableTest {
     @Test
     fun suspend_failureBecomesResult() = runTest {
         val result = suspendRunCatchingCancellable {
-            delay(1)
+            delay(1.milliseconds)
             error("boom")
         }
         expectThat(result.isFailure).isTrue()
@@ -94,7 +94,7 @@ class RunCatchingCancellableTest {
         var completed = false
         val job = launch {
             suspendRunCatchingCancellable {
-                delay(1_000)
+                delay(1_000.milliseconds)
                 completed = true
                 "never"
             }

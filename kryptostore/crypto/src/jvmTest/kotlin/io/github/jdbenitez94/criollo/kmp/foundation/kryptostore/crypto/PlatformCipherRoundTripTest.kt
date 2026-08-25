@@ -45,13 +45,15 @@ class PlatformCipherRoundTripTest {
     fun webCryptoDbName_isIndexedDbNotLocalStorage() {
         expectThat(WEB_CRYPTO_DB_NAME).isEqualTo("app-crypto")
         val workerSource = javaClass.classLoader
-            .getResourceAsStream("crypto-worker-source.ts")
+            .getResourceAsStream("crypto-worker-source.js")
             ?.bufferedReader()
             ?.readText()
         // Resource may be absent on jvmTest classpath; assert constant + optional file.
         if (workerSource != null) {
             expectThat(workerSource.contains("const CRYPTO_DB_NAME = 'app-crypto'")).isEqualTo(true)
+            expectThat(workerSource.contains("CRYPTO_DB_VERSION = 1")).isEqualTo(true)
             expectThat(workerSource.contains("localStorage")).isFalse()
+            expectThat(workerSource.contains("rotateIfNeeded")).isEqualTo(true)
         }
     }
 }

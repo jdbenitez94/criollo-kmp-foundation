@@ -9,8 +9,10 @@ import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.StoreRegi
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.EncryptedProtoSerializer
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.EncryptedStoreOptions
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.ProtoOkioSerializer
+import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.StoreLocator
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.failClosedCorruptionHandler
-import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.kryptostoreFileSystem
+import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.requireKryptostoreFileSystem
+import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.resolve
 import kotlinx.serialization.KSerializer
 import okio.Path
 import androidx.datastore.core.DataStoreFactory as EncryptedDataStoreFactory
@@ -19,11 +21,7 @@ import androidx.datastore.core.okio.OkioStorage as EncryptedOkioStorage
 /**
  * Creates a [DataStore] over a caller-supplied [storage] (Okio, IndexedDB, etc.).
  *
- * Prefer the [producePath] overload for file targets and
- * [createEncryptedProtoDataStoreIndexedDb] for web typed stores.
- *
- * Callers must ensure [io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.CryptoRuntime]
- * is Ready before reading/writing encrypted stores (REQ-STO-05).
+ * Callers must ensure [CryptoRuntime] is Ready before reading/writing encrypted stores (REQ-STO-05).
  */
 fun <T : Any> createEncryptedProtoDataStore(
     storage: Storage<T>,
@@ -39,7 +37,47 @@ fun <T : Any> createEncryptedProtoDataStore(
 }
 
 /**
- * File-backed encrypted proto [DataStore] using Okio + platform [kryptostoreFileSystem].
+ * Canonical encrypted typed factory. Prefer [StoreLocator.Platform] from commonMain
+ * (Okio on file targets, IndexedDB on JS/Wasm).
+ */
+fun <T : Any> createEncryptedProtoDataStore(
+    cipher: Cipher,
+    kSerializer: KSerializer<T>,
+    defaultValue: T,
+    locator: StoreLocator,
+    options: EncryptedStoreOptions = EncryptedStoreOptions(),
+    migrations: List<DataMigration<T>> = emptyList(),
+    corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
+    registry: StoreRegistry? = null,
+): DataStore<T> = locator.resolve(
+    onFile = { producePath ->
+        createEncryptedProtoDataStore(
+            cipher = cipher,
+            kSerializer = kSerializer,
+            defaultValue = defaultValue,
+            producePath = producePath,
+            options = options,
+            migrations = migrations,
+            corruptionHandler = corruptionHandler,
+            registry = registry,
+        )
+    },
+    onNamed = { webName ->
+        options.applyDefaultStoreName(webName)
+        createNamedEncryptedProtoDataStore(
+            cipher = cipher,
+            kSerializer = kSerializer,
+            defaultValue = defaultValue,
+            name = webName,
+            options = options,
+            migrations = migrations,
+            registry = registry,
+        )
+    },
+)
+
+/**
+ * Okio typed path factory with AEAD. Prefer [StoreLocator.File] / [StoreLocator.Platform] from shared code.
  */
 fun <T : Any> createEncryptedProtoDataStore(
     cipher: Cipher,
@@ -56,11 +94,7 @@ fun <T : Any> createEncryptedProtoDataStore(
         cipher = cipher,
         options = options,
     )
-    val fileSystem = kryptostoreFileSystem
-        ?: error(
-            "FileSystem is not available on this platform; " +
-                "use createEncryptedProtoDataStoreIndexedDb on JS/Wasm.",
-        )
+    val fileSystem = requireKryptostoreFileSystem()
     return createEncryptedProtoDataStore(
         storage = EncryptedOkioStorage(
             fileSystem = fileSystem,
@@ -87,14 +121,12 @@ fun <T : Any> encryptedProtoSerializer(
     options = options,
 )
 
-/**
- * Web typed helper — IndexedDB (proto storage). Prefer this over file paths on JS/Wasm.
- */
-expect fun <T : Any> createEncryptedProtoDataStoreIndexedDb(
+internal expect fun <T : Any> createNamedEncryptedProtoDataStore(
     cipher: Cipher,
     kSerializer: KSerializer<T>,
     defaultValue: T,
     name: String,
-    options: EncryptedStoreOptions = EncryptedStoreOptions().apply { storeName = name },
-    migrations: List<DataMigration<T>> = emptyList(),
+    options: EncryptedStoreOptions,
+    migrations: List<DataMigration<T>>,
+    registry: StoreRegistry?,
 ): DataStore<T>

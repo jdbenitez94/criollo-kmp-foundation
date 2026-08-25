@@ -8,7 +8,7 @@ Platform crypto for encrypted DataStore (Tink / Android Keystore / WebCrypto / i
 | -------- | ---------- |
 | Android / JVM | Time-based Tink keyset rotation via [KeyRotationConfig] (default 90 days) |
 | iOS | Time-based AES-GCM key rotation; master keys in **Keychain** (not sandbox files) |
-| Web (JS/Wasm) | **Honest no-op** — `KeyRotator.rotateKeyIfNeeded()` always returns `false` after ensuring the WebCrypto key exists. There is no multi-key scheme yet; do not expect ciphertext rewrite on a schedule. |
+| Web (JS/Wasm) | Time-based multi-key WebCrypto keyring in IndexedDB (`extractable: false`) + key-id envelope; `KeyRotationConfig` honored; rotation triggers `StoreRegistry.reEncryptAll` then inactive-key cleanup (REQ-ROT-05) |
 
 After a successful rotation, [CryptoRuntime.initialize] calls [StoreRegistry.reEncryptAll] before Ready so registered stores rewrite under the new primary key. Failures surface [CryptoRuntimeState.Error].
 

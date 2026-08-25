@@ -13,7 +13,11 @@ import kotlinx.coroutines.Job
  * [launch]/[cancel]/ and completion callbacks are safe from any thread.
  */
 interface TaskScope {
-    fun launch(key: TaskKey, policy: TaskPolicy = TaskPolicy.SkipIfActive, block: suspend CoroutineScope.() -> Unit): TaskLaunchResult
+    fun launch(
+        key: TaskKey,
+        policy: TaskPolicy = TaskPolicy.SkipIfActive,
+        block: suspend CoroutineScope.() -> Unit,
+    ): TaskLaunchResult
 
     fun cancel(key: TaskKey)
 

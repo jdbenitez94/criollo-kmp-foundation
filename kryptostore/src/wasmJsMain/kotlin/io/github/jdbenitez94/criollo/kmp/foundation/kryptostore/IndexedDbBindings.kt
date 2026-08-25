@@ -7,7 +7,7 @@ import kotlin.js.JsAny
 import kotlin.js.JsModule
 import kotlin.js.Promise
 
-@JsModule("indexeddb.ts")
+@JsModule("./indexeddb.js")
 internal actual external object IndexedDbBindings {
     actual fun install()
 

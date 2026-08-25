@@ -16,7 +16,8 @@ import okio.BufferedSource
 import okio.IOException
 
 @OptIn(ExperimentalSerializationApi::class)
-class ProtoOkioSerializer<T : Any>(private val kSerializer: KSerializer<T>, override val defaultValue: T) : OkioSerializer<T> {
+class ProtoOkioSerializer<T : Any>(private val kSerializer: KSerializer<T>, override val defaultValue: T) :
+    OkioSerializer<T> {
     override suspend fun readFrom(source: BufferedSource): T = try {
         val bytes = source.readByteArray()
         if (bytes.isEmpty()) {
@@ -68,14 +69,12 @@ class EncryptedProtoSerializer<T : Any>(
 
     override suspend fun readFrom(source: BufferedSource): T {
         val bytes = source.readByteArray()
-        if (bytes.isEmpty()) return defaultValue
-        if (!bytes.startsWithEncryptedBlobMagic()) {
-            if (options.allowPlaintextRead) {
-                return inner.decodeBytes(bytes)
-            }
-            rejectPlaintextPayload()
+        return when {
+            bytes.isEmpty() -> defaultValue
+            bytes.startsWithEncryptedBlobMagic() -> readEncryptedProto(bytes)
+            options.allowPlaintextRead -> inner.decodeBytes(bytes)
+            else -> rejectPlaintextPayload()
         }
-        return readEncryptedProto(bytes)
     }
 
     override suspend fun writeTo(t: T, sink: BufferedSink) {
@@ -102,10 +101,10 @@ class EncryptedProtoSerializer<T : Any>(
     }
 }
 
-/** Migration alias — prefer [EncryptedProtoSerializer]. */
-typealias EncryptedOkioSerializer<T> = EncryptedProtoSerializer<T>
-
-class EncryptedPreferencesSerializer(private val cipher: Cipher, private val options: EncryptedStoreOptions = EncryptedStoreOptions()) : OkioSerializer<Preferences> {
+class EncryptedPreferencesSerializer(
+    private val cipher: Cipher,
+    private val options: EncryptedStoreOptions = EncryptedStoreOptions(),
+) : OkioSerializer<Preferences> {
     constructor(
         cipher: Cipher,
         associatedData: ByteArray,
@@ -130,15 +129,16 @@ class EncryptedPreferencesSerializer(private val cipher: Cipher, private val opt
 
     override suspend fun readFrom(source: BufferedSource): Preferences {
         val bytes = source.readByteArray()
-        if (bytes.isEmpty()) return defaultValue
-        if (!bytes.startsWithEncryptedBlobMagic()) {
-            if (options.allowPlaintextRead) {
-                return inner.readFrom(Buffer().write(bytes))
-            }
-            rejectPlaintextPayload()
+        return when {
+            bytes.isEmpty() -> defaultValue
+
+            bytes.startsWithEncryptedBlobMagic() ->
+                inner.readFrom(Buffer().write(decryptEnvelope(bytes)))
+
+            options.allowPlaintextRead -> inner.readFrom(Buffer().write(bytes))
+
+            else -> rejectPlaintextPayload()
         }
-        val payload = decryptEnvelope(bytes)
-        return inner.readFrom(Buffer().write(payload))
     }
 
     override suspend fun writeTo(t: Preferences, sink: BufferedSink) {

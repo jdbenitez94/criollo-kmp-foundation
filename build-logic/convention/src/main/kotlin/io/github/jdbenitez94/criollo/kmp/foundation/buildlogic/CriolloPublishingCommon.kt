@@ -105,8 +105,8 @@ private fun Project.configureMavenPublications(baseArtifactId: String, versionSt
                 val snapshotUrl = ProjectConfig.Publishing.mavenCentralSnapshotUrl
                 url = uri(if (versionString.endsWith("SNAPSHOT")) snapshotUrl else releaseUrl)
                 credentials {
-                    username = criolloProperty("mavenCentralUsername")
-                    password = criolloProperty("mavenCentralPassword")
+                    username = localProperty<String>("mavenCentralUsername")
+                    password = localProperty<String>("mavenCentralPassword")
                 }
             }
             maven {
@@ -122,16 +122,15 @@ private fun Project.configureMavenPublications(baseArtifactId: String, versionSt
 
 private fun Project.configurePublicationSigning() {
     extensions.configure<SigningExtension> {
-        val key = criolloProperty("signingInMemoryKey")
-        val password = criolloProperty("signingInMemoryPassword")
-        val keyId = criolloProperty("signingInMemoryKeyId")
+        val key = localProperty<String>("signingInMemoryKey")
+        val password = localProperty<String>("signingInMemoryPassword")
+        val keyId = localProperty<String>("signingInMemoryKeyId")
 
         if (!key.isNullOrBlank() && !password.isNullOrBlank()) {
             useInMemoryPgpKeys(keyId, key, password)
         }
 
-        val isRequired = criolloProperty("signing.required")?.toBoolean() ?: false
-        setRequired(isRequired)
+        setRequired(localProperty("signing.required", false))
 
         this@configurePublicationSigning.extensions.configure<PublishingExtension> {
             sign(publications)

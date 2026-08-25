@@ -7,16 +7,18 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * Useful when a [Result] may still contain a [CancellationException] (e.g. after raw [runCatching]).
  */
-inline fun <reified E : Throwable, T> Result<T>.onFailureOrRethrow(action: (Throwable) -> Unit): Result<T> = onFailure { error ->
-    if (error is E) throw error else action(error)
-}
+inline fun <reified E : Throwable, T> Result<T>.onFailureOrRethrow(action: (Throwable) -> Unit): Result<T> =
+    onFailure { error ->
+        if (error is E) throw error else action(error)
+    }
 
 /**
  * Handles non-cancellation failures; rethrows [CancellationException] so the coroutine can cancel.
  *
  * Prefer producing the [Result] with [runCatchingCancellable] so cancellation never enters the [Result].
  */
-inline fun <T> Result<T>.onFailureExceptCancellation(action: (Throwable) -> Unit): Result<T> = onFailureOrRethrow<CancellationException, T>(action)
+inline fun <T> Result<T>.onFailureExceptCancellation(action: (Throwable) -> Unit): Result<T> =
+    onFailureOrRethrow<CancellationException, T>(action)
 
 /**
  * Like [Result.getOrElse], but rethrows [CancellationException] if present in the failure.

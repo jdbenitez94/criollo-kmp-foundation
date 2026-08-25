@@ -10,9 +10,11 @@ internal class JvmMasterKeyAead(private val appId: String) : Aead {
         AesGcmJce(keyBytes)
     }
 
-    override fun encrypt(plaintext: ByteArray, associatedData: ByteArray?): ByteArray = delegate.encrypt(plaintext, associatedData)
+    override fun encrypt(plaintext: ByteArray, associatedData: ByteArray?): ByteArray =
+        delegate.encrypt(plaintext, associatedData)
 
-    override fun decrypt(ciphertext: ByteArray, associatedData: ByteArray?): ByteArray = delegate.decrypt(ciphertext, associatedData)
+    override fun decrypt(ciphertext: ByteArray, associatedData: ByteArray?): ByteArray =
+        delegate.decrypt(ciphertext, associatedData)
 }
 
 internal interface JvmSecureMasterKeyStore {

@@ -14,7 +14,11 @@ import kotlinx.coroutines.sync.withLock
  * postMigrationCleanup → Ready (REQ-ROT-02). Re-encrypt runs before cleanup so old key
  * material can still decrypt existing ciphertext (notably iOS SecureKeyStore).
  */
-class CryptoRuntime(private val stack: PlatformCryptoStack, private val storeRegistry: StoreRegistry = StoreRegistry(), private val log: KryptoLog = KryptoLog.NoOp) {
+class CryptoRuntime(
+    private val stack: PlatformCryptoStack,
+    private val storeRegistry: StoreRegistry = StoreRegistry(),
+    private val log: KryptoLog = KryptoLog.NoOp,
+) {
     constructor(
         keyRotator: KeyRotator,
         postRotationInit: suspend () -> Unit,

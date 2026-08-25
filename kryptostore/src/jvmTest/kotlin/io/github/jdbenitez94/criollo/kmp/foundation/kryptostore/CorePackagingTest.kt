@@ -22,7 +22,7 @@ class CorePackagingTest {
 
     @Test
     fun indexedDbResource_usesAppProtoDatabase() {
-        val source = javaClass.classLoader.getResourceAsStream("indexeddb.ts")?.bufferedReader()?.readText()
+        val source = javaClass.classLoader.getResourceAsStream("indexeddb.js")?.bufferedReader()?.readText()
         if (source != null) {
             assertTrue(source.contains("const PROTO_DB_NAME = 'app-proto'"))
             assertFalse(source.contains("localStorage"))

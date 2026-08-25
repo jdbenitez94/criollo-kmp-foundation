@@ -3,10 +3,12 @@ package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto
 import android.content.Context
 
 object AndroidCryptoContextHolder {
-    lateinit var applicationContext: Context
-        private set
+    private lateinit var context: Context
+
+    val applicationContext: Context
+        get() = context
 
     fun init(context: Context) {
-        applicationContext = context.applicationContext
+        this.context = context.applicationContext
     }
 }

@@ -1,36 +1,15 @@
-import cryptoWorkerModule = require('./crypto-worker');
+const cryptoWorkerModule = require('./crypto-worker');
 
 const cryptoWorkerScript = cryptoWorkerModule.cryptoWorkerScript;
 
-type WorkerRequestType = 'ensureKey' | 'encrypt' | 'decrypt';
+const WORKER_REQUEST_TIMEOUT_MS = 15000;
 
-interface WorkerRequest {
-    requestId: string;
-    type: WorkerRequestType;
-    keyAlias: string;
-    plaintextBase64?: string;
-    ciphertextBase64?: string;
-    associatedDataBase64?: string | null;
-}
-
-interface WorkerResponse {
-    requestId: string;
-    ok: boolean;
-    result?: unknown;
-    error?: string;
-}
-
-const WORKER_REQUEST_TIMEOUT_MS = 15_000;
-
-let cryptoWorker: Worker | null = null;
-let cryptoWorkerUrl: string | null = null;
+let cryptoWorker = null;
+let cryptoWorkerUrl = null;
 let nextRequestId = 0;
-const pendingRequests = new Map<
-    string,
-    { resolve: (value: unknown) => void; reject: (reason: Error) => void; timer: ReturnType<typeof setTimeout> }
->();
+const pendingRequests = new Map();
 
-function rejectAllPending(reason: Error): void {
+function rejectAllPending(reason) {
     pendingRequests.forEach(({ reject, timer }) => {
         clearTimeout(timer);
         reject(reason);
@@ -38,7 +17,7 @@ function rejectAllPending(reason: Error): void {
     pendingRequests.clear();
 }
 
-function terminateCryptoWorker(): void {
+function terminateCryptoWorker() {
     if (cryptoWorker != null) {
         cryptoWorker.terminate();
         cryptoWorker = null;
@@ -49,14 +28,14 @@ function terminateCryptoWorker(): void {
     }
 }
 
-function ensureCryptoWorker(): Worker {
+function ensureCryptoWorker() {
     if (cryptoWorker != null) {
         return cryptoWorker;
     }
     const blob = new Blob([cryptoWorkerScript], { type: 'application/javascript' });
     cryptoWorkerUrl = URL.createObjectURL(blob);
     cryptoWorker = new Worker(cryptoWorkerUrl);
-    cryptoWorker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+    cryptoWorker.onmessage = (event) => {
         const { requestId, ok, result, error } = event.data;
         const pending = pendingRequests.get(requestId);
         if (!pending) {
@@ -77,7 +56,7 @@ function ensureCryptoWorker(): Worker {
     return cryptoWorker;
 }
 
-function postToWorker(request: Omit<WorkerRequest, 'requestId'>): Promise<unknown> {
+function postToWorker(request) {
     const worker = ensureCryptoWorker();
     const requestId = `crypto-${nextRequestId++}`;
     return new Promise((resolve, reject) => {
@@ -86,61 +65,71 @@ function postToWorker(request: Omit<WorkerRequest, 'requestId'>): Promise<unknow
             reject(new Error(`Crypto worker request timed out after ${WORKER_REQUEST_TIMEOUT_MS}ms.`));
         }, WORKER_REQUEST_TIMEOUT_MS);
         pendingRequests.set(requestId, { resolve, reject, timer });
-        worker.postMessage({ ...request, requestId } satisfies WorkerRequest);
+        worker.postMessage(Object.assign({}, request, { requestId }));
     });
 }
 
-function install(): void {
-    const subtle = globalThis.crypto?.subtle;
+function install() {
+    const subtle = globalThis.crypto && globalThis.crypto.subtle;
     if (!subtle) {
         throw new Error(
             'WebCrypto (crypto.subtle) is unavailable. ' +
                 'KryptoStore requires a secure context (HTTPS or localhost).',
         );
     }
-    // Worker is created lazily on first crypto operation.
 }
 
-async function ensureKey(keyAlias: string): Promise<boolean> {
-    const result = await postToWorker({ type: 'ensureKey', keyAlias });
-    return Boolean(result);
+function ensureKeyring(appId) {
+    return postToWorker({ type: 'ensureKeyring', appId }).then(Boolean);
 }
 
-async function encrypt(
-    keyAlias: string,
-    plaintextBase64: string,
-    associatedDataBase64: string | null,
-): Promise<string> {
-    const result = await postToWorker({
+function encrypt(appId, plaintextBase64, associatedDataBase64) {
+    return postToWorker({
         type: 'encrypt',
-        keyAlias,
+        appId,
         plaintextBase64,
         associatedDataBase64,
-    });
-    return String(result);
+    }).then(String);
 }
 
-async function decrypt(
-    keyAlias: string,
-    ciphertextBase64: string,
-    associatedDataBase64: string | null,
-): Promise<string> {
-    const result = await postToWorker({
+function decrypt(appId, ciphertextBase64, associatedDataBase64) {
+    return postToWorker({
         type: 'decrypt',
-        keyAlias,
+        appId,
         ciphertextBase64,
         associatedDataBase64,
-    });
-    return String(result);
+    }).then(String);
 }
 
-const kryptoStoreCrypto = {
+function rotateIfNeeded(appId, periodMs, nowMillis) {
+    return postToWorker({
+        type: 'rotateIfNeeded',
+        appId,
+        periodMs,
+        nowMillis,
+    }).then(Boolean);
+}
+
+function listKeyIds(appId) {
+    return postToWorker({ type: 'listKeyIds', appId }).then(String);
+}
+
+function deleteKey(appId, keyId) {
+    return postToWorker({ type: 'deleteKey', appId, keyId }).then(Boolean);
+}
+
+function getActiveKeyId(appId) {
+    return postToWorker({ type: 'getActiveKeyId', appId }).then(String);
+}
+
+module.exports = {
     install,
-    ensureKey,
+    ensureKeyring,
     encrypt,
     decrypt,
-    /** Test / teardown helper — terminates the worker and revokes its blob URL. */
+    rotateIfNeeded,
+    listKeyIds,
+    deleteKey,
+    getActiveKeyId,
     dispose: terminateCryptoWorker,
 };
-
-export = kryptoStoreCrypto;

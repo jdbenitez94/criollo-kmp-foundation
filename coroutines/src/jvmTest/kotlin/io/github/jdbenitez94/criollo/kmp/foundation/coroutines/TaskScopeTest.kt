@@ -39,7 +39,7 @@ class TaskScopeTest {
         val completed = AtomicBoolean(false)
         scope.launch(testKey, TaskPolicy.SkipIfActive) {
             try {
-                delay(1_000)
+                delay(1_000.milliseconds)
                 completed.set(true)
             } catch (_: CancellationException) {
             }
@@ -52,7 +52,7 @@ class TaskScopeTest {
     private fun TestScope.startLongSkipIfActiveJob(): Pair<TaskScope, TaskLaunchResult.Started> {
         val scope = TaskScope(backgroundScope)
         val started = scope.launch(testKey, TaskPolicy.SkipIfActive) {
-            delay(1_000)
+            delay(1_000.milliseconds)
         } as TaskLaunchResult.Started
         runCurrent()
         return scope to started
@@ -126,7 +126,7 @@ class TaskScopeTest {
 
             scope.launch(testKey, TaskPolicy.ReplaceActive) {
                 try {
-                    delay(1_000)
+                    delay(1_000.milliseconds)
                     lastCompleted = 1
                 } catch (_: CancellationException) {
                 }
@@ -135,7 +135,7 @@ class TaskScopeTest {
                 lastCompleted = 2
             }
 
-            advanceTimeBy(1_500)
+            advanceTimeBy(1_500.milliseconds)
             runCurrent()
             expectThat(lastCompleted).isEqualTo(2)
         }
@@ -148,7 +148,7 @@ class TaskScopeTest {
 
             scope.launch(testKey, TaskPolicy.ReplaceActive) {
                 try {
-                    delay(1_000)
+                    delay(1_000.milliseconds)
                 } catch (_: CancellationException) {
                 }
             }
@@ -156,7 +156,7 @@ class TaskScopeTest {
             expectThat(state.value).isEqualTo(TaskJobState.Running)
 
             scope.launch(testKey, TaskPolicy.ReplaceActive) {
-                delay(1_000)
+                delay(1_000.milliseconds)
             }
             // Drain the cancelled job's completion callback before the replacement starts.
             runCurrent()
@@ -171,15 +171,15 @@ class TaskScopeTest {
 
             scope.launch(testKey, TaskPolicy.ReplaceActive) {
                 try {
-                    delay(1_000)
+                    delay(1_000.milliseconds)
                 } catch (_: CancellationException) {
                 }
             }
             scope.launch(testKey, TaskPolicy.ReplaceActive) {
-                delay(100)
+                delay(100.milliseconds)
             }
 
-            advanceTimeBy(150)
+            advanceTimeBy(150.milliseconds)
             runCurrent()
             expectThat(scope.isActive(testKey)).isFalse()
         }
@@ -199,10 +199,10 @@ class TaskScopeTest {
                     lastValue = index
                     executions++
                 }
-                advanceTimeBy(50)
+                advanceTimeBy(50.milliseconds)
             }
 
-            advanceTimeBy(300)
+            advanceTimeBy(300.milliseconds)
             runCurrent()
             expectThat(executions).isEqualTo(1)
             expectThat(lastValue).isEqualTo(4)
@@ -216,11 +216,11 @@ class TaskScopeTest {
             scope.launch(testKey, TaskPolicy.Debounce(300.milliseconds)) {
                 executions = 1
             }
-            advanceTimeBy(100)
+            advanceTimeBy(100.milliseconds)
             scope.launch(testKey, TaskPolicy.Debounce(300.milliseconds)) {
                 executions = 2
             }
-            advanceTimeBy(300)
+            advanceTimeBy(300.milliseconds)
             runCurrent()
             expectThat(executions).isEqualTo(2)
         }
@@ -234,7 +234,7 @@ class TaskScopeTest {
             val scope = TaskScope(backgroundScope)
             val completed = launchCancellableLongJob(scope)
             scope.cancel(testKey)
-            advanceTimeBy(1_500)
+            advanceTimeBy(1_500.milliseconds)
             runCurrent()
             expectThat(completed.get()).isFalse()
             expectThat(scope.isActive(testKey)).isFalse()
@@ -245,7 +245,7 @@ class TaskScopeTest {
             val scope = TaskScope(backgroundScope)
             val completed = launchCancellableLongJob(scope)
             scope.cancelAll()
-            advanceTimeBy(1_500)
+            advanceTimeBy(1_500.milliseconds)
             runCurrent()
             expectThat(completed.get()).isFalse()
             expectThat(scope.isActive(testKey)).isFalse()
@@ -274,14 +274,14 @@ class TaskScopeTest {
 
             scope.launch(testKey, TaskPolicy.SkipIfActive) {
                 try {
-                    delay(1_000)
+                    delay(1_000.milliseconds)
                     completed = true
                 } catch (_: CancellationException) {
                 }
             }
             runCurrent()
             parentJob.cancel()
-            advanceTimeBy(1_500)
+            advanceTimeBy(1_500.milliseconds)
             runCurrent()
             expectThat(completed).isFalse()
         }
@@ -298,7 +298,7 @@ class TaskScopeTest {
             expectThat(state.value).isEqualTo(TaskJobState.Idle)
 
             scope.launch(testKey, TaskPolicy.SkipIfActive) {
-                delay(1_000)
+                delay(1_000.milliseconds)
             }
             runCurrent()
             expectThat(state.value).isEqualTo(TaskJobState.Running)
@@ -314,7 +314,7 @@ class TaskScopeTest {
             val state = scope.taskState(testKey)
 
             scope.launch(testKey, TaskPolicy.SkipIfActive) {
-                delay(1_000)
+                delay(1_000.milliseconds)
             }
             runCurrent()
             expectThat(state.value).isEqualTo(TaskJobState.Running)
@@ -338,7 +338,7 @@ class TaskScopeTest {
             expectThat(scope.isActive(testKey)).isFalse()
 
             val relaunched = scope.launch(testKey, TaskPolicy.SkipIfActive) {
-                delay(1_000)
+                delay(1_000.milliseconds)
             }
             expectThat(relaunched).isA<TaskLaunchResult.Started>()
             expectThat(scope.isActive(testKey)).isTrue()
@@ -347,7 +347,11 @@ class TaskScopeTest {
         @Test
         fun taskState_requiresDefaultTaskScope() {
             val unsupportedScope = object : TaskScope {
-                override fun launch(key: TaskKey, policy: TaskPolicy, block: suspend CoroutineScope.() -> Unit): TaskLaunchResult = TaskLaunchResult.Skipped
+                override fun launch(
+                    key: TaskKey,
+                    policy: TaskPolicy,
+                    block: suspend CoroutineScope.() -> Unit,
+                ): TaskLaunchResult = TaskLaunchResult.Skipped
 
                 override fun cancel(key: TaskKey) = Unit
 
@@ -399,11 +403,11 @@ class TaskScopeTest {
         fun taskHandle_equalityUsesJobIdentity() = runTest {
             val scope = TaskScope(backgroundScope)
             val first = scope.launch(testKey, TaskPolicy.SkipIfActive) {
-                delay(1_000)
+                delay(1_000.milliseconds)
             } as TaskLaunchResult.Started
             val sameJob = first.handle
             val relaunched = scope.launch(testKey, TaskPolicy.ReplaceActive) {
-                delay(1_000)
+                delay(1_000.milliseconds)
             } as TaskLaunchResult.Started
 
             runCurrent()
@@ -433,13 +437,13 @@ class TaskScopeTest {
                     repeat(iterations) { index ->
                         when (index % 3) {
                             0 -> scope.launch(testKey, TaskPolicy.ReplaceActive) {
-                                delay(5)
+                                delay(5.milliseconds)
                             }
 
                             1 -> scope.cancel(testKey)
 
                             else -> scope.launch(testKey, TaskPolicy.SkipIfActive) {
-                                delay(5)
+                                delay(5.milliseconds)
                             }
                         }
                         state.value
@@ -452,7 +456,7 @@ class TaskScopeTest {
             start.countDown()
             pool.shutdown()
             expectThat(pool.awaitTermination(30, TimeUnit.SECONDS)).isTrue()
-            advanceTimeBy(1_000)
+            advanceTimeBy(1_000.milliseconds)
             runCurrent()
             expectThat(ops.get()).isEqualTo(threads * iterations)
             expectThat(state.value).isEqualTo(TaskJobState.Idle)

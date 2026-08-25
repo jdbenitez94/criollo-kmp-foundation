@@ -18,7 +18,10 @@ import java.io.ByteArrayOutputStream
  *
  * Prefer the default [TinkCipher] / platform [Cipher] for small settings blobs.
  */
-class StreamingAeadCipher(private val streamingAead: StreamingAead, private val dispatcher: CoroutineDispatcher = Dispatchers.Default) : Cipher {
+class StreamingAeadCipher(
+    private val streamingAead: StreamingAead,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) : Cipher {
     override suspend fun encrypt(message: ByteArray, associatedData: ByteArray?): ByteArray = withContext(dispatcher) {
         val out = ByteArrayOutputStream()
         streamingAead.newEncryptingStream(out, associatedData ?: ByteArray(0)).use { stream ->

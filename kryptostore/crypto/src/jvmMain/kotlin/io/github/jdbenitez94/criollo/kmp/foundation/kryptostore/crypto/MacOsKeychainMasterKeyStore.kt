@@ -68,7 +68,12 @@ internal object MacOsKeychainMasterKeyStore : JvmSecureMasterKeyStore {
         if (status != ERR_SEC_DUPLICATE_ITEM) checkStatus(status, "add")
     }
 
-    private fun find(account: String, passwordLength: IntByReference, passwordData: PointerByReference, itemRef: PointerByReference): Int {
+    private fun find(
+        account: String,
+        passwordLength: IntByReference,
+        passwordData: PointerByReference,
+        itemRef: PointerByReference,
+    ): Int {
         val service = SERVICE.encodeToByteArray()
         val accountBytes = account.encodeToByteArray()
         return security.secKeychainFindGenericPassword(
