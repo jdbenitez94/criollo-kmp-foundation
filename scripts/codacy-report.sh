@@ -7,8 +7,8 @@
 # Usage:
 #   ./scripts/codacy-report.sh
 #   ./scripts/codacy-report.sh --pr 45
-#   ./scripts/codacy-report.sh --branch main --top 20
-#   CODACY_PROVIDER=gh CODACY_ORG=jdbenitez94 CODACY_REPO=criollo-kmp-foundation ./scripts/codacy-report.sh
+#   ./scripts/codacy-report.sh --reanalyze HEAD
+#   ./scripts/codacy-report.sh --reanalyze <commitSha>
 #
 # Notes:
 #   - File metrics (complexity/duplication) require sort=duplication|complexity on the files API.
@@ -23,6 +23,7 @@ REPO="${CODACY_REPO:-criollo-kmp-foundation}"
 BRANCH=""
 PR=""
 TOP=25
+REANALYZE_COMMIT=""
 
 usage() {
   sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
@@ -37,6 +38,15 @@ while [[ $# -gt 0 ]]; do
     --branch) BRANCH="$2"; shift 2 ;;
     --pr) PR="$2"; shift 2 ;;
     --top) TOP="$2"; shift 2 ;;
+    --reanalyze)
+      shift
+      if [[ $# -gt 0 && "$1" != --* ]]; then
+        REANALYZE_COMMIT="$1"
+        shift
+      else
+        REANALYZE_COMMIT="HEAD"
+      fi
+      ;;
     -h|--help) usage 0 ;;
     *)
       echo "Unknown arg: $1" >&2
@@ -44,6 +54,12 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -n "$REANALYZE_COMMIT" ]]; then
+  if [[ "$REANALYZE_COMMIT" == "HEAD" ]]; then
+    REANALYZE_COMMIT="$(git -C "$ROOT" rev-parse HEAD)"
+  fi
+fi
 
 resolve_token() {
   if [[ -n "${CODACY_API_TOKEN:-}" ]]; then
@@ -74,6 +90,7 @@ export CODACY_REPO="$REPO"
 export CODACY_BRANCH="${BRANCH}"
 export CODACY_PR="${PR}"
 export CODACY_TOP="$TOP"
+export CODACY_REANALYZE_COMMIT="${REANALYZE_COMMIT}"
 
 python3 - <<'PY'
 from __future__ import annotations
@@ -93,6 +110,7 @@ REPO = os.environ["CODACY_REPO"]
 BRANCH = os.environ.get("CODACY_BRANCH") or ""
 PR = os.environ.get("CODACY_PR") or ""
 TOP = int(os.environ.get("CODACY_TOP") or "25")
+REANALYZE = os.environ.get("CODACY_REANALYZE_COMMIT") or ""
 
 ORG_BASE = f"https://app.codacy.com/api/v3/organizations/{PROVIDER}/{ORG}/repositories/{REPO}"
 ANAL_BASE = (
@@ -104,6 +122,7 @@ def request(
     method: str,
     url: str,
     body: dict[str, Any] | None = None,
+    allow_empty: bool = False,
 ) -> Any:
     data = None
     headers = {
@@ -117,10 +136,24 @@ def request(
     try:
         with urllib.request.urlopen(req) as resp:
             raw = resp.read().decode("utf-8")
-            return json.loads(raw) if raw else {}
+            if not raw:
+                return {} if allow_empty else {}
+            return json.loads(raw)
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", errors="replace")[:500]
         raise SystemExit(f"HTTP {e.code} {method} {url}\n{detail}") from e
+
+
+if REANALYZE:
+    print(f"Requesting Codacy reanalyze for commit {REANALYZE}…")
+    request(
+        "POST",
+        f"{ORG_BASE}/reanalyzeCommit",
+        {"commitUuid": REANALYZE},
+        allow_empty=True,
+    )
+    print("Reanalyze accepted (HTTP 2xx). Metrics refresh asynchronously.")
+    print()
 
 
 def paginate_get(url: str, params: dict[str, Any] | None = None) -> list[Any]:

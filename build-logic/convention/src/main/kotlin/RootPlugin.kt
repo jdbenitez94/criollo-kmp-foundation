@@ -146,8 +146,8 @@ class RootPlugin : Plugin<Project> {
             group = "verification"
             description =
                 "Optional local cloud parity: markdownlint + jscpd; with -PlocalCloudParity.coverage=true " +
-                    "also runs tests + koverXmlReport and best-effort Codecov/Codacy uploads. " +
-                    "Complexity: use detekt / qualityCheck."
+                "also runs tests + koverXmlReport and best-effort Codecov/Codacy uploads. " +
+                "Complexity: use detekt / qualityCheck."
             rootDirProperty.set(layout.projectDirectory)
             codecovSlug.set("jdbenitez94/criollo-kmp-foundation")
             runCoverageUploads.set(coverageEnabled)

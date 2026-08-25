@@ -1,8 +1,8 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.KlibModuleNaming
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
-import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloBooleanProperty
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.isXcodeAvailable
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.libs
 import org.gradle.api.Plugin
