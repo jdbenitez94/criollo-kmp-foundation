@@ -23,25 +23,25 @@ land in this monorepo over time.
 
 ## Artifacts
 
-| Artifact | Maven name | Gradle project | Required? | Role |
-| ---------- | ------------ | ---------------- | ----------- | ------ |
-| Bill of Materials (BOM) | `bom` | `:bom` | Recommended | Aligns versions of all foundation modules |
-| Core | `coroutines` | `:coroutines` | **Yes** | `TaskScope` registry (`TaskKey`, `TaskPolicy`, …) |
-| ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | Optional | `by taskScope()` on `ViewModel` |
-| Compose | `coroutines-compose` | `:coroutines:compose` | Optional | `rememberTaskScope()` in Composables |
-| Result | `result` | `:result` | Optional | Flow `Result` triad (`Loading` / `Success` / `Error`) + `asResult()` |
-| Runtime | `runtime` | `:runtime` | Optional | `retryWithBackoff` (exponential backoff + jitter) |
-| Tooling | `project-conventions` | `:project-conventions` | Optional | Gradle plugin to sync `.editorconfig` + Detekt configs |
-| Crypto (KryptoStore) | `kryptostore-crypto` | `:kryptostore:crypto` | Optional | Platform crypto for encrypted DataStore (Tink / Keystore / WebCrypto) |
-| Serializers (KryptoStore) | `kryptostore-serializers` | `:kryptostore:serializers` | Optional | Encrypted Okio envelope serializers + fail-closed corruption handler |
-| Core (KryptoStore) | `kryptostore` | `:kryptostore` | Optional | Encrypted typed DataStore factories + IndexedDB storage |
-| Preferences (KryptoStore) | `kryptostore-preferences` | `:kryptostore:preferences` | Optional | Encrypted + plain Preferences DataStore factories |
-| Android DX (KryptoStore) | `kryptostore-android-delegates` | `:kryptostore:android` | Optional | `Context` property delegates for encrypted/plain stores |
-| Migrate Android (KryptoStore) | `kryptostore-migrate-android` | `:kryptostore:migrate-android` | Optional | Unenveloped AEAD migration helpers |
-| Testing | `testing` | `:testing` | Optional | JUnit 5 helpers (`MainTestDispatcherExtension`) |
+| Artifact | Maven name | Gradle project | Role |
+| ---------- | ------------ | ---------------- | ------ |
+| Bill of Materials (BOM) | `bom` | `:bom` | Aligns versions of all foundation modules |
+| Core | `coroutines` | `:coroutines` | `TaskScope` registry (`TaskKey`, `TaskPolicy`, …) |
+| ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | `by taskScope()` on `ViewModel` |
+| Compose | `coroutines-compose` | `:coroutines:compose` | `rememberTaskScope()` in Composables |
+| Result | `result` | `:result` | Flow `Result` triad (`Loading` / `Success` / `Error`) + `asResult()` |
+| Runtime | `runtime` | `:runtime` | `retryWithBackoff` (exponential backoff + jitter) |
+| Tooling | `project-conventions` | `:project-conventions` | Gradle plugin to sync `.editorconfig` + Detekt configs |
+| Crypto (KryptoStore) | `kryptostore-crypto` | `:kryptostore:crypto` | Platform crypto for encrypted DataStore (Tink / Keystore / WebCrypto) |
+| Serializers (KryptoStore) | `kryptostore-serializers` | `:kryptostore:serializers` | Encrypted Okio envelope serializers + fail-closed corruption handler |
+| Core (KryptoStore) | `kryptostore` | `:kryptostore` | Encrypted typed DataStore factories + IndexedDB storage |
+| Preferences (KryptoStore) | `kryptostore-preferences` | `:kryptostore:preferences` | Encrypted + plain Preferences DataStore factories |
+| Android DX (KryptoStore) | `kryptostore-android-delegates` | `:kryptostore:android` | `Context` property delegates for encrypted/plain stores |
+| Migrate Android (KryptoStore) | `kryptostore-migrate-android` | `:kryptostore:migrate-android` | Unenveloped AEAD migration helpers |
+| Testing | `testing` | `:testing` | JUnit 5 helpers (`MainTestDispatcherExtension`) |
 
-Only `coroutines` is required. Pick ViewModel and/or Compose adapters when you want the convenience
-APIs; you can also construct `TaskScope(coroutineScope)` yourself.
+All artifacts are optional—add only what you use. For `TaskScope`, pick ViewModel and/or Compose
+adapters when you want the convenience APIs, or construct `TaskScope(coroutineScope)` yourself.
 
 Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`);
 `…foundation.result`; `…foundation.runtime`;
