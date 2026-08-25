@@ -70,7 +70,7 @@ function postToWorker(request) {
 }
 
 function install() {
-    const subtle = globalThis.crypto && globalThis.crypto.subtle;
+    const subtle = globalThis.crypto?.subtle;
     if (!subtle) {
         throw new Error(
             'WebCrypto (crypto.subtle) is unavailable. ' +

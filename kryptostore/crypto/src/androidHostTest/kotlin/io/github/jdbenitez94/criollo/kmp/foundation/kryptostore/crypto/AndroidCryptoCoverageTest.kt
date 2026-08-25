@@ -23,7 +23,7 @@ class AndroidCryptoCoverageTest {
     }
 
     @Test
-    fun keysetPersistence_andAndroidRotationCoverEveryTimingPath() = runTest {
+    fun keysetPersistence_roundTripsThroughProviders() = runTest {
         AeadConfig.register()
         val context = MemoryContext()
         val master = AesGcmJce(ByteArray(32) { 6 })
@@ -49,6 +49,18 @@ class AndroidCryptoCoverageTest {
         val plaintext = byteArrayOf(3, 1, 4)
         val encrypted = firstProvider.algorithm.encrypt(plaintext, null)
         assertContentEquals(plaintext, loadedProvider.algorithm.decrypt(encrypted, null))
+    }
+
+    @Test
+    fun androidRotation_coversStampAndWithinPeriodPaths() = runTest {
+        AeadConfig.register()
+        val context = MemoryContext()
+        val master = AesGcmJce(ByteArray(32) { 6 })
+        val associatedData = "alias".encodeToByteArray()
+        AndroidCryptoContextHolder.init(context)
+        val loaded = loadOrCreateKeyset(context, "keys", "primary", master, associatedData)
+        val loadedProvider = TinkAeadProvider(loaded)
+        loadedProvider.initialize()
 
         val rotationPrefs = context.getSharedPreferences("keys.rotation", Context.MODE_PRIVATE)
         rotationPrefs.edit().clear().apply()
