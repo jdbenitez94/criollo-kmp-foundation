@@ -122,7 +122,7 @@ Every formerly “open” question is decided here. Changing one requires an exp
 | DEC-16 | Rotation | Keep platform rotators **and** implement **store re-encrypt** API | “Complete” product; sample previously dropped data — KryptoStore must do better |
 | DEC-17 | Streaming AEAD | Optional Android/JVM `Cipher` / serializer path in **complete** scope (Phase E) | Large payloads; not required for small settings |
 | DEC-18 | iOS Keychain | Promote master keys to Keychain as part of complete scope (Phase E) | CRYPTO_KMP already flags sandbox-only as interim |
-| DEC-19 | Web key rotation | Document limitation in v1.0; design interface for future multi-key WebCrypto | Non-extractable keys make classic rotation hard; do not fake it |
+| DEC-19 | Web key rotation | Multi-key WebCrypto keyring in IndexedDB (non-extractable) + key-id envelope; same rotate → reEncrypt → cleanup pipeline as JVM/iOS | Do not export raw keys; no fake single-key rotation |
 | DEC-20 | DataStore version | Align with repo catalog (`1.3.0-alpha09` today) in monorepo; **first Maven 1.0** prefers **stable** DataStore if available, else document alpha clearly | Risk management |
 | DEC-21 | Logging coupling | No hard dep on composeApp logging/utils; `KryptoLogger` no-op + optional inject | Publishable artifact |
 | DEC-22 | Remember-email | Sample feature **separate** from lib core; **must** use plain prefs API | Demonstrates plain tier |
@@ -137,6 +137,21 @@ Every formerly “open” question is decided here. Changing one requires an exp
 | DEC-31 | Build conventions | Use foundation `criollo.kmp-library`, `ProjectConfig`, RootPlugin, qualityCheck, release-please | Do not invent a parallel publish stack inside saveable |
 | DEC-32 | BOM | Extend existing `:bom` with kryptostore constraints (do **not** create a second BOM artifact unless owner reopens) | One foundation BOM |
 | DEC-33 | Working tree for implementation | Primary PRs land in **criollo-kmp-foundation**; saveable PRs only for consumer migration + CRYPTO_KMP hygiene | Clear ownership |
+| DEC-34 | `kotlinx-io` filesystem | **Deferred.** Keep **Okio** as the kryptostore storage stack (`OkioStorage` / `OkioSerializer` / quarantine). Revisit `kotlinx-io` (`kotlinx.io.files`) only when AndroidX DataStore offers a clear kotlinx-io path **or** filesystem APIs stabilize and a bridge does not fight DataStore’s Okio contract | Avoid dual I/O stacks; DataStore is Okio-bound today |
+| DEC-35 | Unified store locator API | Canonical factories take **`StoreLocator`**: **`Platform(producePath, name)`** routes via **`kryptostoreUsesFileStorage`** expect (not FileSystem null-check). `File` / `Named` are escape hatches. `producePath` overloads stay as file convenience. Android delegates build `Platform` with `Context` files path + logical name. | One commonMain call; dual identity; explicit routing contract |
+
+**DEC-34 revisit inventory** (do not dual-stack until triggers fire):
+
+| Area | Binding today | Future kotlinx-io? |
+| ------ | --------------- | -------------------- |
+| Proto/prefs factories + `OkioStorage` | **Hard** Okio via `datastore-core-okio` | Only if DataStore gains kotlinx-io storage |
+| `OkioSerializer` / envelope bytes | **Hard** Okio `BufferedSource`/`Sink` | Same |
+| `kryptostoreFileSystem` + quarantine | Okio `FileSystem`/`Path` (aligned with factories) | Keep Okio while factories are Okio |
+| IndexedDB / WebLocalStorage | DataStore web storage (not Okio FS) | Out of scope for kotlinx-io FS |
+| JVM master-key file (`PosixSealedFileMasterKeyStore`, `java.io.File`) | JDK files | **Candidate** later (non-DataStore) |
+| Android Keystore / iOS Keychain / WebCrypto | Platform crypto, not FS | N/A |
+
+**Revisit triggers:** DataStore documents kotlinx-io storage **or** `kotlinx.io.files` is stable **and** a spike shows no dual Okio/kotlinx-io tax on commonMain.
 
 ---
 
@@ -396,17 +411,29 @@ Web/IndexedDB: define equivalent “quarantine” strategy (rename key / delete 
 ### 5.5 Core factories — `kryptostore`
 
 ```kotlin
+sealed interface StoreLocator {
+    data class Platform(val producePath: () -> Path, val name: String) : StoreLocator
+    data class File(val producePath: () -> Path) : StoreLocator
+    data class Named(val name: String) : StoreLocator // IndexedDB (proto) / localStorage (prefs)
+}
+
+fun <T : Any> createEncryptedProtoDataStore(
+    storage: Storage<T>,
+    migrations: List<DataMigration<T>> = emptyList(),
+    corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
+): DataStore<T>
+
+/** Canonical — Platform routes Okio vs IndexedDB */
 fun <T : Any> createEncryptedProtoDataStore(
     cipher: Cipher,
     kSerializer: KSerializer<T>,
     defaultValue: T,
+    locator: StoreLocator,
     options: EncryptedStoreOptions = EncryptedStoreOptions(),
-    storage: Storage<T>, // or overload with producePath for file targets
     migrations: List<DataMigration<T>> = emptyList(),
-    corruptionHandler: ReplaceFileCorruptionHandler<T>? = null, // null → fail-closed when path known
 ): DataStore<T>
 
-/** File targets helper */
+/** File convenience ≡ StoreLocator.File */
 fun <T : Any> createEncryptedProtoDataStore(
     cipher: Cipher,
     kSerializer: KSerializer<T>,
@@ -415,17 +442,9 @@ fun <T : Any> createEncryptedProtoDataStore(
     options: EncryptedStoreOptions = EncryptedStoreOptions(),
     migrations: List<DataMigration<T>> = emptyList(),
 ): DataStore<T>
-
-/** Web typed helper — IndexedDB */
-fun <T : Any> createEncryptedProtoDataStoreIndexedDb(
-    cipher: Cipher,
-    kSerializer: KSerializer<T>,
-    defaultValue: T,
-    name: String,
-    options: EncryptedStoreOptions = EncryptedStoreOptions(storeName = name),
-    migrations: List<DataMigration<T>> = emptyList(),
-): DataStore<T>
 ```
+
+Same `locator: StoreLocator` shape for `createPlainProtoDataStore`.
 
 ### 5.6 Preferences — `kryptostore-preferences`
 
@@ -437,6 +456,14 @@ fun createEncryptedPreferencesDataStore(
     migrations: List<DataMigration<Preferences>> = emptyList(),
 ): DataStore<Preferences>
 
+/** Canonical — Platform routes Okio vs localStorage */
+fun createEncryptedPreferencesDataStore(
+    cipher: Cipher,
+    locator: StoreLocator,
+    options: EncryptedStoreOptions = EncryptedStoreOptions(),
+    migrations: List<DataMigration<Preferences>> = emptyList(),
+): DataStore<Preferences>
+
 fun createEncryptedPreferencesDataStore(
     cipher: Cipher,
     producePath: () -> Path,
@@ -444,19 +471,8 @@ fun createEncryptedPreferencesDataStore(
     migrations: List<DataMigration<Preferences>> = emptyList(),
 ): DataStore<Preferences>
 
-fun createEncryptedPreferencesDataStoreLocalStorage(
-    cipher: Cipher,
-    name: String,
-    options: EncryptedStoreOptions = EncryptedStoreOptions(storeName = name),
-): DataStore<Preferences>
-
-fun createPlainPreferencesDataStore(
-    producePath: () -> Path,
-): DataStore<Preferences>
-
-fun createPlainPreferencesDataStoreLocalStorage(
-    name: String,
-): DataStore<Preferences>
+fun createPlainPreferencesDataStore(locator: StoreLocator): DataStore<Preferences>
+fun createPlainPreferencesDataStore(producePath: () -> Path): DataStore<Preferences>
 ```
 
 ### 5.7 Android — `kryptostore-android`
@@ -504,7 +520,7 @@ Semantics:
 
 - After successful key rotation, every registered encrypted store must be readable with the new key material.
 - If re-encrypt fails, surface `CryptoRuntimeState.Error`; do not claim Ready with mixed old/new ciphertext unless documented recovery mode exists.
-- Web: rotation remains no-op until a real multi-key scheme exists; registry still works for AAD/schema migrations.
+- Web: multi-key WebCrypto keyring + key-id envelope; same rotate → reEncrypt → cleanup semantics as other targets.
 
 ### 5.9 Migrate Android (optional artifact)
 
@@ -587,9 +603,9 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 | ID | Requirement | AC | Tests |
 | ---- | ------------- | ---- | ------- |
 | REQ-STO-01 | File targets use OkioStorage + platform FileSystem | create + updateData round-trip | jvmTest |
-| REQ-STO-02 | Web typed store uses IndexedDbStorage | Data persists across DataStore recreate in same origin | jsTest |
-| REQ-STO-03 | Web encrypted prefs use WebLocalStorage | Persist in localStorage key space | jsTest |
-| REQ-STO-04 | Plain prefs factory creates readable unencrypted Preferences | Can read without Cipher | jvmTest + jsTest |
+| REQ-STO-02 | Web typed store uses IndexedDbStorage | Data persists across DataStore recreate in same origin | **Done** — `IndexedDbStorageTest` (jsBrowserTest) |
+| REQ-STO-03 | Web encrypted prefs use WebLocalStorage | Persist in localStorage key space | **Done** — `WebLocalStoragePreferencesTest` (jsBrowserTest) |
+| REQ-STO-04 | Plain prefs factory creates readable unencrypted Preferences | Can read without Cipher | **Done** — jvmTest + jsBrowserTest |
 | REQ-STO-05 | Encrypted factories refuse use before CryptoRuntime Ready (or document caller responsibility + sample enforces gate) | Sample keeps gate; lib documents contract | Sample test / doc |
 | REQ-STO-06 | Migrations list is plumbed to DataStoreFactory | Custom DataMigration invoked | jvmTest |
 | REQ-STO-07 | Preferences file extension rules respected (`.preferences_pb` where AndroidX requires) | Document + validate in Android factory | android test |
@@ -602,7 +618,7 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 | REQ-ROT-02 | `CryptoRuntime.initialize` calls reEncrypt when rotator returns true | Order: rotate → reEncrypt → Ready | jvmTest |
 | REQ-ROT-03 | Failed reEncrypt → Error state | — | jvmTest |
 | REQ-ROT-04 | Android/JVM time-based rotator still configurable via KeyRotationConfig | Period honored in test with fake clock if possible | jvm/android test |
-| REQ-ROT-05 | Web rotator remains honest no-op; documented | CRYPTO.md | Doc + unit returns false |
+| REQ-ROT-05 | Web rotator is time-based multi-key (IndexedDB keyring + key-id envelope); `KeyRotationConfig` honored; cleanup deletes inactive keys after reEncrypt | CRYPTO.md + jsBrowserTest | Doc + WebCryptoKeyringTest |
 
 ### 7.7 Android DX
 
@@ -628,8 +644,8 @@ Each requirement has ID, statement, acceptance criteria (AC), and primary tests 
 | ---- | ------------- | ---- | ------- |
 | REQ-HRD-01 | Frozen blob fixtures per target for envelope v1 | Compat suite never broken without version bump | `compat` source set tests |
 | REQ-HRD-02 | Binary compatibility validator on JVM public API | `.api` dump in CI | BCV task |
-| REQ-HRD-03 | Optional StreamingAead encrypting path for large payloads (Android/JVM) | Feature flag / alternate serializer; documented | jvmTest |
-| REQ-HRD-04 | iOS master key in Keychain | Keys survive reinstall policy as documented; sandbox file deprecated | ios test / manual protocol |
+| REQ-HRD-03 | Optional StreamingAead encrypting path for large payloads (Android/JVM) | Feature flag / alternate serializer; documented | **Done** — `StreamingAeadCipher` + jvmTest + `docs/kryptostore-crypto.md` |
+| REQ-HRD-04 | iOS master key in Keychain | Keys survive reinstall policy as documented; sandbox file deprecated | **Done** — Keychain wired; manual protocol in `docs/kryptostore-crypto.md` |
 | REQ-HRD-05 | Public README quickstarts for Android, iOS, JVM, Web | Copy-paste works | Manual / sample |
 
 ### 7.10 Sample / consumer
@@ -814,7 +830,7 @@ KryptoStore is **complete** when:
 2. Web matrix holds: IndexedDB / localStorage / WebCrypto / keys in IndexedDB.
 3. Forbidden deps absent.
 4. Fail-closed default + opt-in plaintext migration.
-5. Rotation re-encrypts registered stores on Android/JVM/iOS (Web documented limitation).
+5. Rotation re-encrypts registered stores on Android/JVM/iOS/Web (multi-key WebCrypto keyring + key-id envelope).
 6. Android delegates ship without security-crypto.
 7. Compat fixtures + BCV + MIGRATION docs exist.
 8. composeApp is a consumer; remember-email uses plain prefs.
@@ -828,8 +844,10 @@ KryptoStore is **complete** when:
 | ------ | ------------ |
 | DataStore 1.3 alphas break consumers | DEC-20; pin in BOM; consider stable for Maven 1.0 |
 | Re-encrypt bugs brick user data | Fail closed; quarantine; extensive ROT tests; backup guidance |
-| Web rotation impossible with non-extractable keys | Honest no-op + docs; future multi-key design |
+| Web multi-key rotation with non-extractable keys | IndexedDB keyring + key-id envelope; rotate → reEncryptAll → delete inactive keys |
 | IndexedDB vs OPFS future | DEC-10 stick to IndexedDB for v1 |
+| `kotlinx-io` vs Okio dual stack | DEC-34 — stay on Okio until DataStore/kotlinx-io path is clear |
+| Dual Path/name factory APIs confuse commonMain callers | DEC-35 — `StoreLocator.Platform` dual identity + auto-route |
 | Magic name `SVBLENC1` branding odd under KryptoStore | Keep for compatibility; document; envelope v2 only if breaking |
 | Large extraction PR | Enforce phase gates |
 | CRYPTO_KMP.md drift | Phase 0 / REQ-SMP-03 |
@@ -918,3 +936,5 @@ After each phase, output the phase checklist (§13) and stop for review unless I
 | 2026-08-22 | Initial authoritative SDD/TDD spec; closed DEC-01..30; named KryptoStore |
 | 2026-08-22 | Amended: home = criollo-kmp-foundation; group/packages/BOM/phases/prompt; DEC-31..33 |
 | 2026-08-22 | Phase 0: living copy in foundation `docs/`; saveable file reduced to pointer |
+| 2026-08-23 | DEC-35: `StoreLocator.Platform` dual identity + auto-route; Android delegates use Platform |
+| 2026-08-23 | Production hardening: `kryptostoreUsesFileStorage`, `KryptostorePaths`, jsBrowserTest CI, dogfood checklist |

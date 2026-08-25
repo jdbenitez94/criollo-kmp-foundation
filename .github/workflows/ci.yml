@@ -81,6 +81,26 @@ jobs:
             --configuration-cache \
             --configuration-cache-problems=fail
 
+      - name: Setup Node.js (host Node/Yarn for Kotlin/JS; Gradle download disabled)
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+
+      - name: Enable Yarn via Corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+
+      - name: Kryptostore JS browser tests (IndexedDB / localStorage)
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          ./gradlew kryptostoreJsBrowserTests \
+            --configuration-cache \
+            --configuration-cache-problems=fail
+
       - name: Collect JUnit reports
         if: ${{ !cancelled() && env.HAS_REPO_SECRETS == 'true' }}
         run: |

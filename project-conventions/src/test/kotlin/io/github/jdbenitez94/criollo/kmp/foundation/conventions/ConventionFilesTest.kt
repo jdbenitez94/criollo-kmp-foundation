@@ -9,7 +9,7 @@ class ConventionFilesTest {
     fun packagedEditorconfigMatchesFoundationStylePolicy() {
         val text = ConventionFiles.read(ConventionFiles.Kind.EDITORCONFIG).decodeToString()
         assertContains(text, "ktlint_code_style = intellij_idea")
-        assertContains(text, "max_line_length = 180")
+        assertContains(text, "max_line_length = 120")
         assertContains(text, "indent_size = 4")
         assertContains(text, "ij_kotlin_allow_trailing_comma = true")
     }

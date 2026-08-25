@@ -6,7 +6,14 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.Properties
 
-internal fun uploadCodecovCoverage(logger: Logger, execOperations: ExecOperations, rootDir: File, report: File, props: Properties, codecovSlug: String) {
+internal fun uploadCodecovCoverage(
+    logger: Logger,
+    execOperations: ExecOperations,
+    rootDir: File,
+    report: File,
+    props: Properties,
+    codecovSlug: String,
+) {
     val token = firstLocalProp(props, "codecovRepositoryToken", "codecovApiToken", "CODECOV_TOKEN")
     if (token == null) {
         logger.lifecycle(
@@ -42,7 +49,13 @@ internal fun uploadCodecovCoverage(logger: Logger, execOperations: ExecOperation
     )
 }
 
-internal fun uploadCodacyCoverage(logger: Logger, execOperations: ExecOperations, rootDir: File, report: File, props: Properties) {
+internal fun uploadCodacyCoverage(
+    logger: Logger,
+    execOperations: ExecOperations,
+    rootDir: File,
+    report: File,
+    props: Properties,
+) {
     val apiToken = firstLocalProp(props, "codacyApiToken", "codacyToken", "CODACY_API_TOKEN")
     val projectToken = firstLocalProp(props, "codacyProjectToken", "CODACY_PROJECT_TOKEN")
     if (apiToken == null && projectToken == null) {
@@ -107,7 +120,12 @@ internal fun firstLocalProp(props: Properties, vararg keys: String): String? = k
         ?: System.getenv(key)?.takeIf { it.isNotBlank() }
 }
 
-private fun execQuiet(execOperations: ExecOperations, logger: Logger, rootDir: File, configure: ExecSpec.() -> Unit): ExecResult {
+private fun execQuiet(
+    execOperations: ExecOperations,
+    logger: Logger,
+    rootDir: File,
+    configure: ExecSpec.() -> Unit,
+): ExecResult {
     val stdout = ByteArrayOutputStream()
     val stderr = ByteArrayOutputStream()
     return execOperations.exec {

@@ -15,11 +15,16 @@ internal object MacOsKeychainMasterKeyStore : JvmSecureMasterKeyStore {
     private const val ERR_SEC_ITEM_NOT_FOUND = -25300
     private const val ERR_SEC_DUPLICATE_ITEM = -25299
     private const val SERVICE = "io.github.jdbenitez94.criollo.kmp.foundation.kryptostore"
-    private val security = Native.load(
-        "Security",
-        SecurityLibrary::class.java,
-        mapOf(Library.OPTION_FUNCTION_MAPPER to SecurityFunctionMapper),
-    )
+
+    // Lazy: referencing this object from JvmSecureMasterKeyStore.current() must not load
+    // Security.framework on non-macOS JVMs (Linux CI).
+    private val security by lazy {
+        Native.load(
+            "Security",
+            SecurityLibrary::class.java,
+            mapOf(Library.OPTION_FUNCTION_MAPPER to SecurityFunctionMapper),
+        )
+    }
 
     override fun readOrCreate(account: String): ByteArray {
         read(account)?.let { return it.copyOf(32) }
@@ -68,7 +73,12 @@ internal object MacOsKeychainMasterKeyStore : JvmSecureMasterKeyStore {
         if (status != ERR_SEC_DUPLICATE_ITEM) checkStatus(status, "add")
     }
 
-    private fun find(account: String, passwordLength: IntByReference, passwordData: PointerByReference, itemRef: PointerByReference): Int {
+    private fun find(
+        account: String,
+        passwordLength: IntByReference,
+        passwordData: PointerByReference,
+        itemRef: PointerByReference,
+    ): Int {
         val service = SERVICE.encodeToByteArray()
         val accountBytes = account.encodeToByteArray()
         return security.secKeychainFindGenericPassword(

@@ -13,8 +13,26 @@ import kotlinx.coroutines.Dispatchers
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+internal fun interface AndroidMasterAeadFactory {
+    fun getOrCreate(alias: String): Aead
+}
+
+internal object AndroidKeystoreMasterAeadFactory : AndroidMasterAeadFactory {
+    override fun getOrCreate(alias: String): Aead {
+        if (!AndroidKeystore.hasKey(alias)) {
+            AndroidKeystore.generateNewAes256GcmKey(alias)
+        }
+        return AndroidKeystore.getAead(alias)
+    }
+}
+
+internal var androidMasterAeadFactory: AndroidMasterAeadFactory = AndroidKeystoreMasterAeadFactory
+
 @OptIn(ExperimentalTime::class)
-internal fun createAndroidTinkStack(appId: String, rotationConfig: KeyRotationConfig = KeyRotationConfig.DEFAULT): PlatformCryptoStack {
+internal fun createAndroidTinkStack(
+    appId: String,
+    rotationConfig: KeyRotationConfig = KeyRotationConfig.DEFAULT,
+): PlatformCryptoStack {
     AeadConfig.register()
     val context = AndroidCryptoContextHolder.applicationContext
     val masterKeyAlias = "$appId.master_key"
@@ -22,10 +40,7 @@ internal fun createAndroidTinkStack(appId: String, rotationConfig: KeyRotationCo
     val preferenceFile = "$appId.keyset_prefs"
     val associatedData = masterKeyAlias.toByteArray()
 
-    if (!AndroidKeystore.hasKey(masterKeyAlias)) {
-        AndroidKeystore.generateNewAes256GcmKey(masterKeyAlias)
-    }
-    val masterAead = AndroidKeystore.getAead(masterKeyAlias)
+    val masterAead = androidMasterAeadFactory.getOrCreate(masterKeyAlias)
 
     val keysetHandle = loadOrCreateKeyset(context, preferenceFile, keysetName, masterAead, associatedData)
     val aeadProvider = TinkAeadProvider(keysetHandle)
@@ -48,14 +63,20 @@ internal fun createAndroidTinkStack(appId: String, rotationConfig: KeyRotationCo
     )
 }
 
-private fun SharedPreferences.editCommit(block: SharedPreferences.Editor.() -> Unit) {
+internal fun SharedPreferences.editCommit(block: SharedPreferences.Editor.() -> Unit) {
     edit().apply {
         block()
         apply()
     }
 }
 
-private fun loadOrCreateKeyset(context: Context, preferenceFile: String, keysetName: String, masterAead: Aead, associatedData: ByteArray): KeysetHandle {
+internal fun loadOrCreateKeyset(
+    context: Context,
+    preferenceFile: String,
+    keysetName: String,
+    masterAead: Aead,
+    associatedData: ByteArray,
+): KeysetHandle {
     val prefs = context.getSharedPreferences(preferenceFile, Context.MODE_PRIVATE)
     val encryptedKeysetHex = prefs.getString(keysetName, null)
     return if (encryptedKeysetHex != null) {
@@ -73,7 +94,7 @@ private fun loadOrCreateKeyset(context: Context, preferenceFile: String, keysetN
     }
 }
 
-private class AndroidTimeBasedKeyRotator(
+internal class AndroidTimeBasedKeyRotator(
     private val context: Context,
     private var keysetHandle: KeysetHandle,
     private val aeadProvider: TinkAeadProvider,
@@ -110,4 +131,5 @@ private class AndroidTimeBasedKeyRotator(
     }
 }
 
-actual fun createPlatformCryptoStack(appId: String, rotationConfig: KeyRotationConfig): PlatformCryptoStack = createAndroidTinkStack(appId, rotationConfig)
+actual fun createPlatformCryptoStack(appId: String, rotationConfig: KeyRotationConfig): PlatformCryptoStack =
+    createAndroidTinkStack(appId, rotationConfig)

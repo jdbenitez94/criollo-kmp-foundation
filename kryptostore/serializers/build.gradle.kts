@@ -4,6 +4,10 @@ plugins {
 }
 
 kotlin {
+    @Suppress("UnstableApiUsage")
+    android {
+        withHostTest {}
+    }
     sourceSets {
         commonMain.dependencies {
             api(project(":kryptostore:crypto"))
@@ -13,6 +17,11 @@ kotlin {
         }
         jvmTest.dependencies {
             implementation(libs.com.squareup.okio.fakefilesystem)
+        }
+        named("androidHostTest") {
+            dependencies {
+                implementation(libs.org.jetbrains.kotlin.test)
+            }
         }
     }
 }

@@ -22,7 +22,8 @@ inline fun <T> runCatchingCancellable(block: () -> T): Result<T> = resultOfCance
  *
  * Non-[CancellationException] failures (including [Error]) become [Result.failure].
  */
-suspend inline fun <T> suspendRunCatchingCancellable(block: suspend () -> T): Result<T> = resultOfCancellable { block() }
+suspend inline fun <T> suspendRunCatchingCancellable(block: suspend () -> T): Result<T> =
+    resultOfCancellable { block() }
 
 /**
  * If this [Result] is a failure caused by [CancellationException], rethrows it; otherwise returns this.

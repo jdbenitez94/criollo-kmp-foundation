@@ -16,20 +16,22 @@ class IndexedDbStorage<T : Any>(private val serializer: OkioSerializer<T>, priva
     override fun createConnection(): StorageConnection<T> = IndexedDbStorageConnection(serializer, name)
 }
 
-private class IndexedDbStorageConnection<T : Any>(private val serializer: OkioSerializer<T>, private val name: String) : StorageConnection<T> {
+private class IndexedDbStorageConnection<T : Any>(private val serializer: OkioSerializer<T>, private val name: String) :
+    StorageConnection<T> {
     private val connectionCoordinator = WebIndexedDbCoordinator(name)
 
     override val coordinator
         get() = connectionCoordinator
 
-    override suspend fun <R> readScope(block: suspend ReadScope<T>.(locked: Boolean) -> R): R = connectionCoordinator.lock {
-        val scope = IndexedDbReadScope(serializer, name)
-        try {
-            block(scope, true)
-        } finally {
-            scope.close()
+    override suspend fun <R> readScope(block: suspend ReadScope<T>.(locked: Boolean) -> R): R =
+        connectionCoordinator.lock {
+            val scope = IndexedDbReadScope(serializer, name)
+            try {
+                block(scope, true)
+            } finally {
+                scope.close()
+            }
         }
-    }
 
     override suspend fun writeScope(block: suspend WriteScope<T>.() -> Unit) {
         connectionCoordinator.lock {
@@ -45,7 +47,8 @@ private class IndexedDbStorageConnection<T : Any>(private val serializer: OkioSe
     override fun close() = Unit
 }
 
-private open class IndexedDbReadScope<T : Any>(private val serializer: OkioSerializer<T>, private val name: String) : ReadScope<T> {
+private open class IndexedDbReadScope<T : Any>(private val serializer: OkioSerializer<T>, private val name: String) :
+    ReadScope<T> {
     override suspend fun readData(): T {
         validateStoreName(name)
         ensureIndexedDbHelpersInstalled()

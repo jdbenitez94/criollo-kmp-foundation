@@ -1,4 +1,4 @@
-import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloProperty
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.localProperty
 
 plugins {
     alias(libs.plugins.convention.root)
@@ -37,7 +37,7 @@ dependencyCheck {
     // Provide via env `NVD_API_KEY`, `-PnvdApiKey=…`, or `nvdApiKey` in local.properties.
     nvd {
         apiKey = providers.environmentVariable("NVD_API_KEY").orNull
-            ?: criolloProperty("nvdApiKey")
+            ?: localProperty<String>("nvdApiKey")
         validForHours = 168
         datafeedUrl = "https://dependency-check.github.io/DependencyCheck_Builder/nvd_cache/nvdcve-{0}.json.gz"
     }

@@ -13,8 +13,17 @@ class EncryptedStoreOptions {
     var allowPlaintextRead: Boolean = false
 
     fun resolvedAssociatedData(): ByteArray = associatedData ?: deriveStoreAssociatedData(storeName, schemaVersion)
+
+    /** When [storeName] is still the class default, adopt [name] (web Named / Platform routing). */
+    fun applyDefaultStoreName(name: String) {
+        if (storeName == "default") {
+            storeName = name
+        }
+    }
 }
 
-fun deriveStoreAssociatedData(storeName: String, schemaVersion: Int): ByteArray = "$storeName|v$schemaVersion".encodeToByteArray()
+fun deriveStoreAssociatedData(storeName: String, schemaVersion: Int): ByteArray =
+    "$storeName|v$schemaVersion".encodeToByteArray()
 
-fun EncryptedStoreOptions(block: EncryptedStoreOptions.() -> Unit): EncryptedStoreOptions = EncryptedStoreOptions().apply(block)
+fun EncryptedStoreOptions(block: EncryptedStoreOptions.() -> Unit): EncryptedStoreOptions =
+    EncryptedStoreOptions().apply(block)

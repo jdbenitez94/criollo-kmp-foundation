@@ -67,7 +67,8 @@ private class IosSecureKeyStore(appId: String) : SecureKeyStore {
         removeKeyIdFromIndex(keyId)
     }
 
-    override suspend fun readLastRotationMillis(): Long = keychain.read(ROTATION_ACCOUNT)?.toByteArray()?.decodeToString()?.toLongOrNull() ?: 0L
+    override suspend fun readLastRotationMillis(): Long =
+        keychain.read(ROTATION_ACCOUNT)?.toByteArray()?.decodeToString()?.toLongOrNull() ?: 0L
 
     override suspend fun writeLastRotationMillis(value: Long) {
         keychain.write(ROTATION_ACCOUNT, value.toString().encodeToByteArray().toNSData())
@@ -118,7 +119,8 @@ private class IosSecureKeyStore(appId: String) : SecureKeyStore {
     }
 }
 
-actual fun createPlatformCryptoStack(appId: String, rotationConfig: KeyRotationConfig): PlatformCryptoStack = createAesPlatformStack(IosSecureKeyStore(appId), rotationConfig)
+actual fun createPlatformCryptoStack(appId: String, rotationConfig: KeyRotationConfig): PlatformCryptoStack =
+    createAesPlatformStack(IosSecureKeyStore(appId), rotationConfig)
 
 internal actual fun randomPlatformAesKey(): ByteArray = ByteArray(32).also { bytes ->
     memScoped {
@@ -137,7 +139,11 @@ internal actual suspend fun aesGcmEncrypt(key: ByteArray, plaintext: ByteArray, 
     )
 }
 
-internal actual suspend fun aesGcmDecrypt(key: ByteArray, ciphertext: ByteArray, associatedData: ByteArray?): ByteArray {
+internal actual suspend fun aesGcmDecrypt(
+    key: ByteArray,
+    ciphertext: ByteArray,
+    associatedData: ByteArray?,
+): ByteArray {
     val cipher = decodeAesKey(key).cipher()
     return cipher.decrypt(
         ciphertext = ciphertext,

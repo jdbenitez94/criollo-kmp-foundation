@@ -35,7 +35,7 @@ replace, and debounce side effects by key.
 - [Project conventions](project-conventions.md)
 - [Publishing](publishing.md)
 - [API reference (Dokka)](api.md)
-- [KryptoStore crypto notes](kryptostore-crypto.md) — rotation, Web no-op, StreamingAead, iOS Keychain
+- [KryptoStore crypto notes](kryptostore-crypto.md) — rotation (incl. Web multi-key), StreamingAead, iOS Keychain
 - [KryptoStore migration](kryptostore-migration.md) — plaintext / AEAD / ESP / osipxd
 - [KryptoStore completion (G1–G10)](kryptostore-complete.md)
 

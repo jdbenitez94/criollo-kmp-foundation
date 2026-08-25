@@ -157,20 +157,39 @@ dependencies {
 }
 ```
 
-**JVM / Android / iOS (file):** initialize crypto, then create an encrypted proto store:
+**All targets — one factory + StoreLocator + KryptostorePaths**
+([StoreLocator](kryptostore/serializers/src/commonMain/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator.kt),
+[KryptostorePaths](kryptostore/serializers/src/commonMain/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/KryptostorePaths.kt)):
 
 ```kotlin
 val stack = createPlatformCryptoStack("my.app")
 val runtime = CryptoRuntime(stack)
-runtime.initialize() // Ready before use
+runtime.initialize() // Ready before encrypted use
+
+// Android commonMain callers: KryptostoreAndroid.initialize(context) once in Application.onCreate
 val store = createEncryptedProtoDataStore(
     cipher = runtime.cipher,
     kSerializer = Settings.serializer(),
     defaultValue = Settings(),
-    producePath = { path },
+    locator = StoreLocator.platform(
+        producePath = { KryptostorePaths.file("settings.pb") },
+        name = "settings",
+    ),
     registry = runtime.registry,
 )
+
+val plain = createPlainProtoDataStore(
+    kSerializer = UiSettings.serializer(),
+    defaultValue = UiSettings(),
+    locator = StoreLocator.platform(
+        producePath = { KryptostorePaths.file("ui-settings.pb") },
+        name = "ui-settings",
+    ),
+)
 ```
+
+On JS/Wasm, `Platform` uses `name` (IndexedDB / localStorage); `KryptostorePaths.file` is not used.
+`producePath = { … }` remains a file-only convenience. `StoreLocator.file` / `StoreLocator.named` are escape hatches.
 
 **Android delegates:**
 
@@ -184,26 +203,26 @@ val Context.settings by encryptedProtoDataStore(
 )
 ```
 
-**Web:** typed store → IndexedDB (`createEncryptedProtoDataStoreIndexedDb`); prefs → localStorage
-(`createEncryptedPreferencesDataStoreLocalStorage` / plain variant). Keys stay in IndexedDB (`app-crypto`).
+Crypto keys on web stay in IndexedDB (`app-crypto`), not localStorage.
 
 Migration guides: [kryptostore-migration.md](docs/kryptostore-migration.md). Crypto notes:
-[kryptostore-crypto.md](docs/kryptostore-crypto.md).
+[kryptostore-crypto.md](docs/kryptostore-crypto.md). Saveable dogfood:
+[kryptostore-dogfood-saveable.md](docs/kryptostore-dogfood-saveable.md).
 
 ## Docs
 
 Site (MkDocs + Dokka API HTML): [jdbenitez94.github.io/criollo-kmp-foundation](https://jdbenitez94.github.io/criollo-kmp-foundation/).
 
-- [Managed tasks (`TaskScope`)](docs/managed-tasks.md) — policies, adapters, anti-patterns
-- [Project conventions](docs/project-conventions.md) — sync shared style configs into consumer repos
-- [Contributing](docs/contributing.md) — git hooks and local quality gate
-- [Commit conventions](docs/commit-conventions.md) — Conventional Commits types/scopes
-- [JS / Wasm webpack notes](docs/js-wasm.md) — `webpack.config.d` fallbacks
-- [Adding a module](docs/adding-a-module.md) — checklist for new artifacts in this repo
-- [Publishing](docs/publishing.md)
-- [KryptoStore spec](docs/spec-final-kryptostore.md) — encrypted DataStore KMP (SDD+TDD)
-- [KryptoStore completion](docs/kryptostore-complete.md) — G1–G10 checklist
-- [Config overview](config/README.md) — Detekt, Kover, Gradle cache encryption
++ [Managed tasks (`TaskScope`)](docs/managed-tasks.md) — policies, adapters, anti-patterns
++ [Project conventions](docs/project-conventions.md) — sync shared style configs into consumer repos
++ [Contributing](docs/contributing.md) — git hooks and local quality gate
++ [Commit conventions](docs/commit-conventions.md) — Conventional Commits types/scopes
++ [JS / Wasm webpack notes](docs/js-wasm.md) — `webpack.config.d` fallbacks
++ [Adding a module](docs/adding-a-module.md) — checklist for new artifacts in this repo
++ [Publishing](docs/publishing.md)
++ [KryptoStore spec](docs/spec-final-kryptostore.md) — encrypted DataStore KMP (SDD+TDD)
++ [KryptoStore completion](docs/kryptostore-complete.md) — G1–G10 checklist
++ [Config overview](config/README.md) — Detekt, Kover, Gradle cache encryption
 
 ## Build
 

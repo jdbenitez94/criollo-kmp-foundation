@@ -1,8 +1,14 @@
+import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
+
 plugins {
     alias(libs.plugins.criollo.kmp.library)
 }
 
 kotlin {
+    @Suppress("UnstableApiUsage")
+    android {
+        withHostTest {}
+    }
     sourceSets {
         val jvmAndAndroidMain by creating {
             dependsOn(commonMain.get())
@@ -28,6 +34,25 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.dev.whyoleg.cryptography.core)
             implementation(libs.dev.whyoleg.cryptography.provider.apple)
+        }
+    }
+}
+
+extensions.configure<KoverProjectExtension> {
+    reports {
+        filters {
+            excludes {
+                // AndroidKeyStore is unavailable in JVM host tests; all surrounding Android orchestration
+                // is covered through an injected in-memory master AEAD.
+                classes(
+                    "io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto." +
+                        "AndroidKeystoreMasterAeadFactory",
+                    // Kotlin emits this uncallable JVM bridge; '?' matches the '$' that Kover
+                    // otherwise treats as an end-anchor in class-name filters.
+                    "io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto." +
+                        "AlgorithmProvider?DefaultImpls",
+                )
+            }
         }
     }
 }

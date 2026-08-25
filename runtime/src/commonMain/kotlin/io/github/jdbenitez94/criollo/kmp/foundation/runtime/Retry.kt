@@ -88,7 +88,11 @@ class RetryPolicy(
  * Attempt indices passed to [block] are 1-based (`1` = first try).
  * [CancellationException] is never retried.
  */
-suspend fun <T> retryWithBackoff(policy: RetryPolicy = RetryPolicy.DEFAULT, random: Random = Random.Default, block: suspend (attempt: Int) -> T): T {
+suspend fun <T> retryWithBackoff(
+    policy: RetryPolicy = RetryPolicy.DEFAULT,
+    random: Random = Random.Default,
+    block: suspend (attempt: Int) -> T,
+): T {
     var attempt = 1
     var currentBackoff = policy.initialBackoff
 
