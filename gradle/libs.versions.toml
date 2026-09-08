@@ -1,7 +1,7 @@
 [versions]
 agp = "9.3.1"
 kotlin = "2.4.10"
-compose-multiplatform = "1.11.1"
+compose-multiplatform = "1.12.0"
 androidx-lifecycle-kmp = "2.11.0"
 coroutines = "1.11.0"
 detekt = "1.23.8"
@@ -16,7 +16,7 @@ dokka = "2.2.0"
 jackson = "2.22.2"
 kover = "0.9.9"
 dependencycheck = "13.0.0"
-binary-compatibility-validator = "0.18.1"
+binary-compatibility-validator = "0.18.2"
 strikt = "0.35.1"
 junit-jupiter = "6.1.3"
 tink = "1.23.0"
@@ -24,7 +24,7 @@ cryptography = "0.6.0"
 jna = "5.19.1"
 # DataStore: alpha aligns with saveable dogfood; prefer stable for Maven 1.0 (DEC-20).
 androidx-datastore = "1.3.0-alpha10"
-okio = "3.18.1"
+okio = "3.18.2"
 kotlinx-serialization = "1.11.0"
 
 [plugins]
