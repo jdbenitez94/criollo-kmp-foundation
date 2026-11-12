@@ -16,7 +16,6 @@
 
 ## [0.2.1](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.2.0...v0.2.1) (2026-11-12)
 
-
 ### Bug Fixes
 
 * **kryptostore:** replace relative js modules with zero-config web interop ([#61](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/61)) ([a1ebfc8](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/a1ebfc8c05e22ad9b5dfb840131b6df929223b18))
