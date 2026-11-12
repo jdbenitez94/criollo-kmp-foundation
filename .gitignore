@@ -34,11 +34,8 @@ local.properties
 .kotlin/
 **/build/
 !gradle/wrapper/gradle-wrapper.jar
-kotlin-js-store/*
-!kotlin-js-store/yarn.lock
-!kotlin-js-store/wasm/
-kotlin-js-store/wasm/*
-!kotlin-js-store/wasm/yarn.lock
+kotlin-js-store/
+yarn.lock
 
 # =============================================================================
 # Android

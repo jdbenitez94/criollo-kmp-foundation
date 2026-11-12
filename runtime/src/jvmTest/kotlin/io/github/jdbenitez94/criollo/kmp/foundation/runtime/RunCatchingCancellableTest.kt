@@ -53,7 +53,7 @@ class RunCatchingCancellableTest {
     @Test
     fun suspend_success() = runTest {
         val result = suspendRunCatchingCancellable {
-            delay(1)
+            delay(1.milliseconds)
             "ok"
         }
         expectThat(result.isSuccess).isTrue()
@@ -63,7 +63,7 @@ class RunCatchingCancellableTest {
     @Test
     fun suspend_failureBecomesResult() = runTest {
         val result = suspendRunCatchingCancellable {
-            delay(1)
+            delay(1.milliseconds)
             error("boom")
         }
         expectThat(result.isFailure).isTrue()
@@ -94,7 +94,7 @@ class RunCatchingCancellableTest {
         var completed = false
         val job = launch {
             suspendRunCatchingCancellable {
-                delay(1_000)
+                delay(1_000.milliseconds)
                 completed = true
                 "never"
             }
@@ -120,6 +120,16 @@ class RunCatchingCancellableTest {
         result.onFailureExceptCancellation { handled = true }
         expectThat(handled).isTrue()
         expectThat(result.exceptionOrNull()).isNotNull()
+    }
+
+    @Test
+    fun onFailureOrRethrow_passesThroughSuccess() {
+        var handled = false
+        val result = Result.success("ok").onFailureOrRethrow<IllegalStateException, String> {
+            handled = true
+        }
+        expectThat(handled).isFalse()
+        expectThat(result.getOrNull()).isEqualTo("ok")
     }
 
     @Test
@@ -184,6 +194,40 @@ class RetryPolicyTest {
         val a = RetryPolicy(maxAttempts = 2)
         val b = RetryPolicy(maxAttempts = 3)
         expectThat(a == b).isFalse()
+    }
+
+    @Test
+    fun equals_considersInitialBackoff() {
+        val a = RetryPolicy(initialBackoff = 100.milliseconds, maxBackoff = 1_000.milliseconds)
+        val b = RetryPolicy(initialBackoff = 200.milliseconds, maxBackoff = 1_000.milliseconds)
+        expectThat(a == b).isFalse()
+    }
+
+    @Test
+    fun equals_considersMaxBackoff() {
+        val a = RetryPolicy(initialBackoff = 100.milliseconds, maxBackoff = 500.milliseconds)
+        val b = RetryPolicy(initialBackoff = 100.milliseconds, maxBackoff = 1_000.milliseconds)
+        expectThat(a == b).isFalse()
+    }
+
+    @Test
+    fun equals_considersJitterFactor() {
+        val a = RetryPolicy(jitterFactor = 0.0)
+        val b = RetryPolicy(jitterFactor = 1.0)
+        expectThat(a == b).isFalse()
+    }
+
+    @Test
+    fun acceptsBoundaryJitterFactors() {
+        expectThat(RetryPolicy(jitterFactor = 0.0).jitterFactor).isEqualTo(0.0)
+        expectThat(RetryPolicy(jitterFactor = 1.0).jitterFactor).isEqualTo(1.0)
+    }
+
+    @Test
+    fun rejectsNegativeJitterFactor() {
+        expectThrows<IllegalArgumentException> {
+            RetryPolicy(jitterFactor = -0.1)
+        }
     }
 
     @Test

@@ -4,7 +4,7 @@ G1–G10 from `docs/spec-final-kryptostore.md` §1.3:
 
 | ID | Status | Evidence |
 | ---- | -------- | ---------- |
-| G1 | Done | Published `kryptostore-*` under foundation group; saveable consumes via Maven Local 0.1.9 |
+| G1 | Done | Published `kryptostore-*` under foundation group (`0.2.0`+) |
 | G2 | Done | Android, JVM, iOS, JS, Wasm targets on kryptostore modules |
 | G3 | Done | Encrypted proto + encrypted prefs + plain prefs factories |
 | G4 | Done | IndexedDB / localStorage / WebCrypto / keys in IndexedDB (`app-crypto`) |
@@ -12,13 +12,13 @@ G1–G10 from `docs/spec-final-kryptostore.md` §1.3:
 | G6 | Done | `StoreRegistry.reEncryptAll` on rotation |
 | G7 | Done | android-delegates, BOM, BCV `api/`, compat fixtures |
 | G8 | Done | `docs/kryptostore-migration.md` + `kryptostore-migrate-android` |
-| G9 | Done | saveable composeApp thin consumer; remember-email plain prefs |
-| G10 | Done | README, CRYPTO.md / kryptostore-crypto.md, MIGRATION, CHANGELOG; saveable CRYPTO_KMP.md corrected |
+| G9 | Done | saveable composeApp thin consumer (`StoreLocator.platform`); remember-email plain prefs |
+| G10 | Done | README, CRYPTO.md / kryptostore-crypto.md, MIGRATION, CHANGELOG, KDoc; saveable CRYPTO_KMP.md corrected |
 
 ## Consumer soak
 
-- Repo: `saveable` `@ 0.1.9` Maven Local (or Central when released)
-- Artifacts: `kryptostore-crypto`, `kryptostore-serializers`, `kryptostore`, `kryptostore-preferences`
+- Repo: `saveable` `@ 0.2.0` (`StoreLocator.platform`, Web multi-key keyring, unified `KryptostoreAndroid.initialize`)
+- Artifacts: `kryptostore-crypto`, `kryptostore-serializers`, `kryptostore`, `kryptostore-preferences`, `kryptostore-android-delegates`
 - No in-tree `Encrypted*Serializer` / `CryptoManager` implementations remain in composeApp
 
 ## Release

@@ -17,15 +17,21 @@ internal const val ENCRYPTION_ENVELOPE_VERSION = 1
  * [CancellationException] always propagates so a cancelled read cannot be
  * misreported as [CorruptionException] and trigger quarantine.
  */
-internal suspend fun decryptWithAssociatedDataFallback(cipher: Cipher, ciphertext: ByteArray, associatedData: ByteArray, legacyAssociatedData: ByteArray? = null): ByteArray {
+internal suspend fun decryptWithAssociatedDataFallback(
+    cipher: Cipher,
+    ciphertext: ByteArray,
+    associatedData: ByteArray,
+    legacyAssociatedData: ByteArray? = null,
+): ByteArray {
     var lastError: Throwable? = null
     for (aad in associatedDataCandidates(associatedData, legacyAssociatedData)) {
         try {
             return cipher.decrypt(ciphertext, aad)
         } catch (cancelled: CancellationException) {
             throw cancelled
-        } catch (error: Exception) {
-            lastError = error
+        } catch (expected: Exception) {
+            // Cipher has no typed failure hierarchy; any Exception is a decrypt miss for AAD retry.
+            lastError = expected
         }
     }
     throw CorruptionException("Encrypted payload could not be decrypted.", lastError)
@@ -37,17 +43,20 @@ internal fun ByteArray.startsWithEncryptedBlobMagic(): Boolean {
     return copyOfRange(0, magic.size).contentEquals(magic)
 }
 
-internal fun rejectPlaintextPayload(): Nothing = throw CorruptionException("Encrypted store rejected plaintext payload (missing $ENCRYPTED_BLOB_MAGIC magic).")
+internal fun rejectPlaintextPayload(): Nothing =
+    throw CorruptionException("Encrypted store rejected plaintext payload (missing $ENCRYPTED_BLOB_MAGIC magic).")
 
 /**
  * Fail-closed corruption handler: quarantine the unreadable file as `*.corrupt` and rethrow.
  * Defaults are never written automatically — recovery requires an explicit user action.
  */
-fun <T> failClosedCorruptionHandler(producePath: () -> Path, fileSystem: () -> FileSystem? = { kryptostoreFileSystem }): ReplaceFileCorruptionHandler<T> =
-    ReplaceFileCorruptionHandler { exception ->
-        quarantineCorruptFile(producePath(), fileSystem())
-        throw exception
-    }
+fun <T> failClosedCorruptionHandler(
+    producePath: () -> Path,
+    fileSystem: () -> FileSystem? = { kryptostoreFileSystem },
+): ReplaceFileCorruptionHandler<T> = ReplaceFileCorruptionHandler { exception ->
+    quarantineCorruptFile(producePath(), fileSystem())
+    throw exception
+}
 
 internal fun quarantineCorruptFile(path: Path, fileSystem: FileSystem? = kryptostoreFileSystem) {
     if (fileSystem == null || !fileSystem.exists(path)) return
@@ -60,11 +69,12 @@ internal fun quarantineCorruptFile(path: Path, fileSystem: FileSystem? = kryptos
     }
 }
 
-private fun associatedDataCandidates(associatedData: ByteArray, legacyAssociatedData: ByteArray?): List<ByteArray> = buildList {
-    add(associatedData)
-    legacyAssociatedData?.let { legacy ->
-        if (!legacy.contentEquals(associatedData)) add(legacy)
+private fun associatedDataCandidates(associatedData: ByteArray, legacyAssociatedData: ByteArray?): List<ByteArray> =
+    buildList {
+        add(associatedData)
+        legacyAssociatedData?.let { legacy ->
+            if (!legacy.contentEquals(associatedData)) add(legacy)
+        }
     }
-}
 
 private const val CORRUPT_SUFFIX = ".corrupt"

@@ -13,12 +13,17 @@ import java.io.ByteArrayOutputStream
 /**
  * Optional [Cipher] backed by Tink [StreamingAead] for large payloads (REQ-HRD-03).
  *
- * Compatible with the KryptoStore envelope when used from [EncryptedProtoSerializer] /
- * [EncryptedPreferencesSerializer]: the envelope still wraps the StreamingAead ciphertext.
+ * Compatible with the KryptoStore envelope when used from `EncryptedProtoSerializer` /
+ * `EncryptedPreferencesSerializer`: the envelope still wraps the StreamingAead ciphertext.
  *
- * Prefer the default [TinkCipher] / platform [Cipher] for small settings blobs.
+ * Prefer the default platform [Cipher] from [createPlatformCryptoStack] for settings blobs,
+ * which manages key persistence and rotation automatically. If you construct a [StreamingAeadCipher]
+ * for persistent stores, supply a [StreamingAead] primitive backed by a persisted `KeysetHandle`.
  */
-class StreamingAeadCipher(private val streamingAead: StreamingAead, private val dispatcher: CoroutineDispatcher = Dispatchers.Default) : Cipher {
+class StreamingAeadCipher(
+    private val streamingAead: StreamingAead,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) : Cipher {
     override suspend fun encrypt(message: ByteArray, associatedData: ByteArray?): ByteArray = withContext(dispatcher) {
         val out = ByteArrayOutputStream()
         streamingAead.newEncryptingStream(out, associatedData ?: ByteArray(0)).use { stream ->
@@ -37,7 +42,11 @@ class StreamingAeadCipher(private val streamingAead: StreamingAead, private val 
 }
 
 /**
- * Creates a standalone [StreamingAeadCipher] with AES256_GCM_HKDF_1MB (REQ-HRD-03).
+ * Creates a standalone, **in-memory** [StreamingAeadCipher] with `AES256_GCM_HKDF_1MB` (REQ-HRD-03).
+ *
+ * **Warning:** This helper generates a fresh ephemeral keyset in memory on every call. Do not pass it
+ * to a persistent `DataStore` across process restarts; for persistent stores, construct
+ * [StreamingAeadCipher] with a [StreamingAead] primitive loaded from a persisted Tink `KeysetHandle`.
  */
 fun createStreamingAeadCipher(dispatcher: CoroutineDispatcher = Dispatchers.Default): StreamingAeadCipher {
     StreamingAeadConfig.register()

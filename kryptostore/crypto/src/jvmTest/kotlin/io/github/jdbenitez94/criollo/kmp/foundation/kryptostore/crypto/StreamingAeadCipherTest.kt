@@ -2,11 +2,10 @@ package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto
 
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import strikt.api.expectThat
-import strikt.assertions.isEqualTo
-import strikt.assertions.isNotEqualTo
+import kotlin.test.assertContentEquals
+import kotlin.test.assertFalse
 
-/** REQ-HRD-03 */
+/** REQ-HRD-03 — Streaming AEAD round-trip (large payload). */
 class StreamingAeadCipherTest {
     @Test
     fun streamingAead_roundTripsLargePayload() = runTest {
@@ -15,9 +14,9 @@ class StreamingAeadCipherTest {
         val plain = ByteArray(256 * 1024) { (it % 251).toByte() }
 
         val encrypted = cipher.encrypt(plain, aad)
-        expectThat(encrypted).isNotEqualTo(plain)
+        assertFalse(encrypted.contentEquals(plain), "ciphertext must differ from plaintext")
 
         val decrypted = cipher.decrypt(encrypted, aad)
-        expectThat(decrypted.toList()).isEqualTo(plain.toList())
+        assertContentEquals(plain, decrypted)
     }
 }

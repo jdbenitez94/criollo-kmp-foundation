@@ -15,7 +15,13 @@
     "**/gradle/wrapper/**",
     "**/KoverAggregationConventionPlugin.kt",
     "**/KoverLibraryConventionPlugin.kt",
-    "**/TaskScopeLock.*.kt"
+    "**/TaskScopeLock.*.kt",
+    "**/jsMain/**/*Bindings.kt",
+    "**/wasmJsMain/**/*Bindings.kt",
+    "**/*.{web,nonWeb}.kt",
+    "**/PlatformCrypto.android.kt",
+    "**/PlatformCrypto.jvm.kt",
+    "**/TinkKeysetRotation.kt"
   ],
   "absolute": true,
   "gitignore": true

@@ -1,32 +1,33 @@
-@file:OptIn(ExperimentalEncodingApi::class, ExperimentalWasmJsInterop::class)
+@file:OptIn(ExperimentalWasmJsInterop::class)
 
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto
 
 import kotlinx.coroutines.await
 import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
 import kotlin.js.Promise
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-actual fun createPlatformCryptoStack(appId: String, @Suppress("UNUSED_PARAMETER") rotationConfig: KeyRotationConfig): PlatformCryptoStack {
-    // Web rotator is an honest no-op; KeyRotationConfig is ignored (REQ-ROT-05).
-    val keyAlias = "$appId.webcrypto.aes_gcm.v1"
+actual fun createPlatformCryptoStack(appId: String, rotationConfig: KeyRotationConfig): PlatformCryptoStack {
+    require(appId.isNotBlank()) { "WebCrypto appId cannot be blank." }
     return PlatformCryptoStack(
-        cipher = WebCryptoCipher(keyAlias),
-        keyRotator = WebCryptoKeyRotator(keyAlias),
-        postRotationInit = { ensureWebCryptoKey(keyAlias) },
+        cipher = WebCryptoCipher(appId),
+        keyRotator = WebCryptoKeyRotator(appId, rotationConfig),
+        postRotationInit = { ensureWebCryptoKeyring(appId) },
+        postMigrationCleanup = { deleteInactiveWebCryptoKeys(appId) },
     )
 }
 
-private class WebCryptoCipher(private val keyAlias: String) : Cipher {
+private class WebCryptoCipher(private val appId: String) : Cipher {
     override suspend fun encrypt(message: ByteArray, associatedData: ByteArray?): ByteArray {
         val plaintextBase64 = Base64.encode(message)
         val associatedDataBase64 = associatedData?.let(Base64::encode)
-        validateWebCryptoInput(keyAlias, plaintextBase64, associatedDataBase64)
+        validateWebCryptoInput(appId, plaintextBase64, associatedDataBase64)
         ensureWebCryptoHelpersInstalled()
         val ciphertext = CryptoBindings.encrypt(
-            keyAlias = keyAlias,
+            appId = appId,
             plaintextBase64 = plaintextBase64,
             associatedDataBase64 = associatedDataBase64,
         ).awaitString()
@@ -36,10 +37,10 @@ private class WebCryptoCipher(private val keyAlias: String) : Cipher {
     override suspend fun decrypt(message: ByteArray, associatedData: ByteArray?): ByteArray {
         val ciphertextBase64 = Base64.encode(message)
         val associatedDataBase64 = associatedData?.let(Base64::encode)
-        validateWebCryptoInput(keyAlias, ciphertextBase64, associatedDataBase64)
+        validateWebCryptoInput(appId, ciphertextBase64, associatedDataBase64)
         ensureWebCryptoHelpersInstalled()
         val plaintext = CryptoBindings.decrypt(
-            keyAlias = keyAlias,
+            appId = appId,
             ciphertextBase64 = ciphertextBase64,
             associatedDataBase64 = associatedDataBase64,
         ).awaitString()
@@ -47,10 +48,20 @@ private class WebCryptoCipher(private val keyAlias: String) : Cipher {
     }
 }
 
-private class WebCryptoKeyRotator(private val keyAlias: String) : KeyRotator {
+@OptIn(ExperimentalTime::class)
+private class WebCryptoKeyRotator(
+    private val appId: String,
+    private val rotationConfig: KeyRotationConfig,
+    private val nowMillis: () -> Long = { Clock.System.now().toEpochMilliseconds() },
+) : KeyRotator {
     override suspend fun rotateKeyIfNeeded(): Boolean {
-        ensureWebCryptoKey(keyAlias)
-        return false
+        ensureWebCryptoHelpersInstalled()
+        val result = CryptoBindings.rotateIfNeeded(
+            appId = appId,
+            periodMs = rotationConfig.rotationPeriod.inWholeMilliseconds.toDouble(),
+            nowMillis = nowMillis().toDouble(),
+        ).await()
+        return result.toString().equals("true", ignoreCase = true)
     }
 }
 
@@ -59,17 +70,29 @@ internal actual fun randomPlatformAesKey(): ByteArray = error("Raw WebCrypto key
 internal actual suspend fun aesGcmEncrypt(key: ByteArray, plaintext: ByteArray, associatedData: ByteArray?): ByteArray =
     error("Raw-key AES-GCM is disabled for web targets. Use WebCryptoCipher.")
 
-internal actual suspend fun aesGcmDecrypt(key: ByteArray, ciphertext: ByteArray, associatedData: ByteArray?): ByteArray =
-    error("Raw-key AES-GCM is disabled for web targets. Use WebCryptoCipher.")
+internal actual suspend fun aesGcmDecrypt(
+    key: ByteArray,
+    ciphertext: ByteArray,
+    associatedData: ByteArray?,
+): ByteArray = error("Raw-key AES-GCM is disabled for web targets. Use WebCryptoCipher.")
 
-private suspend fun ensureWebCryptoKey(keyAlias: String) {
-    require(keyAlias.isNotBlank()) { "WebCrypto key alias cannot be blank." }
+private suspend fun ensureWebCryptoKeyring(appId: String) {
+    require(appId.isNotBlank()) { "WebCrypto appId cannot be blank." }
     ensureWebCryptoHelpersInstalled()
-    CryptoBindings.ensureKey(keyAlias).await()
+    CryptoBindings.ensureKeyring(appId).await()
 }
 
-private fun validateWebCryptoInput(keyAlias: String, payloadBase64: String, associatedDataBase64: String?) {
-    require(keyAlias.isNotBlank()) { "WebCrypto key alias cannot be blank." }
+private suspend fun deleteInactiveWebCryptoKeys(appId: String) {
+    ensureWebCryptoHelpersInstalled()
+    val activeKeyId = CryptoBindings.getActiveKeyId(appId).awaitString()
+    val keyIdsJson = CryptoBindings.listKeyIds(appId).awaitString()
+    parseJsonStringArray(keyIdsJson)
+        .filter { it != activeKeyId }
+        .forEach { keyId -> CryptoBindings.deleteKey(appId, keyId).await() }
+}
+
+private fun validateWebCryptoInput(appId: String, payloadBase64: String, associatedDataBase64: String?) {
+    require(appId.isNotBlank()) { "WebCrypto appId cannot be blank." }
     require(payloadBase64.all(Char::isAscii)) { "WebCrypto payload must be Base64 ASCII." }
     require(associatedDataBase64 == null || associatedDataBase64.all(Char::isAscii)) {
         "Associated data must be Base64 ASCII."

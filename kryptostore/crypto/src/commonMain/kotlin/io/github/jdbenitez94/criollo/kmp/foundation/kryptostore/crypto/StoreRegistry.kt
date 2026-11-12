@@ -39,6 +39,9 @@ class StoreRegistry {
         }
     }
 
+    /**
+     * Removes [handle] from the registry if present.
+     */
     fun unregister(handle: EncryptedStoreHandle) {
         check(mutex.tryLock()) {
             "StoreRegistry.unregister contended; unregister outside of initialize()"
@@ -50,6 +53,9 @@ class StoreRegistry {
         }
     }
 
+    /**
+     * Sequentially invokes [EncryptedStoreHandle.reEncryptInPlace] on all registered handles.
+     */
     suspend fun reEncryptAll() {
         val snapshot = mutex.withLock { handles.toList() }
         for (handle in snapshot) {

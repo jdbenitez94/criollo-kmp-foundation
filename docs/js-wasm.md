@@ -1,5 +1,19 @@
 # JS / Wasm webpack notes
 
+## Kotlin/JS browser tests (kryptostore)
+
+Storage REQs (IndexedDB / localStorage) run under Karma + Chrome Headless:
+
+```bash
+# Use a host Node install (Gradle Node/Yarn download is disabled in RootPlugin —
+# PREFER_SETTINGS blocks Kotlin’s GitHub Yarn dist repo).
+corepack enable && corepack prepare yarn@1.22.22 --activate
+export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"  # macOS
+./gradlew kryptostoreJsBrowserTests
+```
+
+CI (`.github/workflows/ci.yml`) installs Node 24 + `google-chrome-stable` and runs the same task.
+
 ## `webpack.config.d/resolve-fallback.js`
 
 Modules that target **JS browser** and/or **WasmJS browser** may ship a `webpack.config.d/` directory.

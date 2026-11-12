@@ -5,6 +5,9 @@ import okio.Path
 /** AndroidX Preferences DataStore requires the `.preferences_pb` file extension (REQ-STO-07). */
 const val PREFERENCES_PB_EXTENSION = "preferences_pb"
 
+/**
+ * Validates that this [Path] ends with `.preferences_pb`, throwing [IllegalArgumentException] otherwise.
+ */
 fun Path.requirePreferencesPbExtension(): Path {
     val name = this.name
     require(name.endsWith(".$PREFERENCES_PB_EXTENSION")) {

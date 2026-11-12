@@ -23,18 +23,18 @@ console-reports:
 output-reports:
   active: true
 
-# Static analysis policy: KtLint (.editorconfig) and detekt-formatting share max_line_length=180.
-# Wrapping rules use the same threshold; comment/kdoc/filename stay off in both tools.
+# Static analysis policy: KtLint (.editorconfig) and detekt-formatting share max_line_length=120.
+# ParameterListWrapping / FunctionSignature wrap to one parameter per line when that limit is exceeded.
 formatting:
   active: true
   android: false
   ArgumentListWrapping:
     active: true
     indentSize: 4
-    maxLineLength: 180
+    maxLineLength: 120
   ChainWrapping:
     indentSize: 4
-    maxLineLength: 180
+    maxLineLength: 120
   CommentWrapping:
     active: false
   Filename:
@@ -43,24 +43,25 @@ formatting:
     active: false
   MaximumLineLength:
     active: true
-    maxLineLength: 180
+    maxLineLength: 120
     ignoreBackTickedIdentifier: true
   ModifierOrdering:
     active: true
   NoWildcardImports:
     active: true
   ParameterListWrapping:
+    active: true
     indentSize: 4
-    maxLineLength: 180
+    maxLineLength: 120
   ParameterWrapping:
     indentSize: 4
-    maxLineLength: 180
+    maxLineLength: 120
   PropertyWrapping:
     indentSize: 4
-    maxLineLength: 180
+    maxLineLength: 120
   Wrapping:
     indentSize: 4
-    maxLineLength: 180
+    maxLineLength: 120
 
 comments:
   active: true

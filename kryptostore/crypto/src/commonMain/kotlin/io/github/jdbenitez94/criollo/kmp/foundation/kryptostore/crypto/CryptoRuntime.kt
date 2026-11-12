@@ -14,7 +14,11 @@ import kotlinx.coroutines.sync.withLock
  * postMigrationCleanup → Ready (REQ-ROT-02). Re-encrypt runs before cleanup so old key
  * material can still decrypt existing ciphertext (notably iOS SecureKeyStore).
  */
-class CryptoRuntime(private val stack: PlatformCryptoStack, private val storeRegistry: StoreRegistry = StoreRegistry(), private val log: KryptoLog = KryptoLog.NoOp) {
+class CryptoRuntime(
+    private val stack: PlatformCryptoStack,
+    private val storeRegistry: StoreRegistry = StoreRegistry(),
+    private val log: KryptoLog = KryptoLog.NoOp,
+) {
     constructor(
         keyRotator: KeyRotator,
         postRotationInit: suspend () -> Unit,
@@ -33,6 +37,9 @@ class CryptoRuntime(private val stack: PlatformCryptoStack, private val storeReg
         log = log,
     )
 
+    /**
+     * Active [Cipher] from the underlying [PlatformCryptoStack]; use after [state] reaches [CryptoRuntimeState.Ready].
+     */
     val cipher: Cipher
         get() = stack.cipher
 
@@ -40,11 +47,20 @@ class CryptoRuntime(private val stack: PlatformCryptoStack, private val storeReg
     val registry: StoreRegistry
         get() = storeRegistry
 
+    /**
+     * Observable initialization state ([CryptoRuntimeState.Initializing], [CryptoRuntimeState.Ready],
+     * or [CryptoRuntimeState.Error]).
+     */
     val state: StateFlow<CryptoRuntimeState>
         field = MutableStateFlow<CryptoRuntimeState>(CryptoRuntimeState.Initializing)
 
     private val initializeMutex = Mutex()
 
+    /**
+     * Runs key rotation, post-rotation initialization, store re-encryption, and key cleanup.
+     *
+     * Idempotent once [CryptoRuntimeState.Ready]; retries if the previous attempt ended in [CryptoRuntimeState.Error].
+     */
     suspend fun initialize() {
         initializeMutex.withLock {
             if (state.value == CryptoRuntimeState.Ready) return
