@@ -1,6 +1,7 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.buildlogic
 
 import org.gradle.api.Project
+import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -33,6 +34,10 @@ object KlibModuleNaming {
 
     fun configureUniqueModuleName(project: Project) {
         val baseModuleName = project.uniqueKlibModuleName()
+        project.pluginManager.apply("base")
+        project.extensions.configure<BasePluginExtension> {
+            archivesName.set(baseModuleName)
+        }
         project.extensions.configure<KotlinMultiplatformExtension> {
             targets.configureEach {
                 if (name in jsWasmTargets) return@configureEach
