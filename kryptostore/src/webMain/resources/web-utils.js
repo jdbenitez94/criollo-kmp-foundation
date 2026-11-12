@@ -1,6 +1,4 @@
-type IdbUpgradeHandler = (db: IDBDatabase) => void;
-
-function base64ToBytes(base64: string): Uint8Array {
+function base64ToBytes(base64) {
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
     for (let index = 0; index < binary.length; index += 1) {
@@ -9,7 +7,7 @@ function base64ToBytes(base64: string): Uint8Array {
     return bytes;
 }
 
-function bytesToBase64(bytes: Uint8Array): string {
+function bytesToBase64(bytes) {
     let binary = '';
     for (let index = 0; index < bytes.length; index += 1) {
         binary += String.fromCharCode(bytes[index]);
@@ -17,13 +15,7 @@ function bytesToBase64(bytes: Uint8Array): string {
     return btoa(binary);
 }
 
-function openDb(
-    databaseName: string,
-    version: number,
-    storeName: string,
-    keyPath: string,
-    onUpgrade?: IdbUpgradeHandler,
-): Promise<IDBDatabase> {
+function openDb(databaseName, version, storeName, keyPath, onUpgrade) {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(databaseName, version);
         request.onupgradeneeded = () => {
@@ -31,7 +23,9 @@ function openDb(
             if (!db.objectStoreNames.contains(storeName)) {
                 db.createObjectStore(storeName, { keyPath });
             }
-            onUpgrade?.(db);
+            if (onUpgrade) {
+                onUpgrade(db);
+            }
         };
         request.onsuccess = () => {
             resolve(request.result);
@@ -42,7 +36,7 @@ function openDb(
     });
 }
 
-function idbGet(db: IDBDatabase, storeName: string, key: string): Promise<unknown | null> {
+function idbGet(db, storeName, key) {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(storeName, 'readonly');
         const request = transaction.objectStore(storeName).get(key);
@@ -55,7 +49,7 @@ function idbGet(db: IDBDatabase, storeName: string, key: string): Promise<unknow
     });
 }
 
-function idbPut(db: IDBDatabase, storeName: string, value: unknown): Promise<boolean> {
+function idbPut(db, storeName, value) {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(storeName, 'readwrite');
         transaction.oncomplete = () => {
@@ -68,12 +62,10 @@ function idbPut(db: IDBDatabase, storeName: string, value: unknown): Promise<boo
     });
 }
 
-const webUtils = {
+module.exports = {
     base64ToBytes,
     bytesToBase64,
     openDb,
     idbGet,
     idbPut,
 };
-
-export = webUtils;

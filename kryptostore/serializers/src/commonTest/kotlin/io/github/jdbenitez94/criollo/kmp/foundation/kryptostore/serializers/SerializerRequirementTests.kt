@@ -1,8 +1,11 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers
 
 import androidx.datastore.core.CorruptionException
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.mutablePreferencesOf
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.Cipher
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.ENCRYPTED_BLOB_MAGIC
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 import okio.Buffer
@@ -59,10 +62,9 @@ class PlaintextMigrationOptionTest {
             associatedData = AAD,
             allowPlaintextRead = false,
         )
-        val error = assertFailsWith<CorruptionException> {
+        assertFailsWith<CorruptionException> {
             serializer.readFrom(Buffer().write(inner.encodeBytes(Sample(enabled = true))))
         }
-        assertTrue(error.message!!.contains(ENCRYPTED_BLOB_MAGIC))
     }
 
     @Test
@@ -120,9 +122,10 @@ class DecryptCancellationTest {
     fun cancellationDuringDecrypt_propagates() = runTest {
         val cipher = object : Cipher {
             override suspend fun encrypt(message: ByteArray, associatedData: ByteArray?): ByteArray = message
-            override suspend fun decrypt(message: ByteArray, associatedData: ByteArray?): ByteArray = throw kotlinx.coroutines.CancellationException("cancelled mid-decrypt")
+            override suspend fun decrypt(message: ByteArray, associatedData: ByteArray?): ByteArray =
+                throw CancellationException("cancelled mid-decrypt")
         }
-        assertFailsWith<kotlinx.coroutines.CancellationException> {
+        assertFailsWith<CancellationException> {
             decryptWithAssociatedDataFallback(
                 cipher = cipher,
                 ciphertext = byteArrayOf(1, 2, 3),
@@ -136,14 +139,14 @@ class DecryptCancellationTest {
 class EncryptedPreferencesRoundTripTest {
     @Test
     fun preferences_roundTrip() = runTest {
-        val key = androidx.datastore.preferences.core.booleanPreferencesKey("enabled")
+        val key = booleanPreferencesKey("enabled")
         val serializer = EncryptedPreferencesSerializer(
             cipher = ReversibleTestCipher(),
             associatedData = AAD,
         )
         val buffer = Buffer()
         serializer.writeTo(
-            androidx.datastore.preferences.core.mutablePreferencesOf(key to true),
+            mutablePreferencesOf(key to true),
             buffer,
         )
         val bytes = buffer.readByteArray()

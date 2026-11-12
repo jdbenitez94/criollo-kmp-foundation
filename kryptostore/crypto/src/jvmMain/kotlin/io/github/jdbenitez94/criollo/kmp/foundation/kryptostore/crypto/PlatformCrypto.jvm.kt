@@ -14,7 +14,10 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-internal fun createJvmTinkStack(appId: String, rotationConfig: KeyRotationConfig = KeyRotationConfig.DEFAULT): PlatformCryptoStack {
+internal fun createJvmTinkStack(
+    appId: String,
+    rotationConfig: KeyRotationConfig = KeyRotationConfig.DEFAULT,
+): PlatformCryptoStack {
     AeadConfig.register()
     val baseDir = File(System.getProperty("user.home"), ".kryptostore/$appId").apply {
         mkdirs()
@@ -46,7 +49,12 @@ internal fun createJvmTinkStack(appId: String, rotationConfig: KeyRotationConfig
     )
 }
 
-private fun loadOrCreateJvmKeyset(keysetFile: File, rotationFile: File, masterAead: Aead, associatedData: ByteArray): KeysetHandle {
+private fun loadOrCreateJvmKeyset(
+    keysetFile: File,
+    rotationFile: File,
+    masterAead: Aead,
+    associatedData: ByteArray,
+): KeysetHandle {
     if (keysetFile.exists() && keysetFile.length() > 0) {
         val serialized = keysetFile.readBytes()
         return TinkProtoKeysetFormat.parseEncryptedKeyset(serialized, masterAead, associatedData)
@@ -95,7 +103,8 @@ private class JvmTimeBasedKeyRotator(
     }
 }
 
-actual fun createPlatformCryptoStack(appId: String, rotationConfig: KeyRotationConfig): PlatformCryptoStack = createJvmTinkStack(appId, rotationConfig)
+actual fun createPlatformCryptoStack(appId: String, rotationConfig: KeyRotationConfig): PlatformCryptoStack =
+    createJvmTinkStack(appId, rotationConfig)
 
 private val posixDirectoryPermissions = EnumSet.of(
     PosixFilePermission.OWNER_READ,

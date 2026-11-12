@@ -4,27 +4,28 @@
 
 ### Features
 
-* **testing:** add `testing` artifact with JUnit 5 `MainTestDispatcherExtension`
-* **build:** adopt JUnit 5 + `@Nested` for JVM tests (`convention.junit5`, aligned with saveable)
-* **result:** add Flow `Result` triad (`Loading` / `Success` / `Error`) and `asResult()`
-* **runtime:** add `retryWithBackoff` with exponential backoff, jitter, and `RetryPolicy`
-* **runtime:** add `runCatchingCancellable` / `suspendRunCatchingCancellable` and cancellation-safe `Result` extensions
-* **runtime:** align Error wrapping, harden `RetryPolicy` equality, expand coverage tests
-* **result:** rethrow `CancellationException` explicitly from `asResult()`
-* **kryptostore:** add `kryptostore-crypto` module (Phase A extract from saveable)
-* **kryptostore:** add `kryptostore-serializers` with envelope + fail-closed (Phase B)
-* **kryptostore:** add core factories + IndexedDB storage (Phase C)
-* **kryptostore:** add `kryptostore-preferences` encrypted + plain prefs (Phase D)
-* **kryptostore:** StoreRegistry re-encrypt, `kryptostore-android` delegates, StreamingAead (Phase E)
-* **kryptostore:** BOM DataStore/Tink constraints, migrate-android, compat fixtures, ABI dumps (Phase F)
-* **kryptostore:** publish DX artifact as `kryptostore-android-delegates` (avoid clash with KMP `*-android` target)
-* **kryptostore:** Phase G — saveable dogfoods kryptostore (crypto/serializers/core); CRYPTO_KMP.md corrected
+* **kryptostore:** add `StoreLocator` (`Platform`, `File`, `Named`), `KryptostorePaths`, and Web multi-key keyring rotation (#48)
+* **kryptostore:** unify `KryptostoreAndroid.initialize(context)` to register both `AndroidCryptoContextHolder` and `KryptostorePaths`
+* **kryptostore:** apply `StoreLocator.Platform` default store name consistently across file and web targets
+
+### Bug Fixes
+
+* **kryptostore:** scope `WebIndexedDbLockRegistry` reentrancy to the current coroutine context instead of a shared counter
+* **kryptostore:** keep `ByteArray` pinned across `SecRandomCopyBytes` and reject unknown non-legacy key IDs on iOS
+* **kryptostore:** deduplicate concurrent `ensureKeyring` calls per `appId` in the WebCrypto worker
 
 ## [0.2.0](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.9...v0.2.0) (2026-08-23)
 
 ### Features
 
 * publish kryptostore, result, runtime, and testing ([5ee3365](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/5ee3365b07fe739f73d4cb0643ca89b7fb7c9b4f))
+* **testing:** add `testing` artifact with JUnit 5 `MainTestDispatcherExtension`
+* **build:** adopt JUnit 5 + `@Nested` for JVM tests (`convention.junit5`, aligned with saveable)
+* **result:** add Flow `Result` triad (`Loading` / `Success` / `Error`) and `asResult()` (rethrowing `CancellationException`)
+* **runtime:** add `retryWithBackoff` with exponential backoff, jitter, `RetryPolicy`, and `runCatchingCancellable` / `suspendRunCatchingCancellable`
+* **kryptostore:** add `kryptostore-crypto`, `kryptostore-serializers`,
+  `kryptostore`, `kryptostore-preferences`, `kryptostore-android-delegates`,
+  and `kryptostore-migrate-android` (Phases A–G)
 
 ## [0.1.9](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.8...v0.1.9) (2026-08-22)
 

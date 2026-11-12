@@ -6,11 +6,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.createEncryptedProtoDataStore
+import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.createPlainProtoDataStore
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.Cipher
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.StoreRegistry
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.preferences.createEncryptedPreferencesDataStore
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.preferences.createPlainPreferencesDataStore
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.EncryptedStoreOptions
+import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.StoreLocator
 import kotlinx.serialization.KSerializer
 import okio.Path.Companion.toPath
 import kotlin.properties.ReadOnlyProperty
@@ -19,6 +21,7 @@ import kotlin.reflect.KProperty
 /**
  * Singleton encrypted proto [DataStore] per [fileName] (REQ-AND-01).
  *
+ * Builds [StoreLocator.Platform] with an app-files path and [fileName] as the web store id.
  * Never constructs EncryptedFile / MasterKeys (REQ-AND-04).
  */
 fun <T : Any> encryptedProtoDataStore(
@@ -36,7 +39,10 @@ fun <T : Any> encryptedProtoDataStore(
         cipher = cipher(),
         kSerializer = kSerializer,
         defaultValue = defaultValue,
-        producePath = { context.kryptostoreFile(fileName) },
+        locator = StoreLocator.platform(
+            producePath = { context.kryptostoreFile(fileName) },
+            name = fileName,
+        ),
         options = opts,
         migrations = produceMigrations(context),
         corruptionHandler = corruptionHandler,
@@ -46,7 +52,7 @@ fun <T : Any> encryptedProtoDataStore(
 
 /**
  * Singleton encrypted Preferences [DataStore] (REQ-AND-02).
- * File is stored as `{name}.preferences_pb`.
+ * File is stored as `{name}.preferences_pb`; [name] is the web/localStorage id.
  */
 fun encryptedPreferencesDataStore(
     name: String,
@@ -61,7 +67,10 @@ fun encryptedPreferencesDataStore(
         val opts = EncryptedStoreOptions().apply(options)
         createEncryptedPreferencesDataStore(
             cipher = cipher(),
-            producePath = { context.kryptostoreFile(fileName) },
+            locator = StoreLocator.platform(
+                producePath = { context.kryptostoreFile(fileName) },
+                name = name,
+            ),
             options = opts,
             migrations = produceMigrations(context),
             corruptionHandler = corruptionHandler,
@@ -81,16 +90,44 @@ fun plainPreferencesDataStore(
     val fileName = "$name.preferences_pb"
     return ContextDataStoreSingleton(fileName) { context ->
         createPlainPreferencesDataStore(
-            producePath = { context.kryptostoreFile(fileName) },
+            locator = StoreLocator.platform(
+                producePath = { context.kryptostoreFile(fileName) },
+                name = name,
+            ),
             migrations = produceMigrations(context),
             corruptionHandler = corruptionHandler,
         )
     }
 }
 
-internal fun Context.kryptostoreFile(fileName: String) = applicationContext.filesDir.resolve("datastore").resolve(fileName).absolutePath.toPath()
+/**
+ * Singleton plain proto [DataStore] for non-sensitive typed settings.
+ * [fileName] is both the on-disk file and the web store id.
+ */
+fun <T : Any> plainProtoDataStore(
+    fileName: String,
+    kSerializer: KSerializer<T>,
+    defaultValue: T,
+    produceMigrations: (Context) -> List<DataMigration<T>> = { emptyList() },
+    corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
+): ReadOnlyProperty<Context, DataStore<T>> = ContextDataStoreSingleton(fileName) { context ->
+    createPlainProtoDataStore(
+        kSerializer = kSerializer,
+        defaultValue = defaultValue,
+        locator = StoreLocator.platform(
+            producePath = { context.kryptostoreFile(fileName) },
+            name = fileName,
+        ),
+        migrations = produceMigrations(context),
+        corruptionHandler = corruptionHandler,
+    )
+}
 
-internal class ContextDataStoreSingleton<T>(private val key: String, private val create: (Context) -> DataStore<T>) : ReadOnlyProperty<Context, DataStore<T>> {
+internal fun Context.kryptostoreFile(fileName: String) =
+    applicationContext.filesDir.resolve("datastore").resolve(fileName).absolutePath.toPath()
+
+internal class ContextDataStoreSingleton<T>(private val key: String, private val create: (Context) -> DataStore<T>) :
+    ReadOnlyProperty<Context, DataStore<T>> {
     private val lock = Any()
 
     @Volatile

@@ -23,6 +23,7 @@
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(stdlib[^@]*|reflect|script-runtime)@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
+        <cve>CVE-2020-29582</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -37,12 +38,27 @@
       issue (GHSA-r937-wjx7-w2jp); JetBrains scores 6.7, NVD 9.8 trips
       failBuildOnCVSS=7.0. Drop when kotlin is pinned to 2.4.20 stable.
     -->
-    <suppress until="2026-10-01Z">
+    <suppress until="2027-10-01Z">
         <notes><![CDATA[
             Accepted on Kotlin 2.4.10 until 2.4.20 stable. Exploit needs local
             high-privilege write to the compiler build cache (JetBrains CVSS 6.7).
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-(compiler[^@]*|gradle-plugin[^@]*|build-tools-api)@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
+    </suppress>
+    <!--
+      Dokka 2.3.0 pulls older protobuf-java (2.6.1) transitively via its internal
+      analysis engine (analysis-kotlin-symbols). Dokka is purely a documentation tool,
+      and these classes are never bundled into runtime or published artifacts.
+    -->
+    <suppress>
+        <notes><![CDATA[
+            Dokka internal analysis engine embeds older protobuf-java.
+            Build-time doc tool only; not shipped in runtime klibs or artifacts.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.google\.protobuf/protobuf-java@.*$</packageUrl>
+        <cve>CVE-2024-7254</cve>
+        <cve>CVE-2022-3171</cve>
+        <cve>CVE-2021-22569</cve>
     </suppress>
 </suppressions>

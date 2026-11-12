@@ -15,8 +15,14 @@ import okio.BufferedSink
 import okio.BufferedSource
 import okio.IOException
 
+/**
+ * Unencrypted [OkioSerializer] backed by `kotlinx-serialization-protobuf` [ProtoBuf].
+ *
+ * Throws [CorruptionException] when protobuf decoding or disk I/O fails.
+ */
 @OptIn(ExperimentalSerializationApi::class)
-class ProtoOkioSerializer<T : Any>(private val kSerializer: KSerializer<T>, override val defaultValue: T) : OkioSerializer<T> {
+class ProtoOkioSerializer<T : Any>(private val kSerializer: KSerializer<T>, override val defaultValue: T) :
+    OkioSerializer<T> {
     override suspend fun readFrom(source: BufferedSource): T = try {
         val bytes = source.readByteArray()
         if (bytes.isEmpty()) {
@@ -39,6 +45,12 @@ class ProtoOkioSerializer<T : Any>(private val kSerializer: KSerializer<T>, over
     fun decodeBytes(bytes: ByteArray): T = ProtoBuf.decodeFromByteArray(kSerializer, bytes)
 }
 
+/**
+ * AEAD-encrypted [OkioSerializer] wrapping [ProtoOkioSerializer] with the `SVBLENC1` v1 envelope.
+ *
+ * Fails closed with [CorruptionException] on unencrypted payloads unless
+ * [EncryptedStoreOptions.allowPlaintextRead] is explicitly enabled for migration.
+ */
 class EncryptedProtoSerializer<T : Any>(
     private val inner: ProtoOkioSerializer<T>,
     private val cipher: Cipher,
@@ -68,14 +80,12 @@ class EncryptedProtoSerializer<T : Any>(
 
     override suspend fun readFrom(source: BufferedSource): T {
         val bytes = source.readByteArray()
-        if (bytes.isEmpty()) return defaultValue
-        if (!bytes.startsWithEncryptedBlobMagic()) {
-            if (options.allowPlaintextRead) {
-                return inner.decodeBytes(bytes)
-            }
-            rejectPlaintextPayload()
+        return when {
+            bytes.isEmpty() -> defaultValue
+            bytes.startsWithEncryptedBlobMagic() -> readEncryptedProto(bytes)
+            options.allowPlaintextRead -> inner.decodeBytes(bytes)
+            else -> rejectPlaintextPayload()
         }
-        return readEncryptedProto(bytes)
     }
 
     override suspend fun writeTo(t: T, sink: BufferedSink) {
@@ -102,10 +112,16 @@ class EncryptedProtoSerializer<T : Any>(
     }
 }
 
-/** Migration alias — prefer [EncryptedProtoSerializer]. */
-typealias EncryptedOkioSerializer<T> = EncryptedProtoSerializer<T>
-
-class EncryptedPreferencesSerializer(private val cipher: Cipher, private val options: EncryptedStoreOptions = EncryptedStoreOptions()) : OkioSerializer<Preferences> {
+/**
+ * AEAD-encrypted [OkioSerializer] for AndroidX [Preferences] using the `SVBLENC1` v1 envelope.
+ *
+ * Fails closed with [CorruptionException] on unencrypted payloads unless
+ * [EncryptedStoreOptions.allowPlaintextRead] is explicitly enabled for migration.
+ */
+class EncryptedPreferencesSerializer(
+    private val cipher: Cipher,
+    private val options: EncryptedStoreOptions = EncryptedStoreOptions(),
+) : OkioSerializer<Preferences> {
     constructor(
         cipher: Cipher,
         associatedData: ByteArray,
@@ -130,15 +146,16 @@ class EncryptedPreferencesSerializer(private val cipher: Cipher, private val opt
 
     override suspend fun readFrom(source: BufferedSource): Preferences {
         val bytes = source.readByteArray()
-        if (bytes.isEmpty()) return defaultValue
-        if (!bytes.startsWithEncryptedBlobMagic()) {
-            if (options.allowPlaintextRead) {
-                return inner.readFrom(Buffer().write(bytes))
-            }
-            rejectPlaintextPayload()
+        return when {
+            bytes.isEmpty() -> defaultValue
+
+            bytes.startsWithEncryptedBlobMagic() ->
+                inner.readFrom(Buffer().write(decryptEnvelope(bytes)))
+
+            options.allowPlaintextRead -> inner.readFrom(Buffer().write(bytes))
+
+            else -> rejectPlaintextPayload()
         }
-        val payload = decryptEnvelope(bytes)
-        return inner.readFrom(Buffer().write(payload))
     }
 
     override suspend fun writeTo(t: Preferences, sink: BufferedSink) {

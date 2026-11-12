@@ -14,9 +14,6 @@ kotlin {
         }
         androidMain {
             dependsOn(jvmAndAndroidMain)
-            dependencies {
-                implementation(libs.org.jetbrains.kotlinx.coroutines.core)
-            }
         }
         jvmMain {
             dependsOn(jvmAndAndroidMain)
@@ -29,18 +26,10 @@ kotlin {
             api(libs.androidx.datastore.core.okio)
             api(libs.androidx.datastore.preferences.core)
             implementation(libs.org.jetbrains.kotlinx.serialization.protobuf)
-            implementation(libs.org.jetbrains.kotlinx.coroutines.core)
-        }
-        jvmTest.dependencies {
-            implementation(project.dependencies.platform(libs.io.strikt.bom))
-            implementation(libs.io.strikt.core)
         }
         named("androidHostTest") {
             dependencies {
-                implementation(libs.org.jetbrains.kotlinx.coroutines.test)
                 implementation(libs.org.jetbrains.kotlinx.serialization.protobuf)
-                implementation(project.dependencies.platform(libs.io.strikt.bom))
-                implementation(libs.io.strikt.core)
             }
         }
     }

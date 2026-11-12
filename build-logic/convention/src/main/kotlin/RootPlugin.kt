@@ -1,15 +1,22 @@
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.ProjectConfig
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.configureXcodeAvailability
-import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloBooleanProperty
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.criolloResolvedVersion
 import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.libsVersion
+import io.github.jdbenitez94.criollo.kmp.foundation.buildlogic.localProperty
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.the
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin
+import org.jetbrains.kotlin.gradle.targets.js.npm.tasks.RootPackageJsonTask
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec
 
 class RootPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -23,6 +30,16 @@ class RootPlugin : Plugin<Project> {
         target.allprojects {
             group = ProjectConfig.group
             version = resolvedVersion
+        }
+
+        // Prefer host Node/Yarn (CI/local) — avoid Maven Central org.nodejs / com.yarnpkg resolution failures.
+        target.allprojects {
+            plugins.withType<NodeJsPlugin> {
+                the<NodeJsEnvSpec>().download.set(false)
+            }
+            plugins.withType<YarnPlugin> {
+                the<YarnRootEnvSpec>().download.set(false)
+            }
         }
 
         // Apply Detekt on root first so convention.ktlint can detect the Detekt 2 line
@@ -65,10 +82,25 @@ class RootPlugin : Plugin<Project> {
         target.registerRootVerificationTasks(installGitHooks)
         target.registerRootAggregatorTasks()
         target.registerLocalCloudParityTask()
+        target.preRealizeRootPackageJsonTasks()
 
         // JUnit Platform is configured by convention.junit5 on library / JVM modules.
 
         target.libsVersion("kotlin")
+    }
+
+    /**
+     * KGP's `:rootPackageJson` / `:wasmRootPackageJson` configure blocks iterate `allprojects`
+     * `TaskContainer`s without acquiring subproject model locks (KT-48241). When IntelliJ's
+     * `GradleTaskWarmUpService` runs in parallel across projects (`org.gradle.tooling.parallel=true`),
+     * realizing `RootPackageJsonTask` on the root thread races with subproject warm-up threads
+     * mutating their `TaskContainer` `TreeSet`, throwing `ConcurrentModificationException`.
+     * Realizing `RootPackageJsonTask` single-threaded after project evaluation prevents the race.
+     */
+    private fun Project.preRealizeRootPackageJsonTasks() {
+        gradle.projectsEvaluated {
+            tasks.withType<RootPackageJsonTask>().forEach { _ -> }
+        }
     }
 
     private fun Project.configureExpectActualClasses() {
@@ -141,13 +173,13 @@ class RootPlugin : Plugin<Project> {
     }
 
     private fun Project.registerLocalCloudParityTask() {
-        val coverageEnabled = criolloBooleanProperty("localCloudParity.coverage")
+        val coverageEnabled = localProperty("localCloudParity.coverage", false)
         val localCloudParity = tasks.register<LocalCloudParityTask>("localCloudParity") {
             group = "verification"
             description =
                 "Optional local cloud parity: markdownlint + jscpd; with -PlocalCloudParity.coverage=true " +
-                    "also runs tests + koverXmlReport and best-effort Codecov/Codacy uploads. " +
-                    "Complexity: use detekt / qualityCheck."
+                "also runs tests + koverXmlReport and best-effort Codecov/Codacy uploads. " +
+                "Complexity: use detekt / qualityCheck."
             rootDirProperty.set(layout.projectDirectory)
             codecovSlug.set("jdbenitez94/criollo-kmp-foundation")
             runCoverageUploads.set(coverageEnabled)
@@ -186,6 +218,17 @@ class RootPlugin : Plugin<Project> {
                 ":kryptostore:android:jvmTest",
                 ":kryptostore:migrate-android:jvmTest",
                 ":testing:test",
+            )
+        }
+
+        tasks.register("kryptostoreJsBrowserTests") {
+            group = "verification"
+            description =
+                "Runs kryptostore JS browser tests (IndexedDB / localStorage / WebCrypto; REQ-STO-02..04, REQ-ROT-05)."
+            dependsOn(
+                ":kryptostore:jsBrowserTest",
+                ":kryptostore:preferences:jsBrowserTest",
+                ":kryptostore:crypto:jsBrowserTest",
             )
         }
 

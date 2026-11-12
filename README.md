@@ -23,25 +23,25 @@ land in this monorepo over time.
 
 ## Artifacts
 
-| Artifact | Maven name | Gradle project | Required? | Role |
-| ---------- | ------------ | ---------------- | ----------- | ------ |
-| Bill of Materials (BOM) | `bom` | `:bom` | Recommended | Aligns versions of all foundation modules |
-| Core | `coroutines` | `:coroutines` | **Yes** | `TaskScope` registry (`TaskKey`, `TaskPolicy`, …) |
-| ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | Optional | `by taskScope()` on `ViewModel` |
-| Compose | `coroutines-compose` | `:coroutines:compose` | Optional | `rememberTaskScope()` in Composables |
-| Result | `result` | `:result` | Optional | Flow `Result` triad (`Loading` / `Success` / `Error`) + `asResult()` |
-| Runtime | `runtime` | `:runtime` | Optional | `retryWithBackoff` (exponential backoff + jitter) |
-| Tooling | `project-conventions` | `:project-conventions` | Optional | Gradle plugin to sync `.editorconfig` + Detekt configs |
-| Crypto (KryptoStore) | `kryptostore-crypto` | `:kryptostore:crypto` | Optional | Platform crypto for encrypted DataStore (Tink / Keystore / WebCrypto) |
-| Serializers (KryptoStore) | `kryptostore-serializers` | `:kryptostore:serializers` | Optional | Encrypted Okio envelope serializers + fail-closed corruption handler |
-| Core (KryptoStore) | `kryptostore` | `:kryptostore` | Optional | Encrypted typed DataStore factories + IndexedDB storage |
-| Preferences (KryptoStore) | `kryptostore-preferences` | `:kryptostore:preferences` | Optional | Encrypted + plain Preferences DataStore factories |
-| Android DX (KryptoStore) | `kryptostore-android-delegates` | `:kryptostore:android` | Optional | `Context` property delegates for encrypted/plain stores |
-| Migrate Android (KryptoStore) | `kryptostore-migrate-android` | `:kryptostore:migrate-android` | Optional | Unenveloped AEAD migration helpers |
-| Testing | `testing` | `:testing` | Optional | JUnit 5 helpers (`MainTestDispatcherExtension`) |
+| Artifact | Maven name | Gradle project | Role |
+| ---------- | ------------ | ---------------- | ------ |
+| Bill of Materials (BOM) | `bom` | `:bom` | Aligns versions of all foundation modules |
+| Core | `coroutines` | `:coroutines` | `TaskScope` registry (`TaskKey`, `TaskPolicy`, …) |
+| ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | `by taskScope()` on `ViewModel` |
+| Compose | `coroutines-compose` | `:coroutines:compose` | `rememberTaskScope()` in Composables |
+| Result | `result` | `:result` | Flow `Result` triad (`Loading` / `Success` / `Error`) + `asResult()` |
+| Runtime | `runtime` | `:runtime` | `retryWithBackoff` (exponential backoff + jitter) |
+| Tooling | `project-conventions` | `:project-conventions` | Gradle plugin to sync `.editorconfig` + Detekt configs |
+| Crypto (KryptoStore) | `kryptostore-crypto` | `:kryptostore:crypto` | Platform crypto for encrypted DataStore (Tink / Keystore / WebCrypto) |
+| Serializers (KryptoStore) | `kryptostore-serializers` | `:kryptostore:serializers` | Encrypted Okio envelope serializers + fail-closed corruption handler |
+| Core (KryptoStore) | `kryptostore` | `:kryptostore` | Encrypted typed DataStore factories + IndexedDB storage |
+| Preferences (KryptoStore) | `kryptostore-preferences` | `:kryptostore:preferences` | Encrypted + plain Preferences DataStore factories |
+| Android DX (KryptoStore) | `kryptostore-android-delegates` | `:kryptostore:android` | `Context` property delegates for encrypted/plain stores |
+| Migrate Android (KryptoStore) | `kryptostore-migrate-android` | `:kryptostore:migrate-android` | Unenveloped AEAD migration helpers |
+| Testing | `testing` | `:testing` | JUnit 5 helpers (`MainTestDispatcherExtension`) |
 
-Only `coroutines` is required. Pick ViewModel and/or Compose adapters when you want the convenience
-APIs; you can also construct `TaskScope(coroutineScope)` yourself.
+All artifacts are optional—add only what you use. For `TaskScope`, pick ViewModel and/or Compose
+adapters when you want the convenience APIs, or construct `TaskScope(coroutineScope)` yourself.
 
 Packages: `…foundation.coroutines` (+ `.viewmodel` / `.compose`);
 `…foundation.result`; `…foundation.runtime`;
@@ -157,20 +157,40 @@ dependencies {
 }
 ```
 
-**JVM / Android / iOS (file):** initialize crypto, then create an encrypted proto store:
+**All targets — one factory + StoreLocator + KryptostorePaths**
+([StoreLocator](kryptostore/serializers/src/commonMain/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator.kt),
+[KryptostorePaths](kryptostore/serializers/src/commonMain/kotlin/io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/KryptostorePaths.kt)):
 
 ```kotlin
 val stack = createPlatformCryptoStack("my.app")
 val runtime = CryptoRuntime(stack)
-runtime.initialize() // Ready before use
+runtime.initialize() // Ready before encrypted use
+
+// Android commonMain callers: call KryptostoreAndroid.initialize(context) once in Application.onCreate
+// (initializes both AndroidCryptoContextHolder and KryptostorePaths)
 val store = createEncryptedProtoDataStore(
     cipher = runtime.cipher,
     kSerializer = Settings.serializer(),
     defaultValue = Settings(),
-    producePath = { path },
+    locator = StoreLocator.platform(
+        producePath = { KryptostorePaths.file("settings.pb") },
+        name = "settings",
+    ),
     registry = runtime.registry,
 )
+
+val plain = createPlainProtoDataStore(
+    kSerializer = UiSettings.serializer(),
+    defaultValue = UiSettings(),
+    locator = StoreLocator.platform(
+        producePath = { KryptostorePaths.file("ui-settings.pb") },
+        name = "ui-settings",
+    ),
+)
 ```
+
+On JS/Wasm, `Platform` uses `name` (IndexedDB / localStorage); `KryptostorePaths.file` is not used.
+`producePath = { … }` remains a file-only convenience. `StoreLocator.file` / `StoreLocator.named` are escape hatches.
 
 **Android delegates:**
 
@@ -184,26 +204,28 @@ val Context.settings by encryptedProtoDataStore(
 )
 ```
 
-**Web:** typed store → IndexedDB (`createEncryptedProtoDataStoreIndexedDb`); prefs → localStorage
-(`createEncryptedPreferencesDataStoreLocalStorage` / plain variant). Keys stay in IndexedDB (`app-crypto`).
+Crypto keys on web stay in IndexedDB (`app-crypto`), not localStorage. Note: the foundation BOM
+aligns `androidx.datastore` to `1.3.0-alpha10` (multiplatform `core-okio` / `preferences-core` + web
+storage support).
 
 Migration guides: [kryptostore-migration.md](docs/kryptostore-migration.md). Crypto notes:
-[kryptostore-crypto.md](docs/kryptostore-crypto.md).
+[kryptostore-crypto.md](docs/kryptostore-crypto.md). Saveable dogfood:
+[kryptostore-dogfood-saveable.md](docs/kryptostore-dogfood-saveable.md).
 
 ## Docs
 
 Site (MkDocs + Dokka API HTML): [jdbenitez94.github.io/criollo-kmp-foundation](https://jdbenitez94.github.io/criollo-kmp-foundation/).
 
-- [Managed tasks (`TaskScope`)](docs/managed-tasks.md) — policies, adapters, anti-patterns
-- [Project conventions](docs/project-conventions.md) — sync shared style configs into consumer repos
-- [Contributing](docs/contributing.md) — git hooks and local quality gate
-- [Commit conventions](docs/commit-conventions.md) — Conventional Commits types/scopes
-- [JS / Wasm webpack notes](docs/js-wasm.md) — `webpack.config.d` fallbacks
-- [Adding a module](docs/adding-a-module.md) — checklist for new artifacts in this repo
-- [Publishing](docs/publishing.md)
-- [KryptoStore spec](docs/spec-final-kryptostore.md) — encrypted DataStore KMP (SDD+TDD)
-- [KryptoStore completion](docs/kryptostore-complete.md) — G1–G10 checklist
-- [Config overview](config/README.md) — Detekt, Kover, Gradle cache encryption
++ [Managed tasks (`TaskScope`)](docs/managed-tasks.md) — policies, adapters, anti-patterns
++ [Project conventions](docs/project-conventions.md) — sync shared style configs into consumer repos
++ [Contributing](docs/contributing.md) — git hooks and local quality gate
++ [Commit conventions](docs/commit-conventions.md) — Conventional Commits types/scopes
++ [JS / Wasm webpack notes](docs/js-wasm.md) — `webpack.config.d` fallbacks
++ [Adding a module](docs/adding-a-module.md) — checklist for new artifacts in this repo
++ [Publishing](docs/publishing.md)
++ [KryptoStore spec](docs/spec-final-kryptostore.md) — encrypted DataStore KMP (SDD+TDD)
++ [KryptoStore completion](docs/kryptostore-complete.md) — G1–G10 checklist
++ [Config overview](config/README.md) — Detekt, Kover, Gradle cache encryption
 
 ## Build
 

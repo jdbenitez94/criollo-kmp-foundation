@@ -192,6 +192,7 @@ style:
   active: true
   MagicNumber:
     active: false
+  # Line length / signature wrapping is enforced by KtLint (max_line_length=120 in .editorconfig).
   MaxLineLength:
     active: false
   ModifierOrder:

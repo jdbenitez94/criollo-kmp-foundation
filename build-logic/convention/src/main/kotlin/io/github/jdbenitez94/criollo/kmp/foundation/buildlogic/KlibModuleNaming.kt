@@ -57,13 +57,16 @@ object KlibModuleNaming {
         }
     }
 
-    internal fun compilationModuleName(baseModuleName: String, compilationName: String): String = if (compilationName == "main") {
+    internal fun compilationModuleName(baseModuleName: String, compilationName: String): String = if (compilationName ==
+        "main"
+    ) {
         baseModuleName
     } else {
         "${baseModuleName}_$compilationName"
     }
 
-    internal fun supportsKlibDuplicatedUniqueNameStrategy(compilationTaskName: String): Boolean = !compilationTaskName.contains("Metadata", ignoreCase = true)
+    internal fun supportsKlibDuplicatedUniqueNameStrategy(compilationTaskName: String): Boolean =
+        !compilationTaskName.contains("Metadata", ignoreCase = true)
 
     fun Project.uniqueKlibModuleName(): String = "criollo_" + path.removePrefix(":").replace(':', '_').replace('-', '_')
 }

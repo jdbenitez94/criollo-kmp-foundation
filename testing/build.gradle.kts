@@ -29,6 +29,7 @@ kotlin {
 
 dependencies {
     api(libs.org.jetbrains.kotlinx.coroutines.test)
+    implementation(libs.org.jetbrains.kotlin.test)
     compileOnly(platform(libs.org.junit.jupiter.bom))
     compileOnly(libs.org.junit.jupiter)
 

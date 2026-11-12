@@ -36,6 +36,7 @@ object ProjectConfig {
         const val licenseUrl = "https://opensource.org/licenses/MIT"
         const val developerId = "jdbenitez94"
         const val developerName = "Joaquin Daniel Benitez"
+
         // Central Publisher Portal (OSSRH staging compatibility API; s01 OSSRH is EOL).
         const val mavenCentralReleaseUrl =
             "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"

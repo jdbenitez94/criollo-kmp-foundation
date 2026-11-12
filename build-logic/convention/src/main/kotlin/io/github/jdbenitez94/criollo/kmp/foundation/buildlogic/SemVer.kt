@@ -24,7 +24,7 @@ fun validateSemVer(version: String) {
  * (used for Central Portal SNAPSHOT publishes from `dev`).
  */
 fun Project.criolloResolvedVersion(): String {
-    val override = criolloProperty("criollo.version")
+    val override = localProperty<String>("criollo.version")
     return override?.also { validateSemVer(it) } ?: ProjectConfig.version
 }
 

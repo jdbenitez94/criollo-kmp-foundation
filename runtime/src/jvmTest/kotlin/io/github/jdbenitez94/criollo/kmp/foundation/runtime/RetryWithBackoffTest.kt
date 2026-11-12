@@ -22,6 +22,12 @@ class RetryWithBackoffTest {
     }
 
     @Test
+    fun usesDefaultPolicyWhenOmitted() = runTest {
+        val value = retryWithBackoff { "ok-default" }
+        expectThat(value).isEqualTo("ok-default")
+    }
+
+    @Test
     fun retriesUntilSuccess() = runTest {
         var calls = 0
         val value = retryWithBackoff(

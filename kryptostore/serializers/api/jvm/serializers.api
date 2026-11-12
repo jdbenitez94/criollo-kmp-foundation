@@ -27,6 +27,7 @@ public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/seri
 
 public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions {
 	public fun <init> ()V
+	public final fun applyDefaultStoreName (Ljava/lang/String;)V
 	public final fun getAllowPlaintextRead ()Z
 	public final fun getAssociatedData ()[B
 	public final fun getLegacyAssociatedData ()[B
@@ -47,6 +48,13 @@ public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/seri
 
 public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/KryptostoreFileSystemKt {
 	public static final fun getKryptostoreFileSystem ()Lokio/FileSystem;
+	public static final fun requireKryptostoreFileSystem (Lokio/FileSystem;)Lokio/FileSystem;
+	public static synthetic fun requireKryptostoreFileSystem$default (Lokio/FileSystem;ILjava/lang/Object;)Lokio/FileSystem;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/KryptostorePaths {
+	public static final field INSTANCE Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/KryptostorePaths;
+	public final fun file (Ljava/lang/String;)Lokio/Path;
 }
 
 public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/ProtoOkioSerializer : androidx/datastore/core/okio/OkioSerializer {
@@ -56,5 +64,56 @@ public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/seri
 	public fun getDefaultValue ()Ljava/lang/Object;
 	public fun readFrom (Lokio/BufferedSource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun writeTo (Ljava/lang/Object;Lokio/BufferedSink;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator {
+	public static final field Companion Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Companion;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Companion {
+	public final fun file (Lkotlin/jvm/functions/Function0;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator;
+	public final fun named (Ljava/lang/String;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator;
+	public final fun platform (Lkotlin/jvm/functions/Function0;Ljava/lang/String;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$File : io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator {
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public final fun component1 ()Lkotlin/jvm/functions/Function0;
+	public final fun copy (Lkotlin/jvm/functions/Function0;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$File;
+	public static synthetic fun copy$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$File;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$File;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getProducePath ()Lkotlin/jvm/functions/Function0;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Named : io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Named;
+	public static synthetic fun copy$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Named;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Named;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Platform : io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator {
+	public fun <init> (Lkotlin/jvm/functions/Function0;Ljava/lang/String;)V
+	public final fun component1 ()Lkotlin/jvm/functions/Function0;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Lkotlin/jvm/functions/Function0;Ljava/lang/String;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Platform;
+	public static synthetic fun copy$default (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Platform;Lkotlin/jvm/functions/Function0;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator$Platform;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getProducePath ()Lkotlin/jvm/functions/Function0;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocatorKt {
+	public static final fun applyDefaultStoreNameTo (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator;Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/EncryptedStoreOptions;)V
+	public static final fun resolve (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun resolve (Lio/github/jdbenitez94/criollo/kmp/foundation/kryptostore/serializers/StoreLocator;ZLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 

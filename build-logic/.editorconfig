@@ -7,7 +7,7 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
-max_line_length = 180
+max_line_length = 120
 
 [*.ts]
 indent_size = 4
@@ -25,6 +25,13 @@ ktlint_standard_filename = disabled
 ktlint_standard_function-naming = disabled
 ktlint_standard_no-empty-file = disabled
 ktlint_standard_no-wildcard-imports = enabled
+ktlint_standard_function-signature = enabled
+ktlint_standard_class-signature = enabled
+ktlint_standard_parameter-list-wrapping = enabled
+# Wrap signatures to one parameter per line when max_line_length is exceeded (not by param count).
+ktlint_function_signature_rule_force_multiline_when_parameter_count_greater_or_equal_than = unset
+ktlint_class_signature_rule_force_multiline_when_parameter_count_greater_or_equal_than = unset
+ktlint_function_signature_body_expression_wrapping = default
 ktlint_function_naming_ignore_when_annotated_with = Composable
 ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
 ij_continuation_indent_size = 4

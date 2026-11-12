@@ -1,12 +1,15 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.android
 
 import android.content.Context
+import android.content.ContextWrapper
 import androidx.datastore.core.DataStore
+import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.AndroidCryptoContextHolder
 import io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.crypto.Cipher
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.assertions.contains
 import strikt.assertions.isEqualTo
 import strikt.assertions.isSameInstanceAs
 
@@ -51,6 +54,35 @@ class AndroidDelegateTest {
         val delegate = plainPreferencesDataStore(name = "plain")
         expectThat(delegate.toString()).isEqualTo("ContextDataStoreSingleton(plain.preferences_pb)")
     }
+
+    @Test
+    fun kryptostoreAndroid_initialize_enables_kryptostorePaths() {
+        val files = java.io.File.createTempFile("ks-files", null).apply {
+            delete()
+            mkdirs()
+        }
+        try {
+            val ctx = object : ContextWrapper(null) {
+                override fun getApplicationContext(): Context = this
+                override fun getFilesDir(): java.io.File = files
+            }
+            KryptostoreAndroid.initialize(ctx)
+            expectThat(AndroidCryptoContextHolder.applicationContext).isSameInstanceAs(ctx)
+            val path = io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.serializers.KryptostorePaths.file(
+                "settings.pb",
+            )
+            expectThat(path.name).isEqualTo("settings.pb")
+            expectThat(path.toString()).contains("datastore")
+            val nonAppCtx = object : ContextWrapper(null) {
+                override fun getApplicationContext(): Context? = null
+                override fun getFilesDir(): java.io.File = files
+            }
+            KryptostoreAndroid.initialize(nonAppCtx)
+            expectThat(AndroidCryptoContextHolder.applicationContext).isSameInstanceAs(nonAppCtx)
+        } finally {
+            files.deleteRecursively()
+        }
+    }
 }
 
 private object TestProps {
@@ -67,9 +99,10 @@ private class IdentityCipher : Cipher {
 
 private object FakeDataStore : DataStore<SampleSettings> {
     override val data = flowOf(SampleSettings())
-    override suspend fun updateData(transform: suspend (SampleSettings) -> SampleSettings): SampleSettings = transform(SampleSettings())
+    override suspend fun updateData(transform: suspend (SampleSettings) -> SampleSettings): SampleSettings =
+        transform(SampleSettings())
 }
 
-private object FakeContext : android.content.ContextWrapper(null) {
+private object FakeContext : ContextWrapper(null) {
     override fun getApplicationContext(): Context = this
 }
