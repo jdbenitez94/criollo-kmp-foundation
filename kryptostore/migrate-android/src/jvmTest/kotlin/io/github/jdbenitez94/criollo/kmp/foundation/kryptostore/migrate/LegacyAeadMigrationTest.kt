@@ -1,5 +1,6 @@
 package io.github.jdbenitez94.criollo.kmp.foundation.kryptostore.migrate
 
+import com.google.crypto.tink.Aead
 import com.google.crypto.tink.KeysetHandle
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.aead.PredefinedAeadParameters
@@ -17,11 +18,13 @@ class LegacyAeadMigrationTest {
     fun decryptUnenveloped_roundTripsTinkAeadBlob() = runTest {
         AeadConfig.register()
         val aead = KeysetHandle.generateNew(PredefinedAeadParameters.AES256_GCM)
-            .getPrimitive(com.google.crypto.tink.Aead::class.java)
+            .getPrimitive(Aead::class.java)
         val cipher = object : Cipher {
-            override suspend fun encrypt(message: ByteArray, associatedData: ByteArray?): ByteArray = aead.encrypt(message, associatedData)
+            override suspend fun encrypt(message: ByteArray, associatedData: ByteArray?): ByteArray =
+                aead.encrypt(message, associatedData)
 
-            override suspend fun decrypt(message: ByteArray, associatedData: ByteArray?): ByteArray = aead.decrypt(message, associatedData)
+            override suspend fun decrypt(message: ByteArray, associatedData: ByteArray?): ByteArray =
+                aead.decrypt(message, associatedData)
         }
         val plain = "migrate-me".encodeToByteArray()
         val aad = "aad".encodeToByteArray()

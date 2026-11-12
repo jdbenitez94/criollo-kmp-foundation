@@ -74,10 +74,13 @@ class DetektConventionPlugin : Plugin<Project> {
         "src/iosMain/kotlin",
         "src/jvmMain/kotlin",
         "src/jvmTest/kotlin",
+        "src/jvmAndAndroidMain/kotlin",
         "src/jsMain/kotlin",
         "src/jsTest/kotlin",
         "src/wasmJsMain/kotlin",
         "src/wasmJsTest/kotlin",
+        "src/webMain/kotlin",
+        "src/nonWebMain/kotlin",
         "src/main/kotlin",
         "src/test/kotlin",
     )

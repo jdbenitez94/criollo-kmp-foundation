@@ -8,6 +8,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 
 /** REQ-CRY-02, REQ-CRY-03 */
 class CryptoRuntimeStateTest {
@@ -18,7 +19,7 @@ class CryptoRuntimeStateTest {
             cipher = IdentityCipher(),
             keyRotator = KeyRotator {
                 rotateCalls++
-                delay(20)
+                delay(20.milliseconds)
                 false
             },
         )

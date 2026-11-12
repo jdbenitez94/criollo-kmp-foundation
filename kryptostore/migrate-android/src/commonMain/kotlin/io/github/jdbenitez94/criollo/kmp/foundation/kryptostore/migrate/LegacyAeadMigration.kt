@@ -18,7 +18,11 @@ object LegacyAeadMigration {
      * After decrypt, re-write via EncryptedProtoSerializer / EncryptedPreferencesSerializer
      * so subsequent reads use envelope v1.
      */
-    suspend fun decryptUnenveloped(cipher: Cipher, ciphertext: ByteArray, associatedData: ByteArray? = null): ByteArray {
+    suspend fun decryptUnenveloped(
+        cipher: Cipher,
+        ciphertext: ByteArray,
+        associatedData: ByteArray? = null,
+    ): ByteArray {
         require(ciphertext.isNotEmpty()) { "ciphertext must not be empty" }
         require(!ciphertext.startsWithMagic()) {
             "Payload already has $ENCRYPTED_BLOB_MAGIC envelope; use Encrypted*Serializer instead"

@@ -1,46 +1,28 @@
-import webUtils = require('./web-utils');
+const webUtils = require('./web-utils');
 
 const PROTO_DB_NAME = 'app-proto';
 const PROTO_STORE_NAME = 'stores';
 const LEGACY_PROTO_DB_NAME = 'saveable-proto';
 
 let legacyProtoDbWiped = false;
-let protoDbPromise: Promise<IDBDatabase> | null = null;
+let protoDbPromise = null;
 
-interface ProtoRecord {
-    id: string;
-    version: number;
-    /** Structured-clone binary payload (no Base64 tax in IndexedDB). */
-    bytes: Uint8Array | null;
-    /** Legacy field kept for one-shot reads of older app-proto rows. */
-    bytesBase64?: string | null;
-    updatedAt: number;
-}
-
-declare global {
-    interface Window {
-        __appProtoLockResolvers?: Record<string, (value: boolean) => void>;
-    }
-
-    var __appProtoLockResolvers: Record<string, (value: boolean) => void> | undefined;
-}
-
-function openProtoDb(): Promise<IDBDatabase> {
+function openProtoDb() {
     if (protoDbPromise == null) {
         protoDbPromise = webUtils.openDb(PROTO_DB_NAME, 1, PROTO_STORE_NAME, 'id');
     }
-    return protoDbPromise as Promise<IDBDatabase>;
+    return protoDbPromise;
 }
 
-async function protoGet(db: IDBDatabase, id: string): Promise<ProtoRecord | null> {
-    return (await webUtils.idbGet(db, PROTO_STORE_NAME, id)) as ProtoRecord | null;
+async function protoGet(db, id) {
+    return await webUtils.idbGet(db, PROTO_STORE_NAME, id);
 }
 
-async function protoPut(db: IDBDatabase, value: ProtoRecord): Promise<boolean> {
+async function protoPut(db, value) {
     return webUtils.idbPut(db, PROTO_STORE_NAME, value);
 }
 
-function protoBroadcast(name: string, version: number): void {
+function protoBroadcast(name, version) {
     if (typeof BroadcastChannel === 'undefined') {
         return;
     }
@@ -49,7 +31,7 @@ function protoBroadcast(name: string, version: number): void {
     channel.close();
 }
 
-function recordToBase64(record: ProtoRecord | null): string | null {
+function recordToBase64(record) {
     if (record == null) {
         return null;
     }
@@ -59,17 +41,17 @@ function recordToBase64(record: ProtoRecord | null): string | null {
     return record.bytesBase64 ?? null;
 }
 
-function base64ToBytes(payloadBase64: string): Uint8Array {
+function base64ToBytes(payloadBase64) {
     return webUtils.base64ToBytes(payloadBase64);
 }
 
-async function read(name: string): Promise<string | null> {
+async function read(name) {
     const db = await openProtoDb();
     const record = await protoGet(db, name);
     return recordToBase64(record);
 }
 
-async function write(name: string, payloadBase64: string): Promise<number> {
+async function write(name, payloadBase64) {
     const db = await openProtoDb();
     const record = await protoGet(db, name);
     const currentVersion = record?.version ?? 0;
@@ -82,13 +64,13 @@ async function write(name: string, payloadBase64: string): Promise<number> {
     return currentVersion;
 }
 
-async function version(name: string): Promise<number> {
+async function version(name) {
     const db = await openProtoDb();
     const record = await protoGet(db, name);
     return record?.version ?? 0;
 }
 
-async function incrementVersion(name: string): Promise<number> {
+async function incrementVersion(name) {
     const db = await openProtoDb();
     const record = await protoGet(db, name);
     const nextVersion = (record?.version ?? 0) + 1;
@@ -102,7 +84,7 @@ async function incrementVersion(name: string): Promise<number> {
     return nextVersion;
 }
 
-function lockResolvers(): Record<string, (value: boolean) => void> {
+function lockResolvers() {
     let resolvers = globalThis.__appProtoLockResolvers;
     if (!resolvers) {
         resolvers = {};
@@ -111,18 +93,18 @@ function lockResolvers(): Record<string, (value: boolean) => void> {
     return resolvers;
 }
 
-async function lock(name: string): Promise<boolean> {
+async function lock(name) {
     const lockName = `app-proto:${name}`;
     if (!globalThis.navigator?.locks) {
         return true;
     }
 
     const resolvers = lockResolvers();
-    await new Promise<void>((resolve, reject) => {
+    await new Promise((resolve, reject) => {
         navigator.locks
             .request(lockName, { mode: 'exclusive' }, () => {
                 resolve();
-                return new Promise<boolean>((release) => {
+                return new Promise((release) => {
                     resolvers[lockName] = release;
                 });
             })
@@ -133,11 +115,7 @@ async function lock(name: string): Promise<boolean> {
     return true;
 }
 
-/**
- * Non-blocking lock attempt using Web Locks `ifAvailable`.
- * @returns true when the lock was acquired, false when another holder has it.
- */
-async function tryLock(name: string): Promise<boolean> {
+async function tryLock(name) {
     const lockName = `app-proto:${name}`;
     if (!globalThis.navigator?.locks) {
         return true;
@@ -150,14 +128,14 @@ async function tryLock(name: string): Promise<boolean> {
             return Promise.resolve(false);
         }
         acquired = true;
-        return new Promise<boolean>((release) => {
+        return new Promise((release) => {
             resolvers[lockName] = release;
         });
     });
     return acquired;
 }
 
-async function unlock(name: string): Promise<boolean> {
+async function unlock(name) {
     const lockName = `app-proto:${name}`;
     const resolvers = globalThis.__appProtoLockResolvers;
     if (!resolvers) {
@@ -171,21 +149,19 @@ async function unlock(name: string): Promise<boolean> {
     return true;
 }
 
-function install(): void {
-    // Fresh baseline: the pre-rename database is encrypted with keys this build no longer holds,
-    // so delete it rather than leaving unreadable records in the user's browser.
+function install() {
     if (legacyProtoDbWiped || typeof indexedDB === 'undefined') {
         return;
     }
     legacyProtoDbWiped = true;
     try {
         indexedDB.deleteDatabase(LEGACY_PROTO_DB_NAME);
-    } catch {
-        // Deleting the legacy database is best-effort; never block store initialization on it.
+    } catch (_error) {
+        // Best-effort legacy wipe.
     }
 }
 
-const kryptoStoreIndexedDb = {
+module.exports = {
     install,
     read,
     write,
@@ -195,5 +171,3 @@ const kryptoStoreIndexedDb = {
     tryLock,
     unlock,
 };
-
-export = kryptoStoreIndexedDb;

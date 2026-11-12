@@ -60,4 +60,7 @@ Gradle project `:kryptostore:android` publishes as **`kryptostore-android-delega
 collide with the KMP Android *target* publication of `:kryptostore` (`kryptostore-android`).
 
 Fail-closed is the default: do not use replace-with-default corruption handlers for encrypted
-stores (security footgun). Prefer quarantining the bad file and surfacing `CryptoRuntimeState.Error`.
+stores (security footgun). Prefer `failClosedCorruptionHandler` (which quarantines corrupted files
+to `*.corrupt` on file targets and rethrows `CorruptionException`). Note that store-level
+`CorruptionException` is surfaced on DataStore reads/writes, whereas `CryptoRuntimeState.Error`
+reflects failures during `CryptoRuntime.initialize()`.

@@ -9,17 +9,23 @@ import javax.crypto.spec.SecretKeySpec
 
 private const val GCM_IV_LENGTH = 12
 private const val GCM_TAG_BITS = 128
+private const val AES_256_KEY_BYTES = 32
 
-internal actual suspend fun aesGcmEncrypt(key: ByteArray, plaintext: ByteArray, associatedData: ByteArray?): ByteArray = withContext(Dispatchers.Default) {
-    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-    cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"))
-    associatedData?.let { cipher.updateAAD(it) }
-    val ciphertext = cipher.doFinal(plaintext)
-    val iv = cipher.iv
-    iv + ciphertext
-}
+internal actual suspend fun aesGcmEncrypt(key: ByteArray, plaintext: ByteArray, associatedData: ByteArray?): ByteArray =
+    withContext(Dispatchers.Default) {
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"))
+        associatedData?.let { cipher.updateAAD(it) }
+        val ciphertext = cipher.doFinal(plaintext)
+        val iv = cipher.iv
+        iv + ciphertext
+    }
 
-internal actual suspend fun aesGcmDecrypt(key: ByteArray, ciphertext: ByteArray, associatedData: ByteArray?): ByteArray = withContext(Dispatchers.Default) {
+internal actual suspend fun aesGcmDecrypt(
+    key: ByteArray,
+    ciphertext: ByteArray,
+    associatedData: ByteArray?,
+): ByteArray = withContext(Dispatchers.Default) {
     require(ciphertext.size > GCM_IV_LENGTH) { "Ciphertext too short." }
     val iv = ciphertext.copyOfRange(0, GCM_IV_LENGTH)
     val payload = ciphertext.copyOfRange(GCM_IV_LENGTH, ciphertext.size)
@@ -34,6 +40,6 @@ internal actual suspend fun aesGcmDecrypt(key: ByteArray, ciphertext: ByteArray,
     }
 }
 
-internal fun randomAes256Key(): ByteArray = ByteArray(32).also { SecureRandom().nextBytes(it) }
+internal fun randomAes256Key(): ByteArray = ByteArray(AES_256_KEY_BYTES).also { SecureRandom().nextBytes(it) }
 
 internal actual fun randomPlatformAesKey(): ByteArray = randomAes256Key()

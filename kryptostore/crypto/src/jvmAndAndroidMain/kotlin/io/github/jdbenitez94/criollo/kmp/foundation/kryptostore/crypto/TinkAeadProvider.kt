@@ -12,8 +12,10 @@ internal class TinkAeadProvider(private var keysetHandle: KeysetHandle) : Algori
     @Volatile
     private var initialized = false
 
-    override lateinit var algorithm: Aead
-        private set
+    private lateinit var initializedAlgorithm: Aead
+
+    override val algorithm: Aead
+        get() = initializedAlgorithm
 
     fun replaceKeyset(handle: KeysetHandle) {
         keysetHandle = handle
@@ -25,7 +27,7 @@ internal class TinkAeadProvider(private var keysetHandle: KeysetHandle) : Algori
         mutex.withLock {
             if (initialized) return
             val configuration = RegistryConfiguration.get()
-            algorithm = keysetHandle.getPrimitive(configuration, Aead::class.java)
+            initializedAlgorithm = keysetHandle.getPrimitive(configuration, Aead::class.java)
             initialized = true
         }
     }
