@@ -14,6 +14,13 @@
 * **kryptostore:** keep `ByteArray` pinned across `SecRandomCopyBytes` and reject unknown non-legacy key IDs on iOS
 * **kryptostore:** deduplicate concurrent `ensureKeyring` calls per `appId` in the WebCrypto worker
 
+## [0.2.1](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.2.0...v0.2.1) (2026-11-12)
+
+### Bug Fixes
+
+* **kryptostore:** replace relative js modules with zero-config web interop ([#61](https://github.com/jdbenitez94/criollo-kmp-foundation/issues/61)) ([a1ebfc8](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/a1ebfc8c05e22ad9b5dfb840131b6df929223b18))
+* **kryptostore:** zero-config js interop and sync stabilization ([a1ebfc8](https://github.com/jdbenitez94/criollo-kmp-foundation/commit/a1ebfc8c05e22ad9b5dfb840131b6df929223b18))
+
 ## [0.2.0](https://github.com/jdbenitez94/criollo-kmp-foundation/compare/v0.1.9...v0.2.0) (2026-08-23)
 
 ### Features
