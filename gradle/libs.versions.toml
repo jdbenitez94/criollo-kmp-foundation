@@ -1,9 +1,15 @@
+# Criollo KMP Foundation version catalog — only dependencies referenced by this monorepo.
+# Naming convention: group.artifact -> group-artifact (e.g., org.jetbrains.kotlinx.kotlinx-io-core -> org-jetbrains-kotlinx-io-core; Gradle accessor: libs.org.jetbrains.kotlinx.io.core).
+
 [versions]
+# Toolchain
 agp = "9.5.1"
 kotlin = "2.4.21"
 compose-multiplatform = "1.12.2"
 androidx-lifecycle-kmp = "2.11.0"
 coroutines = "1.11.0"
+
+# Quality & publishing
 detekt = "1.23.8"
 # alpha.4+ detekt-test requests unpublished detekt-api test-fixtures (detekt/detekt#9543)
 detekt2 = "2.0.0-alpha.6"
