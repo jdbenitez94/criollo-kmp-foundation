@@ -44,6 +44,26 @@ private fun Project.configureEmptyKmpJavadocJar() {
                 tasks.register<Jar>("emptyJavadocJar") {
                     archiveClassifier.set("javadoc")
                 }
+            val scmRevision = providers.environmentVariable("GITHUB_SHA")
+                .map { it.take(12) }
+                .orElse(
+                    providers.exec {
+                        commandLine("git", "rev-parse", "--short", "HEAD")
+                        isIgnoreExitValue = true
+                    }.standardOutput.asText.map { it.trim().ifEmpty { "unknown" } },
+                )
+
+            tasks.withType(org.gradle.jvm.tasks.Jar::class.java).configureEach {
+                manifest {
+                    attributes(
+                        mapOf(
+                            "Implementation-Version" to version.toString(),
+                            "SCM-Revision" to scmRevision,
+                        ),
+                    )
+                }
+            }
+
             extensions.configure<PublishingExtension> {
                 publications.withType<MavenPublication>().matching { it.name == "jvm" }.configureEach {
                     artifact(javadocJar)
@@ -55,6 +75,26 @@ private fun Project.configureEmptyKmpJavadocJar() {
 
 private fun Project.configureMavenPublications(baseArtifactId: String, versionString: String) {
     fun configurePublicationArtifactIds() {
+        val scmRevision = providers.environmentVariable("GITHUB_SHA")
+            .map { it.take(12) }
+            .orElse(
+                providers.exec {
+                    commandLine("git", "rev-parse", "--short", "HEAD")
+                    isIgnoreExitValue = true
+                }.standardOutput.asText.map { it.trim().ifEmpty { "unknown" } },
+            )
+
+        tasks.withType(org.gradle.jvm.tasks.Jar::class.java).configureEach {
+            manifest {
+                attributes(
+                    mapOf(
+                        "Implementation-Version" to version.toString(),
+                        "SCM-Revision" to scmRevision,
+                    ),
+                )
+            }
+        }
+
         extensions.configure<PublishingExtension> {
             publications.withType<MavenPublication>().configureEach {
                 groupId = ProjectConfig.group
@@ -67,6 +107,26 @@ private fun Project.configureMavenPublications(baseArtifactId: String, versionSt
                     else -> "$baseArtifactId-$name"
                 }
             }
+        }
+    }
+
+    val scmRevision = providers.environmentVariable("GITHUB_SHA")
+        .map { it.take(12) }
+        .orElse(
+            providers.exec {
+                commandLine("git", "rev-parse", "--short", "HEAD")
+                isIgnoreExitValue = true
+            }.standardOutput.asText.map { it.trim().ifEmpty { "unknown" } },
+        )
+
+    tasks.withType(org.gradle.jvm.tasks.Jar::class.java).configureEach {
+        manifest {
+            attributes(
+                mapOf(
+                    "Implementation-Version" to version.toString(),
+                    "SCM-Revision" to scmRevision,
+                ),
+            )
         }
     }
 
@@ -93,6 +153,15 @@ private fun Project.configureMavenPublications(baseArtifactId: String, versionSt
                     connection.set("scm:git:git://${ProjectConfig.Publishing.repoUrl.removePrefix("https://")}.git")
                     developerConnection.set(
                         "scm:git:ssh://${ProjectConfig.Publishing.repoUrl.removePrefix("https://")}.git",
+                    )
+                    tag.set(
+                        if (versionString.endsWith("SNAPSHOT")) {
+                            scmRevision
+                        } else {
+                            providers.provider {
+                                "v$versionString"
+                            }
+                        },
                     )
                 }
             }
@@ -130,7 +199,7 @@ private fun Project.configurePublicationSigning() {
             useInMemoryPgpKeys(keyId, key, password)
         }
 
-        setRequired(localProperty("signing.required", false))
+        isRequired = localProperty("signing.required", false)
 
         this@configurePublicationSigning.extensions.configure<PublishingExtension> {
             sign(publications)
