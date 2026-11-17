@@ -25,7 +25,7 @@ jna = "5.19.1"
 # DataStore: alpha aligns with saveable dogfood; prefer stable for Maven 1.0 (DEC-20).
 androidx-datastore = "1.3.0"
 okio = "3.18.2"
-kotlinx-serialization = "1.12.0"
+kotlinx-serialization = "1.13.0"
 
 [plugins]
 org-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
