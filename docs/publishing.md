@@ -43,15 +43,16 @@ Local check:
 
 | Branch | Behavior |
 | -------- | ---------- |
-| `dev` | Integration + **SNAPSHOT** publish; tip kept equal to `main` after every `main` push |
+| `dev` | Integration; tip kept equal to `main` after every `main` push |
+| `release/**` | **SNAPSHOT** publish to Central Portal snapshots |
 | `main` | [release-please](../.github/workflows/release-please.yml) opens a release PR from conventional commits |
 
 See [Contributing — branch model](contributing.md#branch-model-dev--main-same-tip) for the
 PR loop and `sync-dev-to-main` automation.
 
-### Snapshots (`dev`)
+### Snapshots (`release/**`)
 
-On push to `dev` (non-docs), [`publish-snapshots.yml`](../.github/workflows/publish-snapshots.yml)
+On push to `release/**` (non-docs), [`publish-snapshots.yml`](../.github/workflows/publish-snapshots.yml)
 publishes **`{nextPatch}-SNAPSHOT`** (e.g. `ProjectConfig` `0.1.4` → `0.1.5-SNAPSHOT`) to
 [`maven-snapshots`](https://central.sonatype.com/repository/maven-snapshots/).
 No Portal finalize / manual publish step. Snapshots expire (~90 days).

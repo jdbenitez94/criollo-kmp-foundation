@@ -4,7 +4,8 @@
 
 | Branch | Role |
 | -------- | ------ |
-| `dev` | Integration + Central Portal **SNAPSHOT** publishes |
+| `dev` | Integration |
+| `release/**` | Pre-release validation + Central Portal **SNAPSHOT** |
 | `main` | Releases via release-please → Maven Central |
 
 **Invariant:** after every push to `main`, CI resets `origin/dev` to that exact commit
