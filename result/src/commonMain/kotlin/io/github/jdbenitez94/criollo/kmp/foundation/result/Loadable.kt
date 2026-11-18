@@ -39,6 +39,9 @@ sealed interface LoadEvent<out T> {
     data class Done<T>(val value: T) : LoadEvent<T>
 }
 
+/** Shorthand for a [Flow] of [LoadEvent]s, e.g. the return type of a download or upload producer. */
+typealias LoadFlow<T> = Flow<LoadEvent<T>>
+
 /**
  * Maps [LoadEvent]s to [Loadable]: emits [Loadable.Loading] (indeterminate) on start,
  * [LoadEvent.Progress] to [Loadable.Loading] with progress, [LoadEvent.Done] to [Loadable.Success],
@@ -46,7 +49,7 @@ sealed interface LoadEvent<out T> {
  *
  * [CancellationException] is rethrown so structured concurrency is preserved.
  */
-fun <T> Flow<LoadEvent<T>>.asLoadable(): Flow<Loadable<T>> = map<LoadEvent<T>, Loadable<T>> { event ->
+fun <T> LoadFlow<T>.asLoadable(): Flow<Loadable<T>> = map<LoadEvent<T>, Loadable<T>> { event ->
     when (event) {
         is LoadEvent.Progress -> Loadable.Loading(event.fraction)
         is LoadEvent.Done -> Loadable.Success(event.value)

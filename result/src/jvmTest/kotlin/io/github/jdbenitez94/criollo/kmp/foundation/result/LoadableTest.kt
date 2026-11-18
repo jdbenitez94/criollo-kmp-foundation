@@ -47,6 +47,16 @@ class LoadableTest {
     }
 
     @Test
+    fun loadFlow_aliasWorksWithAsLoadable() = runTest {
+        val source: LoadFlow<Int> = flow { emit(LoadEvent.Done(42)) }
+
+        expectThat(source.asLoadable().toList()).containsExactly(
+            Loadable.Loading(),
+            Loadable.Success(42),
+        )
+    }
+
+    @Test
     fun loading_rejectsOutOfRangeProgress() {
         expectThrows<IllegalArgumentException> { Loadable.Loading(1.5f) }
         expectThrows<IllegalArgumentException> { Loadable.Loading(-0.1f) }

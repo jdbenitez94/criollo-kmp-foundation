@@ -36,10 +36,10 @@ Use `Loadable<T>` instead of `Result<T>` when the UI needs a progress bar (downl
 uploads, long syncs). `Loading.progress` is a fraction in `0f..1f`, or `null` when
 indeterminate (out-of-range values throw `IllegalArgumentException`).
 
-The producer emits `LoadEvent`s; `asLoadable()` maps them:
+The producer emits `LoadEvent`s (`LoadFlow<T>` is a typealias for `Flow<LoadEvent<T>>`); `asLoadable()` maps them:
 
 ```kotlin
-fun download(url: String): Flow<LoadEvent<ByteArray>> = flow {
+fun download(url: String): LoadFlow<ByteArray> = flow {
     emit(LoadEvent.Progress(0.5f))
     emit(LoadEvent.Done(bytes))
 }
