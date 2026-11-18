@@ -29,7 +29,7 @@ land in this monorepo over time.
 | Core | `coroutines` | `:coroutines` | `TaskScope` registry (`TaskKey`, `TaskPolicy`, …) |
 | ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | `by taskScope()` on `ViewModel` |
 | Compose | `coroutines-compose` | `:coroutines:compose` | `rememberTaskScope()` in Composables |
-| Result | `result` | `:result` | Flow `Result` triad (`Loading` / `Success` / `Error`) + `asResult()` |
+| Result | `result` | `:result` | Flow `Result` triad (`Loading` / `Success` / `Error`) + `asResult()`; `Loadable<T>` with progress + `asLoadable()` |
 | Runtime | `runtime` | `:runtime` | `retryWithBackoff` (exponential backoff + jitter) |
 | Tooling | `project-conventions` | `:project-conventions` | Gradle plugin to sync `.editorconfig` + Detekt configs |
 | Crypto (KryptoStore) | `kryptostore-crypto` | `:kryptostore:crypto` | Platform crypto for encrypted DataStore (Tink / Keystore / WebCrypto) |
@@ -126,6 +126,18 @@ items.asResult().collect { result ->
         is Result.Loading -> Unit
         is Result.Success -> render(result.data)
         is Result.Error -> show(result.exception)
+    }
+}
+```
+
+**Loads with progress (`Loadable`):**
+
+```kotlin
+download(url).asLoadable().collect { state ->
+    when (state) {
+        is Loadable.Loading -> showProgress(state.progress) // null = indeterminate
+        is Loadable.Success -> render(state.data)
+        is Loadable.Error -> show(state.exception)
     }
 }
 ```

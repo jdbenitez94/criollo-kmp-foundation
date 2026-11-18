@@ -15,7 +15,7 @@ replace, and debounce side effects by key.
 | Core | `coroutines` | `:coroutines` | `TaskScope` registry |
 | ViewModel | `coroutines-viewmodel` | `:coroutines:viewmodel` | `by taskScope()` on `ViewModel` |
 | Compose | `coroutines-compose` | `:coroutines:compose` | `rememberTaskScope()` in Composables |
-| Result | `result` | `:result` | Flow `Result` triad + `asResult()` |
+| Result | `result` | `:result` | Flow `Result` triad + `asResult()`; `Loadable<T>` + `asLoadable()` |
 | Runtime | `runtime` | `:runtime` | `retryWithBackoff` |
 | Tooling | `project-conventions` | `:project-conventions` | Gradle plugin to sync shared style configs |
 | Crypto | `kryptostore-crypto` | `:kryptostore:crypto` | Platform crypto for KryptoStore |
